@@ -85,7 +85,7 @@ const ScopeChangeRequestForm = ({ bookingId, onCancel, onSuccess }) => {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
           <div>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Additional Labor Cost (INR)</label>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Additional Labor Cost (₹)</label>
             <Input
               type="number"
               min="0"
@@ -94,7 +94,7 @@ const ScopeChangeRequestForm = ({ bookingId, onCancel, onSuccess }) => {
             />
           </div>
           <div>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Additional Material Cost (INR)</label>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Additional Material Cost (₹)</label>
             <Input
               type="number"
               min="0"
@@ -106,7 +106,7 @@ const ScopeChangeRequestForm = ({ bookingId, onCancel, onSuccess }) => {
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--color-border)' }}>
           <div style={{ fontSize: 'var(--font-size-h4)', fontWeight: 600 }}>
-            Total Additional: INR {(Number(laborAmount) || 0) + (Number(materialAmount) || 0)}
+            Total Additional: ₹{(Number(laborAmount) || 0) + (Number(materialAmount) || 0)}
           </div>
           <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
             <Button type="button" variant="secondary" onClick={onCancel} disabled={isLoading}>Cancel</Button>

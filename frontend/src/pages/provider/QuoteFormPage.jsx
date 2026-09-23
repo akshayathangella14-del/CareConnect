@@ -78,7 +78,7 @@ export default function QuoteFormPage() {
           exclusions: exclusions.filter(e => e.trim() !== ''),
         },
         pricingBreakdown: {
-          currency: 'USD', // Hardcoded for demo, normally fetched from profile or config
+          currency: 'INR', // Indian Rupees for CareConnect
           labor: laborAmount,
           materials: materialsAmount,
           tax: taxAmount,
@@ -229,7 +229,7 @@ export default function QuoteFormPage() {
               <div style={{ padding: 'var(--space-3)', backgroundColor: 'var(--color-surface-muted)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--space-2)' }}>
                 <span style={{ fontWeight: 500 }}>Total Quote Amount</span>
                 <span style={{ fontSize: 'var(--font-size-h3)', fontWeight: 700, color: 'var(--color-primary)' }}>
-                  ${totalAmount.toFixed(2)}
+                  ₹{totalAmount.toFixed(2)}
                 </span>
               </div>
             </div>

@@ -169,7 +169,7 @@ export default function ProviderBookingDetailPage() {
                       </ul>
                     )}
                     <div style={{ marginTop: 'var(--space-2)', fontSize: 'var(--font-size-small)', fontWeight: 600 }}>
-                      Cost Difference: INR {change.costDifference}
+                      Cost Difference: ₹{change.costDifference}
                     </div>
                   </Card>
                 ))}
@@ -231,7 +231,7 @@ export default function ProviderBookingDetailPage() {
           <Card padding="md">
              <h4 style={{ fontSize: 'var(--font-size-body)', marginBottom: 'var(--space-3)' }}>Earnings (Net)</h4>
              <div style={{ fontSize: 'var(--font-size-display)', fontWeight: 700, color: 'var(--color-success)', lineHeight: 1 }}>
-               ${booking.pricingSnapshot?.totalAmount?.toFixed(2)}
+               ₹{booking.pricingSnapshot?.totalAmount?.toFixed(2)}
              </div>
              <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-muted)', marginTop: 'var(--space-2)' }}>
                Payment processed securely after job completion.

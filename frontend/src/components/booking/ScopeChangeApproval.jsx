@@ -57,7 +57,7 @@ const ScopeChangeApproval = ({ bookingId, scopeChange, onDecision }) => {
         <div style={{ marginTop: 'var(--space-4)', paddingTop: 'var(--space-3)', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: 'var(--font-size-small)', fontWeight: 600 }}>Additional Cost Request</div>
           <div style={{ fontSize: 'var(--font-size-body)', fontWeight: 700, color: 'var(--color-primary)' }}>
-            INR {scopeChange.costDifference}
+            ₹{scopeChange.costDifference}
           </div>
         </div>
       </div>

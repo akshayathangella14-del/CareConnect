@@ -8,34 +8,34 @@ require('dotenv').config();
 
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/careconnect';
 
-// Realistic first names
+// Indian first names
 const firstNames = [
-  'James', 'Michael', 'Robert', 'David', 'William', 'Richard', 'Joseph', 'Thomas', 'Christopher', 'Charles',
-  'Daniel', 'Matthew', 'Anthony', 'Mark', 'Donald', 'Steven', 'Paul', 'Andrew', 'Joshua', 'Kenneth',
-  'Kevin', 'Brian', 'George', 'Timothy', 'Ronald', 'Edward', 'Jason', 'Jeffrey', 'Ryan', 'Jacob',
-  'Gary', 'Nicholas', 'Eric', 'Jonathan', 'Stephen', 'Larry', 'Justin', 'Scott', 'Brandon', 'Benjamin'
+  'Rahul', 'Amit', 'Vikram', 'Arjun', 'Rajesh', 'Suresh', 'Mahesh', 'Dinesh', 'Ramesh', 'Suresh',
+  'Arun', 'Deepak', 'Sanjay', 'Vijay', 'Ajay', 'Sunil', 'Anil', 'Ravi', 'Rajeev', 'Vikas',
+  'Pradeep', 'Prakash', 'Naresh', 'Rakesh', 'Mukesh', 'Ashok', 'Kumar', 'Srinivas', 'Venkat', 'Krishna',
+  'Ramesh', 'Suresh', 'Mohan', 'Sohan', 'Rohan', 'Pawan', 'Nitin', 'Manish', 'Harish', 'Girish'
 ];
 
-// Realistic last names
+// Indian last names
 const lastNames = [
-  'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez',
-  'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
-  'Lee', 'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson',
-  'Walker', 'Young', 'Allen', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores'
+  'Sharma', 'Verma', 'Gupta', 'Singh', 'Kumar', 'Patel', 'Jain', 'Reddy', 'Nair', 'Iyer',
+  'Sharma', 'Das', 'Das', 'Mishra', 'Pandey', 'Tiwari', 'Dubey', 'Yadav', 'Singh', 'Kaur',
+  'Kapoor', 'Khanna', 'Malhotra', 'Mehta', 'Shah', 'Patel', 'Joshi', 'Desai', 'Menon', 'Nair',
+  'Pillai', 'Rao', 'Murthy', 'Iyengar', 'Iyer', 'Gopalakrishnan', 'Venkatesh', 'Balasubramanian', 'Chatterjee', 'Mukherjee'
 ];
 
-// Service areas
+// Indian service areas
 const serviceAreas = [
-  { city: 'New York', state: 'NY', postalCode: '10001' },
-  { city: 'Los Angeles', state: 'CA', postalCode: '90001' },
-  { city: 'Chicago', state: 'IL', postalCode: '60601' },
-  { city: 'Houston', state: 'TX', postalCode: '77001' },
-  { city: 'Phoenix', state: 'AZ', postalCode: '85001' },
-  { city: 'Philadelphia', state: 'PA', postalCode: '19101' },
-  { city: 'San Antonio', state: 'TX', postalCode: '78201' },
-  { city: 'San Diego', state: 'CA', postalCode: '92101' },
-  { city: 'Dallas', state: 'TX', postalCode: '75201' },
-  { city: 'San Jose', state: 'CA', postalCode: '95101' }
+  { city: 'Mumbai', state: 'Maharashtra', postalCode: '400001' },
+  { city: 'Delhi', state: 'Delhi', postalCode: '110001' },
+  { city: 'Bangalore', state: 'Karnataka', postalCode: '560001' },
+  { city: 'Chennai', state: 'Tamil Nadu', postalCode: '600001' },
+  { city: 'Kolkata', state: 'West Bengal', postalCode: '700001' },
+  { city: 'Hyderabad', state: 'Telangana', postalCode: '500001' },
+  { city: 'Pune', state: 'Maharashtra', postalCode: '411001' },
+  { city: 'Ahmedabad', state: 'Gujarat', postalCode: '380001' },
+  { city: 'Jaipur', state: 'Rajasthan', postalCode: '302001' },
+  { city: 'Lucknow', state: 'Uttar Pradesh', postalCode: '226001' }
 ];
 
 // Skills/Services
@@ -52,7 +52,7 @@ const randomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 // Generate random email
 const generateEmail = (firstName, lastName) => {
-  const domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'];
+  const domains = ['gmail.com', 'yahoo.co.in', 'hotmail.com', 'rediffmail.com', 'outlook.com'];
   const domain = randomItem(domains);
   const randomNum = randomInt(10, 99);
   return `${firstName.toLowerCase()}.${lastName.toLowerCase()}${randomNum}@${domain}`;
@@ -67,12 +67,10 @@ const generatePassword = () => {
   return randomItem(passwords);
 };
 
-// Generate phone number
+// Generate Indian phone number
 const generatePhone = () => {
-  const areaCode = randomInt(200, 999);
-  const exchange = randomInt(200, 999);
-  const number = randomInt(1000, 9999);
-  return `(${areaCode}) ${exchange}-${number}`;
+  const mobileNumber = randomInt(7000000000, 9999999999);
+  return `+91 ${mobileNumber}`;
 };
 
 mongoose.connect(MONGO_URI).then(async () => {
@@ -141,7 +139,7 @@ mongoose.connect(MONGO_URI).then(async () => {
         user: user._id,
         displayName: fullName,
         businessName: `${fullName} Services`,
-        description: `Professional ${firstName} with expertise in ${providerSkills.length} services. Reliable and experienced service provider committed to quality work.`,
+        description: `Professional ${firstName} with expertise in ${providerSkills.length} services. Reliable and experienced service provider committed to quality work across ${serviceArea.city}.`,
         phone: phone,
         serviceAreas: [serviceArea],
         skills: providerSkills,

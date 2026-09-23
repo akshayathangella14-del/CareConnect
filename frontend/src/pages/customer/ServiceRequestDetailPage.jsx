@@ -304,7 +304,7 @@ export default function ServiceRequestDetailPage() {
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <div style={{ fontSize: 'var(--font-size-h3)', fontWeight: 700, color: 'var(--color-primary)' }}>
-                          {quote.pricingBreakdown?.currency || 'INR'} {quote.totalAmount}
+                          ₹{quote.totalAmount}
                         </div>
                         <StatusBadge status={quote.status} size="sm" />
                       </div>

@@ -116,16 +116,16 @@ export default function BookingDetailPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-secondary)' }}>
                     <span>Subtotal</span>
-                    <span>{booking.pricingSnapshot?.currency} {booking.pricingSnapshot?.subtotal?.toFixed(2)}</span>
+                    <span>₹{booking.pricingSnapshot?.subtotal?.toFixed(2)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-secondary)' }}>
                     <span>Tax</span>
-                    <span>{booking.pricingSnapshot?.currency} {booking.pricingSnapshot?.tax?.toFixed(2)}</span>
+                    <span>₹{booking.pricingSnapshot?.tax?.toFixed(2)}</span>
                   </div>
                   <hr style={{ border: 0, borderBottom: '1px solid var(--color-border-subtle)', margin: 'var(--space-2) 0' }} />
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: 'var(--font-size-h4)' }}>
                     <span>Total Amount</span>
-                    <span style={{ color: 'var(--color-primary)' }}>{booking.pricingSnapshot?.currency} {booking.pricingSnapshot?.totalAmount?.toFixed(2)}</span>
+                    <span style={{ color: 'var(--color-primary)' }}>₹{booking.pricingSnapshot?.totalAmount?.toFixed(2)}</span>
                   </div>
                 </div>
               </Card>
