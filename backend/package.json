@@ -1,0 +1,38 @@
+{
+  "name": "careconnect-backend",
+  "version": "0.1.0",
+  "description": "Phase 0 backend foundation for the CareConnect MERN capstone.",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node --test",
+    "test:watch": "node --test --watch",
+    "check": "node --check src/server.js && node --check src/app.js && node --check src/config/env.js && node --check src/config/database.js && node --check src/routes/index.js && node --check src/routes/v1/auth.routes.js && node --check src/routes/v1/category.routes.js && node --check src/routes/v1/skill.routes.js && node --check src/routes/v1/pricing.routes.js && node --check src/routes/v1/provider.routes.js && node --check src/routes/v1/availability.routes.js && node --check src/routes/v1/serviceRequest.routes.js && node --check src/routes/v1/quote.routes.js && node --check src/routes/v1/booking.routes.js && node --check src/routes/v1/invoice.routes.js && node --check src/routes/v1/review.routes.js && node --check src/routes/v1/dispute.routes.js && node --check src/routes/v1/notification.routes.js && node --check src/routes/v1/audit.routes.js && node --check src/routes/v1/analytics.routes.js && node --check src/controllers/auth.controller.js && node --check src/controllers/business.controller.js && node --check src/services/auth.service.js && node --check src/services/ai.service.js && node --check src/services/audit.service.js && node --check src/services/availability.service.js && node --check src/services/invoice.service.js && node --check src/services/matching.service.js && node --check src/services/notification.service.js && node --check src/services/trace.service.js && node --check src/middleware/auth.middleware.js && node --check src/middleware/role.middleware.js && node --check src/middleware/error.middleware.js && node --check src/middleware/notFound.middleware.js && node --check src/validators/auth.validator.js && node --check src/utils/AppError.js && node --check src/utils/access.js && node --check src/utils/asyncHandler.js && node --check src/utils/http.js && node --check src/utils/ownership.js && node --check src/utils/sanitizeUser.js"
+  },
+  "keywords": [
+    "careconnect",
+    "express",
+    "mongodb",
+    "mongoose"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^2.23.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "supertest": "^7.0.0"
+  }
+}

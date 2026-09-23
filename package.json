@@ -1,0 +1,21 @@
+{
+  "name": "careconnect",
+  "version": "1.0.0",
+  "description": "AI-Powered Home Services Booking Platform",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "start:backend": "cd backend && npm start"
+  },
+  "keywords": [
+    "careconnect",
+    "home-services",
+    "mern",
+    "ai-powered"
+  ],
+  "author": "",
+  "license": "ISC"
+}

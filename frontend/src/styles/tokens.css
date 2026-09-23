@@ -1,0 +1,206 @@
+/* ============================================================
+   CareConnect Design Tokens — Phase 3 (Final Visual Identity)
+   
+   FROZEN after Phase 3.
+   This is the single source of truth for the CareConnect
+   visual design system.
+   
+   Visual Identity:
+   - Primary: Deep Indigo / Electric Blue (#3B49DF)
+   - Secondary Accent: Vivid Coral / Orange (#FF5A36)
+   - Supporting Accent: Restrained Violet / Lavender (#7C3AED)
+   - Warm Premium Neutrals: Warm off-white background (#FAF8F5)
+   ============================================================ */
+
+:root {
+  /* ----------------------------------------------------------
+     PRIMARY BRAND COLOR — Deep Indigo / Electric Blue
+     Energetic, contemporary, and trustworthy.
+     ---------------------------------------------------------- */
+  --color-primary: #3B49DF;
+  --color-primary-hover: #2F3CBF;
+  --color-primary-active: #2632A4;
+  --color-primary-soft: #EEF2FF;
+  --color-primary-100: #E0E7FF;
+  --color-primary-200: #C7D2FE;
+  --color-primary-700: #312E81;
+  --color-primary-800: #1E1B4B;
+
+  /* ----------------------------------------------------------
+     SECONDARY ACCENT — Vivid Coral / Orange
+     Warmth and human energy for repairs, action, discovery.
+     ---------------------------------------------------------- */
+  --color-accent: #FF5A36;
+  --color-accent-hover: #E04622;
+  --color-accent-active: #C53818;
+  --color-accent-soft: #FFF1ED;
+  --color-accent-100: #FFE0D6;
+  --color-accent-700: #9C2A0F;
+
+  /* ----------------------------------------------------------
+     SUPPORTING ACCENT — Violet / Lavender
+     For AI-related moments, insights, and highlight badges.
+     ---------------------------------------------------------- */
+  --color-violet: #7C3AED;
+  --color-violet-hover: #6D28D9;
+  --color-violet-soft: #F5F3FF;
+  --color-violet-100: #EDE9FE;
+  --color-violet-700: #5B21B6;
+
+  /* Legacy alias for backwards compatibility */
+  --color-secondary: var(--color-violet);
+  --color-secondary-soft: var(--color-violet-soft);
+
+  /* ----------------------------------------------------------
+     WARM PREMIUM NEUTRALS
+     Sophisticated, warm, non-sterile foundation.
+     ---------------------------------------------------------- */
+  --color-background: #FAF8F5;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #F3EFE9;
+  --color-surface-warm: #EAE4DA;
+  --color-surface-elevated: #FFFFFF;
+
+  /* ----------------------------------------------------------
+     TEXT COLORS — Dark charcoal & warm hierarchy
+     ---------------------------------------------------------- */
+  --color-text-primary: #18181B;
+  --color-text-secondary: #52525B;
+  --color-text-muted: #71717A;
+  --color-text-disabled: #A1A1AA;
+  --color-text-inverse: #FFFFFF;
+
+  /* ----------------------------------------------------------
+     BORDER COLORS
+     ---------------------------------------------------------- */
+  --color-border-subtle: #ECE7DE;
+  --color-border: #E4DFD7;
+  --color-border-strong: #D1C9BE;
+
+  /* ----------------------------------------------------------
+     SEMANTIC COLORS — For meaning only
+     ---------------------------------------------------------- */
+  --color-success: #16A34A;
+  --color-success-hover: #15803D;
+  --color-success-soft: #F0FDF4;
+  --color-success-border: #BBF7D0;
+
+  --color-warning: #D97706;
+  --color-warning-hover: #B45309;
+  --color-warning-soft: #FFFBEB;
+  --color-warning-border: #FDE68A;
+
+  --color-error: #DC2626;
+  --color-error-hover: #B91C1C;
+  --color-error-soft: #FEF2F2;
+  --color-error-border: #FECACA;
+
+  --color-info: #2563EB;
+  --color-info-hover: #1D4ED8;
+  --color-info-soft: #EFF6FF;
+  --color-info-border: #BFDBFE;
+
+  /* ----------------------------------------------------------
+     TYPOGRAPHY
+     ---------------------------------------------------------- */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+
+  /* Font Sizes */
+  --font-size-display: 2.5rem;    /* 40px */
+  --font-size-h1: 2rem;           /* 32px */
+  --font-size-h2: 1.5rem;         /* 24px */
+  --font-size-h3: 1.25rem;        /* 20px */
+  --font-size-h4: 1.0625rem;      /* 17px */
+  --font-size-body-lg: 1rem;      /* 16px */
+  --font-size-body: 0.875rem;     /* 14px */
+  --font-size-small: 0.8125rem;   /* 13px */
+  --font-size-caption: 0.75rem;   /* 12px */
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.35;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.65;
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.01em;
+  --letter-spacing-wider: 0.04em;
+
+  /* ----------------------------------------------------------
+     SPACING — 4px base grid
+     ---------------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* ----------------------------------------------------------
+     BORDER RADIUS
+     ---------------------------------------------------------- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* ----------------------------------------------------------
+     SHADOWS — Refined, soft, modern
+     ---------------------------------------------------------- */
+  --shadow-none: none;
+  --shadow-subtle: 0 1px 3px rgba(24, 24, 27, 0.05),
+                   0 1px 2px rgba(24, 24, 27, 0.03);
+  --shadow-overlay: 0 4px 16px rgba(24, 24, 27, 0.08),
+                    0 2px 6px rgba(24, 24, 27, 0.04);
+  --shadow-elevated: 0 12px 36px rgba(24, 24, 27, 0.1),
+                     0 4px 12px rgba(24, 24, 27, 0.04);
+
+  /* ----------------------------------------------------------
+     TRANSITIONS
+     ---------------------------------------------------------- */
+  --transition-fast: 120ms ease;
+  --transition-normal: 180ms ease;
+  --transition-slow: 250ms ease;
+
+  /* ----------------------------------------------------------
+     Z-INDEX SCALE
+     ---------------------------------------------------------- */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+
+  /* ----------------------------------------------------------
+     FOCUS RING
+     ---------------------------------------------------------- */
+  --focus-ring: 0 0 0 2px var(--color-background),
+               0 0 0 4px var(--color-primary);
+
+  /* ----------------------------------------------------------
+     LAYOUT DIMENSIONS
+     ---------------------------------------------------------- */
+  --content-max-width: 1280px;
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 64px;
+  --topbar-height: 64px;
+}

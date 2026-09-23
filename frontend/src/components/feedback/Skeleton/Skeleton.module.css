@@ -1,0 +1,55 @@
+/* ============================================================
+   Skeleton Component Styles
+   Loading placeholder animation
+   ============================================================ */
+
+@keyframes skeleton-pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.skeleton {
+  background-color: var(--color-surface-muted);
+  border-radius: var(--radius-sm);
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+/* ---- Variants ---- */
+.skeleton--text {
+  height: 14px;
+  width: 100%;
+  border-radius: var(--radius-xs);
+}
+
+.skeleton--heading {
+  height: 24px;
+  width: 60%;
+  border-radius: var(--radius-xs);
+}
+
+.skeleton--circle {
+  border-radius: 50%;
+}
+
+.skeleton--rect {
+  border-radius: var(--radius-md);
+}
+
+.skeleton--card {
+  border-radius: var(--radius-lg);
+  min-height: 120px;
+}

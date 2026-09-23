@@ -1,0 +1,117 @@
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--font-size-body);
+}
+
+.thead {
+  background-color: var(--color-surface-muted);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.th {
+  padding: var(--space-3) var(--space-4);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.th--right {
+  text-align: right;
+}
+
+.tbody {
+  background-color: var(--color-surface);
+}
+
+.tr {
+  border-bottom: 1px solid var(--color-border-subtle);
+  transition: background-color var(--transition-fast);
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+.tr--clickable {
+  cursor: pointer;
+}
+
+.tr--clickable:hover {
+  background-color: var(--color-surface-muted);
+}
+
+.td {
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text-primary);
+  vertical-align: middle;
+}
+
+.td--right {
+  text-align: right;
+}
+
+.emptyState {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-body);
+}
+
+/* Mobile responsive card layout */
+@media (max-width: 767px) {
+  .thead {
+    display: none;
+  }
+
+  .tableContainer {
+    border: none;
+    background-color: transparent;
+  }
+
+  .table, .tbody, .tr, .td {
+    display: block;
+    width: 100%;
+  }
+
+  .tr {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+    padding: var(--space-2) 0;
+  }
+
+  .td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-2) var(--space-4);
+    text-align: right;
+    border-bottom: 1px solid var(--color-surface-muted);
+  }
+
+  .td:last-child {
+    border-bottom: none;
+  }
+
+  .td::before {
+    content: attr(data-label);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    text-align: left;
+    margin-right: var(--space-4);
+  }
+}

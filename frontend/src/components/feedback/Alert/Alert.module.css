@@ -1,0 +1,85 @@
+/* ============================================================
+   Alert Component Styles
+   Variants: info, success, warning, error
+   ============================================================ */
+
+.alert {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+}
+
+.alert__icon {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 1px;
+  flex-shrink: 0;
+}
+
+.alert__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.alert__title {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-body);
+}
+
+.alert__description {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-relaxed);
+}
+
+.alert__dismiss {
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+  border-radius: var(--radius-xs);
+}
+
+.alert__dismiss:hover {
+  opacity: 1;
+}
+
+.alert__dismiss:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ---- Variants ---- */
+.alert--info {
+  background-color: var(--color-info-soft);
+  border-color: rgba(52, 120, 168, 0.2);
+  color: var(--color-info);
+}
+
+.alert--success {
+  background-color: var(--color-success-soft);
+  border-color: rgba(33, 134, 91, 0.2);
+  color: var(--color-success);
+}
+
+.alert--warning {
+  background-color: var(--color-warning-soft);
+  border-color: rgba(183, 121, 31, 0.2);
+  color: var(--color-warning);
+}
+
+.alert--error {
+  background-color: var(--color-error-soft);
+  border-color: rgba(200, 75, 75, 0.2);
+  color: var(--color-error);
+}

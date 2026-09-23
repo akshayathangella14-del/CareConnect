@@ -1,0 +1,362 @@
+/* ============================================================
+   HomePage Styles — Phase 3 (Deep Indigo + Coral Accent)
+   ============================================================ */
+
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: var(--space-12);
+}
+
+/* ---- Hero Section ---- */
+.home__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-12) var(--space-6) var(--space-10);
+  background: radial-gradient(ellipse at top, #EEF2FF 0%, var(--color-background) 70%);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.home__hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background-color: var(--color-violet-soft);
+  border: 1px solid var(--color-violet-100);
+  color: var(--color-violet);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  margin-bottom: var(--space-5);
+}
+
+.home__hero-title {
+  font-size: var(--font-size-display);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  max-width: 780px;
+  margin-bottom: var(--space-4);
+}
+
+.home__hero-title span {
+  color: var(--color-primary);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-violet) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.home__hero-desc {
+  font-size: var(--font-size-body-lg);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  max-width: 620px;
+  margin-bottom: var(--space-8);
+}
+
+.home__hero-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: var(--space-10);
+}
+
+.home__hero-actions a {
+  text-decoration: none;
+}
+
+/* Trust Indicators */
+.home__hero-stats {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: var(--space-3) var(--space-6);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-subtle);
+}
+
+.home__hero-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.home__hero-stat-icon {
+  color: var(--color-primary);
+}
+
+.home__hero-stat-divider {
+  width: 1px;
+  height: 16px;
+  background-color: var(--color-border);
+}
+
+/* ---- Section Header ---- */
+.home__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.home__section-header {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.home__section-kicker {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.home__section-title {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  letter-spacing: var(--letter-spacing-tight);
+  margin-bottom: var(--space-2);
+}
+
+.home__section-subtitle {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ---- Pillars Grid ---- */
+.home__pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+.home__pillar-card {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.home__pillar-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-overlay);
+  border-color: var(--color-border-strong);
+}
+
+.home__pillar-body {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.home__pillar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.home__pillar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.home__pillar-icon--primary {
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.home__pillar-icon--accent {
+  background-color: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.home__pillar-icon--violet {
+  background-color: var(--color-violet-soft);
+  color: var(--color-violet);
+}
+
+.home__pillar-icon--success {
+  background-color: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.home__pillar-icon--info {
+  background-color: var(--color-info-soft);
+  color: var(--color-info);
+}
+
+.home__pillar-icon--neutral {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+}
+
+.home__pillar-step {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.home__pillar-title {
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.home__pillar-desc {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: var(--space-5);
+  flex: 1;
+}
+
+.home__pillar-footer {
+  margin-top: auto;
+}
+
+/* ---- CTA Banner ---- */
+.home__cta {
+  background: linear-gradient(135deg, #2A36B8 0%, #1E278E 60%, #161D6E 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-12) var(--space-8);
+  text-align: center;
+  color: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-elevated);
+}
+
+.home__cta::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 90, 54, 0.25) 0%, transparent 70%);
+}
+
+.home__cta-content {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.home__cta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--space-4);
+}
+
+.home__cta-title {
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--space-3);
+  color: #FFFFFF;
+}
+
+.home__cta-desc {
+  font-size: var(--font-size-body-lg);
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: var(--space-6);
+  line-height: var(--line-height-relaxed);
+}
+
+.home__cta-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.home__cta-actions a {
+  text-decoration: none;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1023px) {
+  .home__pillars {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .home__pillars {
+    grid-template-columns: 1fr;
+  }
+
+  .home__hero {
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .home__hero-title {
+    font-size: var(--font-size-h1);
+  }
+
+  .home__hero-stats {
+    flex-direction: column;
+    border-radius: var(--radius-lg);
+    gap: var(--space-3);
+  }
+
+  .home__hero-stat-divider {
+    display: none;
+  }
+
+  .home__cta {
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .home__cta-title {
+    font-size: var(--font-size-h2);
+  }
+}

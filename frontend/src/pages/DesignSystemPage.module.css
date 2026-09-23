@@ -1,0 +1,300 @@
+/* ============================================================
+   DesignSystemPage Styles — Showcase layout
+   ============================================================ */
+
+.ds {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  padding-bottom: var(--space-16);
+}
+
+/* ---- Section ---- */
+.ds__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.ds__section-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ds__section-title {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.ds__section-desc {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+/* ---- Subsection ---- */
+.ds__subsection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.ds__subsection-title {
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+/* ---- Demo Row ---- */
+.ds__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.ds__row--start {
+  align-items: flex-start;
+}
+
+.ds__row--column {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* ---- Color Grid ---- */
+.ds__color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-4);
+}
+
+.ds__color-swatch {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.ds__color-preview {
+  height: 60px;
+  width: 100%;
+}
+
+.ds__color-info {
+  padding: var(--space-3);
+  background-color: var(--color-surface);
+}
+
+.ds__color-name {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.ds__color-value {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* ---- Typography Showcase ---- */
+.ds__type-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-6);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.ds__type-label {
+  min-width: 100px;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  flex-shrink: 0;
+}
+
+.ds__type-spec {
+  min-width: 80px;
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  flex-shrink: 0;
+}
+
+/* ---- Spacing Showcase ---- */
+.ds__spacing-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ds__spacing-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.ds__spacing-bar {
+  height: 20px;
+  background-color: var(--color-primary-soft);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-xs);
+  transition: width var(--transition-normal);
+}
+
+.ds__spacing-label {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  min-width: 80px;
+}
+
+/* ---- Demo Card ---- */
+.ds__demo-card {
+  max-width: 400px;
+  width: 100%;
+}
+
+/* ---- Form Demo ---- */
+.ds__form-demo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  max-width: 600px;
+}
+
+.ds__form-demo--full {
+  grid-column: 1 / -1;
+}
+
+/* ---- Radius Demo ---- */
+.ds__radius-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.ds__radius-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ds__radius-box {
+  width: 64px;
+  height: 64px;
+  background-color: var(--color-primary-soft);
+  border: 2px solid var(--color-primary);
+}
+
+.ds__radius-label {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* ---- Shadow Demo ---- */
+.ds__shadow-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.ds__shadow-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ds__shadow-box {
+  width: 120px;
+  height: 80px;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ds__shadow-label {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+/* ---- Skeleton Demo ---- */
+.ds__skeleton-demo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 350px;
+}
+
+.ds__skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ---- Icon Grid ---- */
+.ds__icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--space-3);
+}
+
+.ds__icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.ds__icon-item:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.ds__icon-name {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+/* Responsive */
+@media (max-width: 639px) {
+  .ds__color-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ds__type-row {
+    flex-direction: column;
+    gap: var(--space-1);
+    align-items: flex-start;
+  }
+
+  .ds__form-demo {
+    grid-template-columns: 1fr;
+  }
+
+  .ds__icon-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

@@ -1,0 +1,141 @@
+/* ============================================================
+   Input Component Styles
+   States: default, focus, error, disabled, read-only
+   ============================================================ */
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.input-label {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.input-label--required::after {
+  content: ' *';
+  color: var(--color-error);
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-field {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.input-field::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Focus */
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+/* Error */
+.input-field--error {
+  border-color: var(--color-error);
+}
+
+.input-field--error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px var(--color-error-soft);
+}
+
+/* Disabled */
+.input-field:disabled {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+  border-color: var(--color-border);
+}
+
+/* Read-only */
+.input-field[readonly] {
+  background-color: var(--color-surface-muted);
+  cursor: default;
+}
+
+/* With icon */
+.input-field--has-left-icon {
+  padding-left: var(--space-10);
+}
+
+.input-field--has-right-icon {
+  padding-right: var(--space-10);
+}
+
+.input-icon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.input-icon--left {
+  left: var(--space-3);
+}
+
+.input-icon--right {
+  right: var(--space-3);
+}
+
+.input-icon--action {
+  pointer-events: auto;
+}
+
+.input-icon--action button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+/* Helper / Error Text */
+.input-helper {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+}
+
+.input-error-message {
+  font-size: var(--font-size-caption);
+  color: var(--color-error);
+  line-height: var(--line-height-normal);
+}

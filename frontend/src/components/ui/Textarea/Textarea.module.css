@@ -1,0 +1,90 @@
+/* ============================================================
+   Textarea Component Styles
+   Same state philosophy as Input
+   ============================================================ */
+
+.textarea-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.textarea-label {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.textarea-label--required::after {
+  content: ' *';
+  color: var(--color-error);
+}
+
+.textarea-field {
+  width: 100%;
+  min-height: 100px;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.textarea-field::placeholder {
+  color: var(--color-text-muted);
+}
+
+.textarea-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.textarea-field--error {
+  border-color: var(--color-error);
+}
+
+.textarea-field--error:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px var(--color-error-soft);
+}
+
+.textarea-field:disabled {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text-disabled);
+  cursor: not-allowed;
+  resize: none;
+}
+
+.textarea-field[readonly] {
+  background-color: var(--color-surface-muted);
+  cursor: default;
+}
+
+.textarea-helper {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-normal);
+}
+
+.textarea-error-message {
+  font-size: var(--font-size-caption);
+  color: var(--color-error);
+  line-height: var(--line-height-normal);
+}
+
+.textarea-char-count {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  text-align: right;
+}
