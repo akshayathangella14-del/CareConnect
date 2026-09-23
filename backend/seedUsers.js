@@ -40,7 +40,43 @@ mongoose.connect(MONGO_URI).then(async () => {
       console.log('Customer user already exists, skipping seed.');
     }
 
+    // Seed provider user (the one you're trying to use)
+    const providerCount = await User.countDocuments({ role: 'SERVICE_PROVIDER' });
+    if (providerCount === 0) {
+      const hashedPassword = await bcrypt.hash('provider1@123', 10);
+      await User.create({
+        name: 'Test Provider',
+        email: 'provider1@mail.com',
+        passwordHash: hashedPassword,
+        role: 'SERVICE_PROVIDER',
+        status: 'ACTIVE'
+      });
+      console.log('Seeded provider user successfully.');
+    } else {
+      console.log('Provider user already exists, skipping seed.');
+    }
+
+    // Seed admin user
+    const adminCount = await User.countDocuments({ role: 'ADMIN' });
+    if (adminCount === 0) {
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      await User.create({
+        name: 'Admin User',
+        email: 'admin@example.com',
+        passwordHash: hashedPassword,
+        role: 'ADMIN',
+        status: 'ACTIVE'
+      });
+      console.log('Seeded admin user successfully.');
+    } else {
+      console.log('Admin user already exists, skipping seed.');
+    }
+
     console.log('Seeding completed successfully.');
+    console.log('Available test users:');
+    console.log('Customer: customer@example.com / password123');
+    console.log('Provider: provider1@mail.com / provider1@123');
+    console.log('Admin: admin@example.com / admin123');
   } catch (err) {
     console.error('Seeding failed:', err);
   }
