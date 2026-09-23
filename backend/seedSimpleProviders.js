@@ -98,25 +98,23 @@ mongoose.connect(MONGO_URI).then(async () => {
         providerSkills.push(shuffledSkills[j]._id);
       }
       
-      // Create provider profile
+      // Create provider profile (matching actual model structure)
       const providerProfile = await ProviderProfile.create({
         user: user._id,
         displayName: `${firstName} ${number}`,
-        businessName: `${firstName} Services`,
-        description: `Professional ${firstName} providing services in ${city}. Reliable and experienced.`,
-        phone: phone,
+        bio: `Professional ${firstName} providing services in ${city}. Reliable and experienced with ${numSkills} skills.`,
+        experienceYears: randomInt(2, 10),
         serviceAreas: [{ city: city, state: 'India', postalCode: '000000' }],
         skills: providerSkills,
         verificationStatus: 'VERIFIED',
-        experienceYears: randomInt(2, 10),
         ratingSummary: {
-          averageRating: (Math.random() * (5.0 - 3.5) + 3.5).toFixed(1),
+          averageRating: parseFloat((Math.random() * (5.0 - 3.5) + 3.5).toFixed(1)),
           reviewCount: randomInt(5, 30)
         },
-        availability: {
-          availableWeekdays: true,
-          availableWeekends: true,
-          responseTime: randomInt(1, 12)
+        pricing: {
+          currency: 'INR',
+          baseHourlyRate: randomInt(200, 500),
+          minimumVisitCharge: randomInt(100, 300)
         }
       });
       
