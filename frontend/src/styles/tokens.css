@@ -1,45 +1,57 @@
 /* ============================================================
-   CareConnect Design Tokens — Phase 3 (Final Visual Identity)
-   
-   FROZEN after Phase 3.
-   This is the single source of truth for the CareConnect
-   visual design system.
+   CareConnect Design Tokens — v2.0 (Coral Rose UI Redesign)
    
    Visual Identity:
-   - Primary: Deep Indigo / Electric Blue (#3B49DF)
-   - Secondary Accent: Vivid Coral / Orange (#FF5A36)
-   - Supporting Accent: Restrained Violet / Lavender (#7C3AED)
-   - Warm Premium Neutrals: Warm off-white background (#FAF8F5)
+   - Primary: Coral Rose (#FF6B6B) — Warm, vibrant, welcoming
+   - Secondary: Teal Ocean (#4ECDC4) — Calming, fresh complement
+   - Accent: Amber Gold (#FFB84D) — Premium highlights, ratings
+   - Neutrals: Clean white + warm grays
+   
+   Fonts: Poppins (headings) + Inter (body)
    ============================================================ */
 
 :root {
   /* ----------------------------------------------------------
-     PRIMARY BRAND COLOR — Deep Indigo / Electric Blue
-     Energetic, contemporary, and trustworthy.
+     PRIMARY BRAND COLOR — Coral Rose
+     Warm, vibrant, energetic, welcoming.
      ---------------------------------------------------------- */
-  --color-primary: #3B49DF;
-  --color-primary-hover: #2F3CBF;
-  --color-primary-active: #2632A4;
-  --color-primary-soft: #EEF2FF;
-  --color-primary-100: #E0E7FF;
-  --color-primary-200: #C7D2FE;
-  --color-primary-700: #312E81;
-  --color-primary-800: #1E1B4B;
+  --color-primary: #FF6B6B;
+  --color-primary-light: #FF8E8E;
+  --color-primary-dark: #E55A5A;
+  --color-primary-hover: #E55A5A;
+  --color-primary-active: #CC4E4E;
+  --color-primary-soft: #FFF0F0;
+  --color-primary-muted: #FFE0E0;
+  --color-primary-100: #FFD4D4;
+  --color-primary-200: #FFB8B8;
+  --color-primary-700: #CC4444;
+  --color-primary-800: #993333;
 
   /* ----------------------------------------------------------
-     SECONDARY ACCENT — Vivid Coral / Orange
-     Warmth and human energy for repairs, action, discovery.
+     SECONDARY — Teal Ocean
+     Calming, fresh, complements coral beautifully.
      ---------------------------------------------------------- */
-  --color-accent: #FF5A36;
-  --color-accent-hover: #E04622;
-  --color-accent-active: #C53818;
-  --color-accent-soft: #FFF1ED;
-  --color-accent-100: #FFE0D6;
-  --color-accent-700: #9C2A0F;
+  --color-secondary: #4ECDC4;
+  --color-secondary-light: #7EDDD6;
+  --color-secondary-dark: #3DB5AD;
+  --color-secondary-soft: #E8F8F7;
+  --color-secondary-hover: #3DB5AD;
 
   /* ----------------------------------------------------------
-     SUPPORTING ACCENT — Violet / Lavender
-     For AI-related moments, insights, and highlight badges.
+     ACCENT — Amber Gold
+     Premium highlights, ratings, special moments.
+     ---------------------------------------------------------- */
+  --color-accent: #FFB84D;
+  --color-accent-light: #FFD699;
+  --color-accent-dark: #E6A544;
+  --color-accent-hover: #E6A544;
+  --color-accent-active: #CC9033;
+  --color-accent-soft: #FFF8E8;
+  --color-accent-100: #FFF0D0;
+  --color-accent-700: #CC8822;
+
+  /* ----------------------------------------------------------
+     SUPPORTING — Violet (for AI/Gemini moments)
      ---------------------------------------------------------- */
   --color-violet: #7C3AED;
   --color-violet-hover: #6D28D9;
@@ -47,137 +59,157 @@
   --color-violet-100: #EDE9FE;
   --color-violet-700: #5B21B6;
 
-  /* Legacy alias for backwards compatibility */
-  --color-secondary: var(--color-violet);
-  --color-secondary-soft: var(--color-violet-soft);
-
   /* ----------------------------------------------------------
-     WARM PREMIUM NEUTRALS
-     Sophisticated, warm, non-sterile foundation.
+     BACKGROUNDS & SURFACES
+     Clean, bright, modern.
      ---------------------------------------------------------- */
-  --color-background: #FAF8F5;
-  --color-surface: #FFFFFF;
-  --color-surface-muted: #F3EFE9;
-  --color-surface-warm: #EAE4DA;
+  --color-background: #FFFFFF;
+  --color-surface: #FAFAFA;
+  --color-surface-muted: #F5F5F5;
+  --color-surface-warm: #FFF9F9;
+  --color-surface-alt: #EEEEEE;
   --color-surface-elevated: #FFFFFF;
 
   /* ----------------------------------------------------------
-     TEXT COLORS — Dark charcoal & warm hierarchy
+     TEXT COLORS
      ---------------------------------------------------------- */
-  --color-text-primary: #18181B;
-  --color-text-secondary: #52525B;
-  --color-text-muted: #71717A;
-  --color-text-disabled: #A1A1AA;
+  --color-text-primary: #2D3436;
+  --color-text-secondary: #636E72;
+  --color-text-muted: #B2BEC3;
+  --color-text-disabled: #DFE6E9;
   --color-text-inverse: #FFFFFF;
+  --color-text: #2D3436;
 
   /* ----------------------------------------------------------
      BORDER COLORS
      ---------------------------------------------------------- */
-  --color-border-subtle: #ECE7DE;
-  --color-border: #E4DFD7;
-  --color-border-strong: #D1C9BE;
+  --color-border: #E0E0E0;
+  --color-border-subtle: #F0F0F0;
+  --color-border-light: #F5F5F5;
+  --color-border-strong: #CCCCCC;
 
   /* ----------------------------------------------------------
-     SEMANTIC COLORS — For meaning only
+     SEMANTIC COLORS
      ---------------------------------------------------------- */
-  --color-success: #16A34A;
-  --color-success-hover: #15803D;
-  --color-success-soft: #F0FDF4;
-  --color-success-border: #BBF7D0;
+  --color-success: #00B894;
+  --color-success-hover: #00A381;
+  --color-success-light: #55EFC4;
+  --color-success-soft: #E6FFFA;
+  --color-success-border: #55EFC4;
 
-  --color-warning: #D97706;
-  --color-warning-hover: #B45309;
-  --color-warning-soft: #FFFBEB;
-  --color-warning-border: #FDE68A;
+  --color-warning: #FFA502;
+  --color-warning-hover: #E69200;
+  --color-warning-light: #FFD32A;
+  --color-warning-soft: #FFF8E1;
+  --color-warning-border: #FFD32A;
 
-  --color-error: #DC2626;
-  --color-error-hover: #B91C1C;
-  --color-error-soft: #FEF2F2;
-  --color-error-border: #FECACA;
+  --color-error: #FF7675;
+  --color-error-hover: #E66767;
+  --color-error-light: #FFA8A8;
+  --color-error-soft: #FFE8E8;
+  --color-error-border: #FFA8A8;
 
-  --color-info: #2563EB;
-  --color-info-hover: #1D4ED8;
-  --color-info-soft: #EFF6FF;
-  --color-info-border: #BFDBFE;
+  --color-info: #74B9FF;
+  --color-info-hover: #5CA8F0;
+  --color-info-light: #A0D2FF;
+  --color-info-soft: #E8F4FF;
+  --color-info-border: #A0D2FF;
 
   /* ----------------------------------------------------------
      TYPOGRAPHY
      ---------------------------------------------------------- */
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-family-heading: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-body: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-mono: 'Fira Code', 'Courier New', monospace;
+  /* Legacy alias */
+  --font-family: var(--font-family-body);
 
   /* Font Sizes */
-  --font-size-display: 2.5rem;    /* 40px */
-  --font-size-h1: 2rem;           /* 32px */
-  --font-size-h2: 1.5rem;         /* 24px */
-  --font-size-h3: 1.25rem;        /* 20px */
-  --font-size-h4: 1.0625rem;      /* 17px */
-  --font-size-body-lg: 1rem;      /* 16px */
-  --font-size-body: 0.875rem;     /* 14px */
-  --font-size-small: 0.8125rem;   /* 13px */
-  --font-size-caption: 0.75rem;   /* 12px */
+  --font-size-display: 3.5rem;    /* 56px — Hero titles */
+  --font-size-h1: 2.5rem;         /* 40px — Page titles */
+  --font-size-h2: 2rem;           /* 32px — Section titles */
+  --font-size-h3: 1.5rem;         /* 24px — Subsection titles */
+  --font-size-h4: 1.25rem;        /* 20px — Card titles */
+  --font-size-body-lg: 1.125rem;  /* 18px — Large body text */
+  --font-size-body: 1rem;         /* 16px — Standard body */
+  --font-size-body-sm: 0.875rem;  /* 14px — Small body text */
+  --font-size-small: 0.875rem;    /* 14px — alias */
+  --font-size-caption: 0.75rem;   /* 12px — Captions, labels */
+  --font-size-tiny: 0.625rem;     /* 10px — Tiny text */
 
   /* Font Weights */
+  --font-weight-light: 300;
   --font-weight-regular: 400;
+  --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
 
   /* Line Heights */
   --line-height-tight: 1.2;
   --line-height-snug: 1.35;
   --line-height-normal: 1.5;
-  --line-height-relaxed: 1.65;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
 
   /* Letter Spacing */
   --letter-spacing-tight: -0.02em;
   --letter-spacing-normal: 0;
-  --letter-spacing-wide: 0.01em;
-  --letter-spacing-wider: 0.04em;
+  --letter-spacing-wide: 0.02em;
+  --letter-spacing-wider: 0.05em;
 
   /* ----------------------------------------------------------
      SPACING — 4px base grid
      ---------------------------------------------------------- */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
-  --space-20: 80px;
-  --space-24: 96px;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
 
   /* ----------------------------------------------------------
      BORDER RADIUS
      ---------------------------------------------------------- */
   --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-  --radius-pill: 999px;
+  --radius-sm: 0.25rem;    /* 4px */
+  --radius-md: 0.5rem;     /* 8px */
+  --radius-lg: 0.75rem;    /* 12px */
+  --radius-xl: 1rem;       /* 16px */
+  --radius-2xl: 1.5rem;    /* 24px */
+  --radius-pill: 9999px;
+  --radius-full: 9999px;
 
   /* ----------------------------------------------------------
-     SHADOWS — Refined, soft, modern
+     SHADOWS
      ---------------------------------------------------------- */
   --shadow-none: none;
-  --shadow-subtle: 0 1px 3px rgba(24, 24, 27, 0.05),
-                   0 1px 2px rgba(24, 24, 27, 0.03);
-  --shadow-overlay: 0 4px 16px rgba(24, 24, 27, 0.08),
-                    0 2px 6px rgba(24, 24, 27, 0.04);
-  --shadow-elevated: 0 12px 36px rgba(24, 24, 27, 0.1),
-                     0 4px 12px rgba(24, 24, 27, 0.04);
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+
+  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-overlay: 0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-floating: 0 12px 32px rgba(0, 0, 0, 0.15);
 
   /* ----------------------------------------------------------
      TRANSITIONS
      ---------------------------------------------------------- */
-  --transition-fast: 120ms ease;
-  --transition-normal: 180ms ease;
-  --transition-slow: 250ms ease;
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+  --transition-slower: 500ms ease-in-out;
 
   /* ----------------------------------------------------------
      Z-INDEX SCALE
@@ -200,7 +232,7 @@
      LAYOUT DIMENSIONS
      ---------------------------------------------------------- */
   --content-max-width: 1280px;
-  --sidebar-width: 260px;
+  --sidebar-width: 280px;
   --sidebar-width-collapsed: 64px;
   --topbar-height: 64px;
 }

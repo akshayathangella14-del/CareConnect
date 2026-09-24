@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  font-family: var(--font-family);
+  font-family: var(--font-family-body);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-medium);
   line-height: 1;
@@ -49,18 +49,19 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* ---- Primary Variant (Deep Indigo / Electric Blue) ---- */
+/* ---- Primary Variant (Coral Rose) ---- */
 .btn--primary {
   background-color: var(--color-primary);
   color: #FFFFFF;
   border-color: var(--color-primary);
-  box-shadow: 0 1px 3px rgba(59, 73, 223, 0.2);
+  box-shadow: 0 1px 3px rgba(255, 107, 107, 0.25);
 }
 
 .btn--primary:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
-  box-shadow: 0 4px 12px rgba(59, 73, 223, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.35);
+  transform: translateY(-1px);
 }
 
 .btn--primary:active:not(:disabled) {
@@ -68,18 +69,19 @@
   transform: translateY(1px);
 }
 
-/* ---- Accent Variant (Vivid Coral / Orange) ---- */
+/* ---- Accent Variant (Amber Gold) ---- */
 .btn--accent {
   background-color: var(--color-accent);
   color: #FFFFFF;
   border-color: var(--color-accent);
-  box-shadow: 0 1px 3px rgba(255, 90, 54, 0.2);
+  box-shadow: 0 1px 3px rgba(255, 184, 77, 0.25);
 }
 
 .btn--accent:hover:not(:disabled) {
   background-color: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
-  box-shadow: 0 4px 12px rgba(255, 90, 54, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 184, 77, 0.35);
+  transform: translateY(-1px);
 }
 
 .btn--accent:active:not(:disabled) {

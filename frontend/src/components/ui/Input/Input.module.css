@@ -34,12 +34,12 @@
   width: 100%;
   box-sizing: border-box;
   padding: var(--space-3) var(--space-4);
-  font-family: var(--font-family);
+  font-family: var(--font-family-body);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
   line-height: var(--line-height-normal);
   color: var(--color-text-primary);
-  background-color: var(--color-surface);
+  background-color: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   transition:
