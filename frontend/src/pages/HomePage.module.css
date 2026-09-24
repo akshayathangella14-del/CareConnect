@@ -78,6 +78,16 @@
   text-decoration: none;
 }
 
+.home__hero-image {
+  width: 100%;
+  max-width: 800px;
+  height: 400px;
+  margin-top: var(--space-8);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-elevated);
+}
+
 /* Trust Indicators */
 .home__hero-stats {
   display: flex;

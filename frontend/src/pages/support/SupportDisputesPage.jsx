@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useListDisputesQuery } from '@/features/disputes';
-import { Card, Button, StatusBadge, DataTable, EmptyState, Badge } from '@/components';
+import { Card, Button, DataTable, EmptyState, Badge } from '@/components';
 import { Headphones, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -21,9 +21,9 @@ export default function SupportDisputesPage() {
       header: 'Booking Ref',
       key: 'booking',
       render: (d) => (
-        <Link to={`/bookings/${d.booking?._id}`} style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>
+        <span style={{ color: 'var(--color-text-primary)', fontWeight: 500 }}>
           {d.booking?._id?.substring(0, 8).toUpperCase() || 'Unknown'}
-        </Link>
+        </span>
       ),
     },
     {
@@ -37,9 +37,9 @@ export default function SupportDisputesPage() {
       render: (d) => (
         <Badge variant={
           d.status === 'OPEN' ? 'error' : 
-          d.status === 'INVESTIGATING' ? 'warning' : 'success'
+          ['UNDER_REVIEW', 'AWAITING_EVIDENCE', 'RESOLUTION_PROPOSED', 'ESCALATED'].includes(d.status) ? 'warning' : 'success'
         } size="sm">
-          {d.status}
+          {d.status?.replace(/_/g, ' ')}
         </Badge>
       ),
     },

@@ -10,7 +10,7 @@ export const analyticsApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAnalyticsSummary: builder.query({
       query: () => '/analytics/summary',
-      transformResponse: (response) => response?.data || response,
+      transformResponse: (response) => response?.data?.analytics || response?.analytics || response?.data || response,
       // No specific tags provided as analytics might aggregate over many things
     }),
   }),

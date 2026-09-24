@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useGetDisputeQuery, useUpdateDisputeMutation } from '@/features/disputes';
-import { Card, Button, Alert, Tabs, Badge, Timeline, Select, Input } from '@/components';
-import { Headphones, Shield, MessageSquare, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Card, Button, Alert, Tabs, Badge, Select, Input } from '@/components';
+import { Shield, MessageSquare, ShieldAlert } from 'lucide-react';
 
 export default function SupportDisputeDetailPage() {
   const { id } = useParams();
   const { data: dispute, isLoading, error } = useGetDisputeQuery(id);
   const [updateDispute, { isLoading: isUpdating }] = useUpdateDisputeMutation();
   
-  const [resolutionStatus, setResolutionStatus] = useState('INVESTIGATING');
+  const [resolutionStatus, setResolutionStatus] = useState('UNDER_REVIEW');
   const [resolution, setResolution] = useState('');
 
   if (isLoading) return <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading dispute details...</div>;
@@ -25,7 +25,9 @@ export default function SupportDisputeDetailPage() {
       await updateDispute({
         id,
         status: resolutionStatus,
-        resolution
+        resolution: resolution
+          ? { summary: resolution, outcome: resolutionStatus }
+          : undefined,
       }).unwrap();
     } catch (err) {
       console.error('Failed to update dispute:', err);
@@ -41,13 +43,13 @@ export default function SupportDisputeDetailPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
             <h1 style={{ fontSize: 'var(--font-size-h2)', margin: 0 }}>Case #{dispute._id.substring(0, 8).toUpperCase()}</h1>
-            <Badge variant={dispute.status === 'OPEN' ? 'error' : dispute.status === 'INVESTIGATING' ? 'warning' : dispute.status === 'REJECTED' ? 'error' : 'success'}>
-              {dispute.status}
+            <Badge variant={dispute.status === 'OPEN' ? 'error' : ['UNDER_REVIEW', 'AWAITING_EVIDENCE', 'RESOLUTION_PROPOSED', 'ESCALATED'].includes(dispute.status) ? 'warning' : dispute.status === 'REJECTED' ? 'error' : 'success'}>
+              {dispute.status?.replace(/_/g, ' ')}
             </Badge>
           </div>
           <div style={{ display: 'flex', gap: 'var(--space-4)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>
             <span>Opened: {new Date(dispute.createdAt).toLocaleString()}</span>
-            <span>Reason: {dispute.reason.replace(/_/g, ' ')}</span>
+            <span>Reason: {dispute.reason?.replace(/_/g, ' ')}</span>
           </div>
         </div>
       </div>
@@ -117,7 +119,7 @@ export default function SupportDisputeDetailPage() {
             {isResolved ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
                 <Alert variant="success" title="Case Closed">
-                  {dispute.resolution || 'Resolved successfully.'}
+                  {dispute.resolution?.summary || 'Resolved successfully.'}
                 </Alert>
               </div>
             ) : (
@@ -127,7 +129,10 @@ export default function SupportDisputeDetailPage() {
                   value={resolutionStatus}
                   onChange={(e) => setResolutionStatus(e.target.value)}
                   options={[
-                    { value: 'INVESTIGATING', label: 'Investigating' },
+                    { value: 'UNDER_REVIEW', label: 'Under Review' },
+                    { value: 'AWAITING_EVIDENCE', label: 'Awaiting Evidence' },
+                    { value: 'RESOLUTION_PROPOSED', label: 'Resolution Proposed' },
+                    { value: 'ESCALATED', label: 'Escalated' },
                     { value: 'RESOLVED', label: 'Resolved (Closed)' },
                     { value: 'REJECTED', label: 'Rejected (Closed)' },
                   ]}
@@ -159,13 +164,11 @@ export default function SupportDisputeDetailPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', fontSize: 'var(--font-size-small)' }}>
               <div>
                 <span style={{ color: 'var(--color-text-muted)' }}>Initiated By: </span>
-                <span style={{ fontWeight: 500 }}>{dispute.initiatorType} ({dispute.initiator?.name || 'User'})</span>
+                <span style={{ fontWeight: 500 }}>{dispute.openedBy?.name || 'User'}</span>
               </div>
               <div>
                 <span style={{ color: 'var(--color-text-muted)' }}>Booking Ref: </span>
-                <Link to={`/bookings/${dispute.booking?._id}`} style={{ color: 'var(--color-primary)' }}>
-                  {dispute.booking?._id?.substring(0, 8)}
-                </Link>
+                <span style={{ fontWeight: 500 }}>{dispute.booking?._id?.substring(0, 8) || 'Unknown'}</span>
               </div>
             </div>
           </Card>

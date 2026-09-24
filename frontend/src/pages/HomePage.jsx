@@ -34,59 +34,64 @@ function HomePage() {
     <div className={styles.home}>
       {/* Hero Section */}
       <section className={styles.home__hero}>
-        <div className={styles['home__hero-badge']}>
-          <Sparkles size={14} />
-          <span>Intelligent Home Operations</span>
-        </div>
-        <h1 className={styles['home__hero-title']}>
-          Expert care for your home, <span>powered by AI</span>
-        </h1>
-        <p className={styles['home__hero-desc']}>
-          Tell us what needs fixing. Our AI analyzes your request, identifies required skills,
-          and instantly matches you with background-verified professionals with transparent pricing.
-        </p>
-
-        <div className={styles['home__hero-actions']}>
-          {isAuthenticated ? (
-            <Link to="/dashboard">
-              <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
-                Go to Dashboard
-              </Button>
-            </Link>
-          ) : (
-            <>
-              <Link to="/register">
+        <div className={styles['home__hero-content']}>
+          <div className={styles['home__hero-badge']}>
+            <Sparkles size={14} />
+            <span>Intelligent Home Operations</span>
+          </div>
+          <h1 className={styles['home__hero-title']}>
+            Expert care for your home, <span>powered by AI</span>
+          </h1>
+          <p className={styles['home__hero-desc']}>
+            Tell us what needs fixing. Our AI analyzes your request, identifies required skills,
+            and instantly matches you with background-verified professionals with transparent pricing.
+          </p>
+          <div className={styles['home__hero-actions']}>
+            {isAuthenticated ? (
+              <Link to="/dashboard">
                 <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
-                  Book a Service
+                  Go to Dashboard
                 </Button>
               </Link>
-              <Link to="/login">
-                <Button variant="secondary" size="lg">
-                  Sign In
-                </Button>
-              </Link>
-            </>
-          )}
+            ) : (
+              <>
+                <Link to="/register">
+                  <Button variant="primary" size="lg" rightIcon={<ArrowRight size={18} />}>
+                    Book a Service
+                  </Button>
+                </Link>
+                <Link to="/login">
+                  <Button variant="secondary" size="lg">
+                    Sign In
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
+          {/* Trust Badges Bar */}
+          <div className={styles['home__hero-stats']}>
+            <div className={styles['home__hero-stat']}>
+              <ShieldCheck size={18} className={styles['home__hero-stat-icon']} />
+              <span>100% Verified Providers</span>
+            </div>
+            <div className={styles['home__hero-stat-divider']} />
+            <div className={styles['home__hero-stat']}>
+              <Sparkles size={18} className={styles['home__hero-stat-icon']} />
+              <span>Instant AI Scope Analysis</span>
+            </div>
+            <div className={styles['home__hero-stat-divider']} />
+            <div className={styles['home__hero-stat']}>
+              <Star size={18} className={styles['home__hero-stat-icon']} />
+              <span>ScopeGuard Protection</span>
+            </div>
+          </div>
         </div>
-
-        {/* Trust Badges Bar */}
-        <div className={styles['home__hero-stats']}>
-          <div className={styles['home__hero-stat']}>
-            <ShieldCheck size={18} className={styles['home__hero-stat-icon']} />
-            <span>100% Verified Providers</span>
-          </div>
-          <div className={styles['home__hero-stat-divider']} />
-          <div className={styles['home__hero-stat']}>
-            <Sparkles size={18} className={styles['home__hero-stat-icon']} />
-            <span>Instant AI Scope Analysis</span>
-          </div>
-          <div className={styles['home__hero-stat-divider']} />
-          <div className={styles['home__hero-stat']}>
-            <Star size={18} className={styles['home__hero-stat-icon']} />
-            <span>ScopeGuard Protection</span>
-          </div>
+        <div className={styles['home__hero-image']}>
+          <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=2070&auto=format&fit=crop" alt="Professional home service" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'var(--radius-lg)' }} />
         </div>
       </section>
+
+
 
       {/* 5 Pillars Section */}
       <section className={styles.home__section}>

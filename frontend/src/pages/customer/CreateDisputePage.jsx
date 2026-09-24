@@ -58,7 +58,6 @@ export default function CreateDisputePage() {
             value={formData.reason}
             onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
             options={[
-              { value: 'QUALITY_ISSUE', label: 'Quality Issue' },
               { value: 'SERVICE_QUALITY', label: 'Service Quality' },
               { value: 'BILLING', label: 'Billing' },
               { value: 'SCOPE_CHANGE', label: 'Scope Change' },

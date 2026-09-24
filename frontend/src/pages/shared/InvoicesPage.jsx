@@ -1,8 +1,6 @@
-import { useState } from 'react';
 import { useListInvoicesQuery } from '@/features/invoices';
-import { Card, Button, StatusBadge, DataTable, EmptyState, Badge } from '@/components';
+import { Card, Button, StatusBadge, DataTable, EmptyState } from '@/components';
 import { Receipt, Download } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 export default function InvoicesPage() {
   const { data: invoices = [], isLoading, isFetching } = useListInvoicesQuery();
@@ -36,10 +34,14 @@ export default function InvoicesPage() {
       header: 'Amount',
       key: 'amount',
       render: (inv) => {
-        const amount = typeof inv.totalAmount === 'number' ? inv.totalAmount : 0;
+        const amount = typeof inv.total === 'number'
+          ? inv.total
+          : typeof inv.totalAmount === 'number'
+          ? inv.totalAmount
+          : 0;
         return (
           <span style={{ fontWeight: 600 }}>
-            {inv.currency || 'USD'} {amount.toFixed(2)}
+            {inv.currency || 'INR'} {amount.toFixed(2)}
           </span>
         );
       },

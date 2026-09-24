@@ -14,6 +14,7 @@ import RegisterPage from '@/pages/auth/RegisterPage';
 import CreateServiceRequestPage from '@/pages/customer/CreateServiceRequestPage';
 import ServiceRequestsPage from '@/pages/customer/ServiceRequestsPage';
 import ServiceRequestDetailPage from '@/pages/customer/ServiceRequestDetailPage';
+import ProviderMatchesPage from '@/pages/customer/ProviderMatchesPage';
 import ScopeMatchPage from '@/pages/customer/ScopeMatchPage';
 import BookingsPage from '@/pages/customer/BookingsPage';
 import BookingDetailPage from '@/pages/customer/BookingDetailPage';
@@ -94,6 +95,7 @@ function AppRouter() {
         {/* Customer Routes */}
         <Route path="/service-requests/new" element={<RoleRoute roles={['CUSTOMER']}><CreateServiceRequestPage /></RoleRoute>} />
         <Route path="/service-requests" element={<RoleRoute roles={['CUSTOMER']}><ServiceRequestsPage /></RoleRoute>} />
+        <Route path="/service-requests/:id/matches" element={<RoleRoute roles={['CUSTOMER']}><ProviderMatchesPage /></RoleRoute>} />
         <Route path="/service-requests/:id" element={<RoleRoute roles={['CUSTOMER']}><ServiceRequestDetailPage /></RoleRoute>} />
         <Route path="/service-requests/:id/matches" element={<RoleRoute roles={['CUSTOMER']}><ScopeMatchPage /></RoleRoute>} />
         <Route path="/bookings" element={<RoleRoute roles={['CUSTOMER']}><BookingsPage /></RoleRoute>} />

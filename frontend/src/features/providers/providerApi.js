@@ -42,6 +42,7 @@ export const providerApi = apiSlice.injectEndpoints({
         method: 'PATCH',
         body: data,
       }),
+      transformResponse: (response) => response?.data?.provider || response?.provider || response,
       invalidatesTags: ['Provider'],
     }),
 

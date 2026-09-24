@@ -1,19 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useGetMeProviderQuery, useUpdateMeProviderMutation } from '@/features/providers';
+import { useListSkillsQuery } from '@/features/skills/skillApi';
 import { Card, Input, Textarea, Button, Alert, Badge } from '@/components';
-import { User, MapPin, DollarSign, Briefcase } from 'lucide-react';
+import { User, MapPin, DollarSign, Briefcase, Plus, X, Wrench } from 'lucide-react';
 
 export default function ProviderProfilePage() {
   const { data: profile, isLoading } = useGetMeProviderQuery();
   const [updateProfile, { isLoading: isUpdating, error: updateError, isSuccess }] = useUpdateMeProviderMutation();
+  const { data: availableSkills = [], isLoading: isLoadingSkills } = useListSkillsQuery();
 
   const [formData, setFormData] = useState({
     displayName: '',
     bio: '',
     experienceYears: '',
     baseHourlyRate: '',
-    minimumVisitCharge: ''
+    minimumVisitCharge: '',
+    selectedSkills: [],
+    serviceAreas: []
   });
+
+  const [newArea, setNewArea] = useState({ label: '', city: '', state: '', postalCode: '' });
 
   useEffect(() => {
     if (profile) {
@@ -22,13 +28,41 @@ export default function ProviderProfilePage() {
         bio: profile.bio || '',
         experienceYears: profile.experienceYears || '',
         baseHourlyRate: profile.pricing?.baseHourlyRate || '',
-        minimumVisitCharge: profile.pricing?.minimumVisitCharge || ''
+        minimumVisitCharge: profile.pricing?.minimumVisitCharge || '',
+        selectedSkills: profile.skills?.map(s => typeof s === 'object' ? s._id : s) || [],
+        serviceAreas: profile.serviceAreas || []
       });
     }
   }, [profile]);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const toggleSkill = (skillId) => {
+    setFormData(prev => {
+      const skills = prev.selectedSkills.includes(skillId)
+        ? prev.selectedSkills.filter(id => id !== skillId)
+        : [...prev.selectedSkills, skillId];
+      return { ...prev, selectedSkills: skills };
+    });
+  };
+
+  const handleAddArea = () => {
+    if (newArea.city && newArea.state) {
+      setFormData(prev => ({
+        ...prev,
+        serviceAreas: [...prev.serviceAreas, { ...newArea, label: newArea.label || newArea.city }]
+      }));
+      setNewArea({ label: '', city: '', state: '', postalCode: '' });
+    }
+  };
+
+  const handleRemoveArea = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      serviceAreas: prev.serviceAreas.filter((_, i) => i !== index)
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -38,8 +72,10 @@ export default function ProviderProfilePage() {
         displayName: formData.displayName,
         bio: formData.bio,
         experienceYears: Number(formData.experienceYears),
+        skills: formData.selectedSkills,
+        serviceAreas: formData.serviceAreas,
         pricing: {
-          currency: 'USD',
+          currency: 'INR',
           baseHourlyRate: Number(formData.baseHourlyRate),
           minimumVisitCharge: Number(formData.minimumVisitCharge)
         }
@@ -111,6 +147,84 @@ export default function ProviderProfilePage() {
               onChange={handleChange}
               leftIcon={<Briefcase size={16} />}
             />
+          </div>
+
+          <hr style={{ border: 0, borderBottom: '1px solid var(--color-border-subtle)' }} />
+
+          {/* Skills Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+            <h3 style={{ fontSize: 'var(--font-size-h4)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <Wrench size={18} color="var(--color-primary)" /> Services & Skills
+            </h3>
+            
+            {isLoadingSkills ? (
+              <div>Loading skills...</div>
+            ) : (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+                {availableSkills.map(skill => (
+                  <button
+                    key={skill._id}
+                    type="button"
+                    onClick={() => toggleSkill(skill._id)}
+                    style={{
+                      padding: 'var(--space-2) var(--space-3)',
+                      borderRadius: 'var(--radius-full)',
+                      border: formData.selectedSkills.includes(skill._id) ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
+                      backgroundColor: formData.selectedSkills.includes(skill._id) ? 'var(--color-primary-muted)' : 'var(--color-surface)',
+                      color: formData.selectedSkills.includes(skill._id) ? 'var(--color-primary)' : 'var(--color-text)',
+                      cursor: 'pointer',
+                      fontSize: 'var(--font-size-small)'
+                    }}
+                  >
+                    {skill.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <hr style={{ border: 0, borderBottom: '1px solid var(--color-border-subtle)' }} />
+
+          {/* Service Areas Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+            <h3 style={{ fontSize: 'var(--font-size-h4)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <MapPin size={18} color="var(--color-primary)" /> Service Areas
+            </h3>
+            
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+              {formData.serviceAreas.map((area, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)', backgroundColor: 'var(--color-surface-muted)', borderRadius: 'var(--radius-md)' }}>
+                  <span style={{ fontSize: 'var(--font-size-small)' }}>{area.city}, {area.state}</span>
+                  <button type="button" onClick={() => handleRemoveArea(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}>
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: 'var(--space-2)', alignItems: 'end' }}>
+              <Input
+                label="City"
+                value={newArea.city}
+                onChange={(e) => setNewArea({ ...newArea, city: e.target.value })}
+                placeholder="Mumbai"
+              />
+              <Input
+                label="State"
+                value={newArea.state}
+                onChange={(e) => setNewArea({ ...newArea, state: e.target.value })}
+                placeholder="Maharashtra"
+              />
+              <Input
+                label="Postal Code"
+                value={newArea.postalCode}
+                onChange={(e) => setNewArea({ ...newArea, postalCode: e.target.value })}
+                placeholder="400001"
+              />
+              <Button type="button" onClick={handleAddArea} disabled={!newArea.city || !newArea.state} style={{ height: 40 }}>
+                <Plus size={16} /> Add Area
+              </Button>
+            </div>
           </div>
 
           <hr style={{ border: 0, borderBottom: '1px solid var(--color-border-subtle)' }} />

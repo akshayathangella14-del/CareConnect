@@ -4,14 +4,24 @@ const ServiceCategory = require('../models/ServiceCategory');
 const Skill = require('../models/Skill');
 
 const keywordMap = [
-  { keyword: 'appliance', problemType: 'Appliance Repair', urgency: 'NORMAL' },
-  { keyword: 'washing machine', problemType: 'Washing Machine Inspection & Repair', urgency: 'HIGH' },
-  { keyword: 'washer', problemType: 'Washing Machine Inspection', urgency: 'HIGH' },
-  { keyword: 'refrigerator', problemType: 'Refrigerator Cooling & Gasket Repair', urgency: 'HIGH' },
-  { keyword: 'fridge', problemType: 'Refrigerator Cooling Inspection', urgency: 'HIGH' },
   { keyword: 'ac', problemType: 'Air Conditioner Servicing & Gas Top-up', urgency: 'HIGH' },
-  { keyword: 'electric', problemType: 'Electrical Circuit & Fuse Repair', urgency: 'HIGH' },
-  { keyword: 'leak', problemType: 'Plumbing Leakage & Pipe Seal', urgency: 'HIGH' },
+  { keyword: 'refrigerator', problemType: 'Refrigerator Cooling & Gasket Repair', urgency: 'HIGH' },
+  { keyword: 'mixer', problemType: 'Mixer Grinder Motor Repair or Blade Replacement', urgency: 'NORMAL' },
+  { keyword: 'grinder', problemType: 'Wet Grinder Service & Repair', urgency: 'NORMAL' },
+  { keyword: 'geyser', problemType: 'Water Geyser Heating Element or Thermostat Repair', urgency: 'HIGH' },
+  { keyword: 'water purifier', problemType: 'RO Water Purifier Filter Change or Service', urgency: 'HIGH' },
+  { keyword: 'chimney', problemType: 'Kitchen Chimney Motor Cleaning or Repair', urgency: 'NORMAL' },
+  { keyword: 'inverter', problemType: 'Home Inverter Battery Charging Issue', urgency: 'HIGH' },
+  { keyword: 'fan', problemType: 'Ceiling Fan Motor or Capacitor Repair', urgency: 'NORMAL' },
+  { keyword: 'switch', problemType: 'Electrical Switchboard or Wiring Repair', urgency: 'HIGH' },
+  { keyword: 'tap', problemType: 'Water Tap Leakage or Replacement', urgency: 'HIGH' },
+  { keyword: 'sink', problemType: 'Kitchen Sink Drain Blockage or Leak Repair', urgency: 'NORMAL' },
+  { keyword: 'door', problemType: 'Door Hinge, Lock or Handle Repair', urgency: 'NORMAL' },
+  { keyword: 'window', problemType: 'Window Glass or Frame Repair', urgency: 'NORMAL' },
+  { keyword: 'paint', problemType: 'Wall Painting or Touch-up Work', urgency: 'NORMAL' },
+  { keyword: 'carpenter', problemType: 'Furniture Assembly or Repair', urgency: 'NORMAL' },
+  { keyword: 'plumber', problemType: 'General Plumbing Repair or Installation', urgency: 'HIGH' },
+  { keyword: 'electrician', problemType: 'General Electrical Repair or Installation', urgency: 'HIGH' },
 ];
 
 const includes = (value, query) => String(value || '').toLowerCase().includes(query);
@@ -76,6 +86,13 @@ const runFallbackAnalysis = async (serviceRequest, categories, skills) => {
   const matchedSkills = skills.filter((s) => includes(text, s.name)).slice(0, 5);
   const keyword = keywordMap.find((entry) => includes(text, entry.keyword));
 
+  let specificDiagnostic = '';
+  if (keyword) {
+    specificDiagnostic = `Based on your description mentioning "${keyword.keyword}", this appears to be a ${keyword.problemType}. Common causes include wear and tear, lack of maintenance, or component failure. A verified technician can diagnose the exact issue and provide an accurate quote.`;
+  } else {
+    specificDiagnostic = `Your request has been analyzed. A qualified technician will inspect the issue, identify the root cause, and provide an accurate estimate for repair or replacement.`;
+  }
+
   const missingInformation = [];
   if (!serviceRequest.preferredSchedule?.startAt) {
     missingInformation.push('Preferred schedule date & time');
@@ -88,15 +105,16 @@ const runFallbackAnalysis = async (serviceRequest, categories, skills) => {
     requiredSkills: matchedSkills.map((s) => s._id),
     problemType: keyword?.problemType || 'Home Service Repair',
     urgency: keyword?.urgency || serviceRequest.urgency || 'NORMAL',
-    diagnosticNotes: `Rule-based analysis identified probable issue as ${keyword?.problemType || 'Home Service Repair'}. Diagnostic verification by provider recommended.`,
+    diagnosticNotes: specificDiagnostic,
     suggestedTasks: [
-      `Inspect appliance/issue area`,
+      `Inspect the ${keyword?.keyword || 'appliance/area'} thoroughly`,
       `Identify broken or failing components`,
-      `Provide cost estimate for replacement parts`
+      `Provide cost estimate for replacement parts if needed`,
+      `Complete repair with proper testing`
     ],
     missingInformation,
-    confidence: 0.65, // Force low confidence for fallback to trigger manual review logic tests
-    manualReviewRecommended: true,
+    confidence: 0.75,
+    manualReviewRecommended: false,
     generatedAt: new Date(),
   };
 };
