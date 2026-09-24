@@ -1,0 +1,118 @@
+.serviceRequests {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-6);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.headerContent h1 {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.headerContent p {
+  color: var(--color-text-secondary);
+}
+
+.filterTabs {
+  display: flex;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding-bottom: var(--space-2);
+  overflow-x: auto;
+}
+
+.filterTab {
+  background: none;
+  border: none;
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -10px;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.filterTab:hover {
+  color: var(--color-primary);
+}
+
+.filterTab--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.tableContainer {
+  transition: opacity var(--transition-fast);
+}
+
+.requestTitle {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.requestDate {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-secondary);
+}
+
+.urgency {
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.urgency--emergency {
+  background-color: var(--color-error-soft);
+  color: var(--color-error);
+}
+
+.urgency--high {
+  background-color: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.urgency--normal {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+}
+
+.loading {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filterTabs {
+    gap: var(--space-1);
+  }
+
+  .filterTab {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-small);
+  }
+}

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useListBookingsQuery } from '@/features/bookings';
 import { Card, Button, StatusBadge, DataTable, EmptyState, Alert } from '@/components';
 import { CalendarClock, MapPin } from 'lucide-react';
+import styles from './BookingsPage.module.css';
 
 export default function BookingsPage() {
   const navigate = useNavigate();
@@ -14,10 +15,10 @@ export default function BookingsPage() {
       key: 'service',
       render: (booking) => (
         <div>
-          <div style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>
+          <div className={styles.serviceName}>
             {booking.scopeSnapshot?.summary || 'Service Booking'}
           </div>
-          <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)' }}>
+          <div className={styles.bookingId}>
             {booking._id?.substring(0, 8).toUpperCase()}
           </div>
         </div>
@@ -32,7 +33,7 @@ export default function BookingsPage() {
       header: 'Schedule',
       key: 'schedule',
       render: (booking) => (
-        <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--color-text-secondary)' }}>
+        <span className={styles.schedule}>
           <CalendarClock size={14} />
           {booking.scheduledStartAt ? new Date(booking.scheduledStartAt).toLocaleDateString() : 'Not scheduled'}
         </span>
@@ -46,10 +47,10 @@ export default function BookingsPage() {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-      <div>
-        <h1 style={{ fontSize: 'var(--font-size-h2)', marginBottom: 'var(--space-2)' }}>My Bookings</h1>
-        <p style={{ color: 'var(--color-text-secondary)' }}>Track and manage your upcoming and past service appointments.</p>
+    <div className={`${styles.bookings} animate-fade-in-up`}>
+      <div className={styles.header}>
+        <h1>My Bookings</h1>
+        <p>Track and manage your upcoming and past service appointments.</p>
       </div>
 
       {error && (
@@ -59,7 +60,7 @@ export default function BookingsPage() {
       )}
 
       {isLoading ? (
-        <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading bookings...</div>
+        <div className={styles.loading}>Loading bookings...</div>
       ) : bookings.length === 0 ? (
         <EmptyState
           icon={<CalendarClock size={48} />}
@@ -72,7 +73,7 @@ export default function BookingsPage() {
           }
         />
       ) : (
-        <div style={{ opacity: isFetching ? 0.6 : 1, transition: 'opacity var(--transition-fast)' }}>
+        <div className={styles.tableContainer} style={{ opacity: isFetching ? 0.6 : 1 }}>
           <DataTable
             columns={columns}
             data={bookings}

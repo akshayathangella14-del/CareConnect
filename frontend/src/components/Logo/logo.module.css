@@ -29,7 +29,7 @@
   border-radius: var(--radius-lg);
   color: #FFFFFF;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.35);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
   overflow: hidden;
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
@@ -37,7 +37,7 @@
 
 .iconWrapper:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.45);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.45);
 }
 
 .iconBackground {

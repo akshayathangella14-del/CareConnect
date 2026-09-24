@@ -31,8 +31,8 @@
 
 .card--interactive:hover {
   box-shadow: var(--shadow-lg);
-  border-color: var(--color-border);
-  transform: translateY(-2px);
+  border-color: var(--color-primary);
+  transform: translateY(-4px);
 }
 
 .card--interactive:focus-visible {

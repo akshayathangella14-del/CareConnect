@@ -4,6 +4,13 @@ import { useListServiceRequestsQuery } from '@/features/serviceRequests';
 import { Card, Button, StatusBadge, DataTable, EmptyState, Alert } from '@/components';
 import { Plus, FileText, CalendarClock } from 'lucide-react';
 
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useListServiceRequestsQuery } from '@/features/serviceRequests';
+import { Card, Button, StatusBadge, DataTable, EmptyState, Alert } from '@/components';
+import { Plus, FileText, CalendarClock } from 'lucide-react';
+import styles from './ServiceRequestsPage.module.css';
+
 export default function ServiceRequestsPage() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState('');
@@ -18,8 +25,8 @@ export default function ServiceRequestsPage() {
       key: 'title',
       render: (req) => (
         <div>
-          <div style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>{req.title}</div>
-          <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)' }}>
+          <div className={styles.requestTitle}>{req.title}</div>
+          <div className={styles.requestDate}>
             Created {new Date(req.createdAt).toLocaleDateString()}
           </div>
         </div>
@@ -34,10 +41,7 @@ export default function ServiceRequestsPage() {
       header: 'Urgency',
       key: 'urgency',
       render: (req) => (
-        <span style={{ 
-          color: req.urgency === 'EMERGENCY' ? 'var(--color-error)' : 
-                 req.urgency === 'HIGH' ? 'var(--color-warning)' : 'var(--color-text-secondary)'
-        }}>
+        <span className={`${styles.urgency} ${styles[`urgency--${req.urgency?.toLowerCase() || 'normal'}`]}`}>
           {req.urgency}
         </span>
       ),
@@ -50,14 +54,14 @@ export default function ServiceRequestsPage() {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
-        <div>
-          <h1 style={{ fontSize: 'var(--font-size-h2)', marginBottom: 'var(--space-2)' }}>My Service Requests</h1>
-          <p style={{ color: 'var(--color-text-secondary)' }}>Track and manage your ongoing and past requests.</p>
+    <div className={`${styles.serviceRequests} animate-fade-in-up`}>
+      <div className={styles.header}>
+        <div className={styles.headerContent}>
+          <h1>My Service Requests</h1>
+          <p>Track and manage your ongoing and past requests.</p>
         </div>
         <Link to="/service-requests/new">
-          <Button leftIcon={<Plus size={18} />}>New Request</Button>
+          <Button variant="primary" leftIcon={<Plus size={18} />}>New Request</Button>
         </Link>
       </div>
 
@@ -67,23 +71,13 @@ export default function ServiceRequestsPage() {
         </Alert>
       )}
 
-      {/* Basic Filter Tabs */}
-      <div style={{ display: 'flex', gap: 'var(--space-2)', borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: 'var(--space-2)', overflowX: 'auto' }}>
-        {['', 'DRAFT', 'MATCHING', 'QUOTING', 'PROVIDER_SELECTED'].map(status => (
+      {/* Filter Tabs */}
+      <div className={styles.filterTabs}>
+        {['', 'DRAFT', 'MATCHING', 'QUOTING', 'PROVIDER_SELECTED'].map((status, index) => (
           <button
             key={status}
             onClick={() => setStatusFilter(status)}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 'var(--space-2) var(--space-4)',
-              cursor: 'pointer',
-              color: statusFilter === status ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-              fontWeight: statusFilter === status ? 600 : 400,
-              borderBottom: statusFilter === status ? '2px solid var(--color-primary)' : '2px solid transparent',
-              marginBottom: '-9px', // Pull down over the border
-              whiteSpace: 'nowrap'
-            }}
+            className={`${styles.filterTab} ${statusFilter === status ? styles['filterTab--active'] : ''} animate-delay-${index * 50}`}
           >
             {status ? status.replace('_', ' ') : 'All Requests'}
           </button>
@@ -91,7 +85,7 @@ export default function ServiceRequestsPage() {
       </div>
 
       {isLoading ? (
-        <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading requests...</div>
+        <div className={styles.loading}>Loading requests...</div>
       ) : requests.length === 0 ? (
         <EmptyState
           icon={FileText}
@@ -104,7 +98,7 @@ export default function ServiceRequestsPage() {
           }
         />
       ) : (
-        <div style={{ opacity: isFetching ? 0.6 : 1, transition: 'opacity var(--transition-fast)' }}>
+        <div className={styles.tableContainer} style={{ opacity: isFetching ? 0.6 : 1 }}>
           <DataTable
             columns={columns}
             data={requests}

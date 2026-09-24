@@ -33,7 +33,7 @@ function HomePage() {
   return (
     <div className={styles.home}>
       {/* Hero Section */}
-      <section className={styles.home__hero}>
+      <section className={`${styles.home__hero} animate-fade-in-up`}>
         <div className={styles['home__hero-content']}>
           <div className={styles['home__hero-badge']}>
             <Sparkles size={14} />
@@ -105,7 +105,7 @@ function HomePage() {
 
         <div className={styles.home__pillars}>
           {pillars.map((pillar, index) => (
-            <Card key={pillar.title} variant="default" padding="none" className={styles['home__pillar-card']}>
+            <Card key={pillar.title} variant="default" padding="none" className={`${styles['home__pillar-card']} animate-scale-in animate-delay-${(index + 1) * 100}`}>
               <div className={styles['home__pillar-body']}>
                 <div className={styles['home__pillar-header']}>
                   <div className={`${styles['home__pillar-icon']} ${styles[`home__pillar-icon--${pillar.color}`]}`}>
@@ -139,7 +139,7 @@ function HomePage() {
           </p>
           <div className={styles['home__cta-actions']}>
             <Link to="/register">
-              <Button variant="accent" size="lg" rightIcon={<ArrowRight size={18} />}>
+              <Button variant="accent" size="lg" rightIcon={<ArrowRight size={18} />} className="animate-pulse-glow">
                 Get Started Now
               </Button>
             </Link>

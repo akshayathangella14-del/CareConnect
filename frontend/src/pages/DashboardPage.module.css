@@ -38,7 +38,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
   transition: transform var(--transition-normal);
 }
 

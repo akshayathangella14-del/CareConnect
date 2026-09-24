@@ -17,7 +17,7 @@
   align-items: center;
   gap: var(--space-10);
   padding: var(--space-12) var(--space-6) var(--space-10);
-  background: linear-gradient(135deg, #FFF0F0 0%, #FFFFFF 50%, #E8F8F7 100%);
+  background: linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-background) 50%, var(--color-secondary-soft) 100%);
   border-radius: var(--radius-2xl);
   position: relative;
   overflow: hidden;
@@ -31,7 +31,7 @@
   width: 500px;
   height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 107, 107, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -287,7 +287,7 @@
 
 /* ---- CTA Banner ---- */
 .home__cta {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 50%, #CC4444 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 50%, var(--color-primary-800) 100%);
   border-radius: var(--radius-2xl);
   padding: var(--space-12) var(--space-8);
   text-align: center;
@@ -305,7 +305,7 @@
   width: 500px;
   height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 184, 77, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
 }
 
 .home__cta::after {
@@ -316,7 +316,7 @@
   width: 400px;
   height: 400px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(78, 205, 196, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
 }
 
 .home__cta-content {
