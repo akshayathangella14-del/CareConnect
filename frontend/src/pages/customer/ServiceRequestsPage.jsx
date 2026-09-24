@@ -3,12 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useListServiceRequestsQuery } from '@/features/serviceRequests';
 import { Card, Button, StatusBadge, DataTable, EmptyState, Alert } from '@/components';
 import { Plus, FileText, CalendarClock } from 'lucide-react';
-
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useListServiceRequestsQuery } from '@/features/serviceRequests';
-import { Card, Button, StatusBadge, DataTable, EmptyState, Alert } from '@/components';
-import { Plus, FileText, CalendarClock } from 'lucide-react';
 import styles from './ServiceRequestsPage.module.css';
 
 export default function ServiceRequestsPage() {
