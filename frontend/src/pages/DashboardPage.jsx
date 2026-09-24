@@ -15,6 +15,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { Card, Badge, Button } from '@/components';
+import styles from './DashboardPage.module.css';
 
 const roleConfig = {
   CUSTOMER: {
@@ -83,72 +84,60 @@ function DashboardPage() {
   const config = roleConfig[user?.role] || roleConfig.CUSTOMER;
   const RoleIcon = config.icon;
 
+  const initials = user?.name
+    ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'U';
+
   return (
-    <div style={{ maxWidth: 900, display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+    <div className={styles.dashboard}>
       {/* Welcome Banner Card */}
-      <Card variant="default" padding="lg">
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-            <div
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 'var(--radius-lg)',
-                backgroundColor: 'var(--color-primary-soft)',
-                color: 'var(--color-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <RoleIcon size={28} />
+      <div className={styles.welcomeCard}>
+        <div className={styles.welcomeContent}>
+          <div className={styles.welcomeUser}>
+            <div className={styles.roleIcon}>
+              <RoleIcon size={32} />
             </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 4 }}>
-                <h1 style={{ fontSize: 'var(--font-size-h2)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 8 }}>
+                <h1 className={styles.welcomeTitle}>
                   Welcome back, {user?.name || 'User'}!
                 </h1>
                 <Badge variant={config.badgeVariant} dot>
                   {user?.role?.replace('_', ' ')}
                 </Badge>
               </div>
-              <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-body)' }}>
+              <p className={styles.welcomeTagline}>
                 {config.tagline}
               </p>
             </div>
           </div>
-          <Badge variant="success" dot>
-            Account Active
-          </Badge>
         </div>
-      </Card>
+      </div>
 
       {/* Account Info & Next Actions Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 'var(--space-6)' }}>
+      <div className={styles.grid}>
         {/* Account Details */}
         <Card variant="default" padding="md">
           <Card.Header
             title="Profile Details"
-            subtitle="Verified account information"
+            subtitle="Your contact and role information"
           />
           <Card.Body>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', fontSize: 'var(--font-size-small)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 'var(--space-2)', borderBottom: '1px solid var(--color-border-subtle)' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>Email Address</span>
-                <span style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>{user?.email || 'N/A'}</span>
+            <div className={styles.profileInfo}>
+              <div className={styles.profileAvatar}>
+                <div className={styles.avatarCircle}>{initials}</div>
+                <div>
+                  <div style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{user?.name || 'User'}</div>
+                  <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)' }}>{user?.role?.replace('_', ' ')}</div>
+                </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 'var(--space-2)', borderBottom: '1px solid var(--color-border-subtle)' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>Phone</span>
-                <span style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>{user?.phone || 'Not provided'}</span>
+              <div className={styles.profileRow}>
+                <span className={styles.profileLabel}>Email Address</span>
+                <span className={styles.profileValue}>{user?.email || 'N/A'}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: 'var(--space-2)', borderBottom: '1px solid var(--color-border-subtle)' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>Platform Role</span>
-                <span style={{ fontWeight: 500, color: 'var(--color-primary)' }}>{user?.role?.replace('_', ' ')}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>Session Status</span>
-                <span style={{ fontWeight: 500, color: 'var(--color-success)' }}>Authenticated (JWT)</span>
+              <div className={styles.profileRow}>
+                <span className={styles.profileLabel}>Phone Number</span>
+                <span className={styles.profileValue}>{user?.phone || 'Not provided'}</span>
               </div>
             </div>
           </Card.Body>
@@ -158,34 +147,21 @@ function DashboardPage() {
         <Card variant="default" padding="md">
           <Card.Header
             title="What's Next?"
-            subtitle="Upcoming platform capabilities"
+            subtitle="Quick actions to get started"
           />
           <Card.Body>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+            <div className={styles.actionList}>
               {config.nextActions.map((action, idx) => (
-                <Link key={idx} to={action.path} style={{ textDecoration: 'none' }}>
-                  <div
-                    style={{
-                      padding: 'var(--space-3)',
-                      backgroundColor: 'var(--color-surface-muted)',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--color-border-subtle)',
-                      cursor: 'pointer',
-                      transition: 'all var(--transition-fast)'
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-                    onMouseOut={(e) => e.currentTarget.style.borderColor = 'var(--color-border-subtle)'}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-                      <div style={{ fontSize: 'var(--font-size-small)', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                        {action.label}
-                      </div>
-                      <ArrowRight size={14} color="var(--color-text-secondary)" />
+                <Link key={idx} to={action.path} className={styles.actionItem}>
+                  <div className={styles.actionText}>
+                    <div className={styles.actionLabel}>
+                      {action.label}
                     </div>
-                    <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)' }}>
+                    <div className={styles.actionDesc}>
                       {action.desc}
                     </div>
                   </div>
+                  <ArrowRight className={styles.actionIcon} size={18} />
                 </Link>
               ))}
             </div>

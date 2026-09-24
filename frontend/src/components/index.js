@@ -1,3 +1,6 @@
+/* Brand Components */
+export { Logo } from './Logo';
+
 /* UI Components */
 export { Button } from './ui/Button';
 export { Input } from './ui/Input';

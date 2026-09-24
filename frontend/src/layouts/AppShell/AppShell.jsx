@@ -8,7 +8,6 @@ import {
   X,
   Bell,
   Search,
-  Wrench,
   LogOut,
   LayoutDashboard,
   ChevronRight,
@@ -32,6 +31,7 @@ import {
 } from '@/features/auth';
 import { useListNotificationsQuery, useMarkAllNotificationsReadMutation } from '@/features/notifications';
 import { apiSlice } from '@/api/apiSlice';
+import { Logo } from '@/components';
 import styles from './AppShell.module.css';
 
 /**
@@ -149,10 +149,7 @@ function AppShell() {
       >
         <div className={styles.sidebar__header}>
           <Link to="/" className={styles.sidebar__brand} aria-label="CareConnect home">
-            <span className={styles['sidebar__logo-icon']} aria-hidden="true">
-              <Wrench size={18} />
-            </span>
-            <span className={styles['sidebar__brand-name']}>CareConnect</span>
+            <Logo size="sm" animated={true} />
           </Link>
           <button
             className={styles.sidebar__close}

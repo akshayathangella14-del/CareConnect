@@ -1,4 +1,5 @@
-import { Wrench, Shield, Sparkles, CheckCircle2, Clock } from 'lucide-react';
+import { Shield, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Logo } from '@/components';
 import styles from './Auth.module.css';
 
 /**
@@ -12,11 +13,8 @@ function AuthLayout({ children }) {
       {/* Brand Panel — visible on desktop */}
       <div className={styles.auth__brand}>
         <div className={styles['auth__brand-content']}>
-          <div className={styles['auth__brand-logo']}>
-            <span className={styles['auth__brand-logo-icon']}>
-              <Wrench size={22} />
-            </span>
-            <span className={styles['auth__brand-logo-text']}>CareConnect</span>
+          <div className={styles['auth__brand-logo']} style={{ color: 'white' }}>
+            <Logo size="lg" animated={true} />
           </div>
 
           <div className={styles['auth__brand-badge']}>
