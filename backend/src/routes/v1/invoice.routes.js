@@ -7,6 +7,7 @@ const router = express.Router();
 router.use(authenticate);
 router.get('/', invoiceController.list);
 router.get('/:id', invoiceController.get);
+router.get('/:id/download', invoiceController.downloadPdf);
 router.patch('/:id', invoiceController.update);
 
 module.exports = router;

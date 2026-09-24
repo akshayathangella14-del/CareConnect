@@ -5,6 +5,10 @@ import { Receipt, Download } from 'lucide-react';
 export default function InvoicesPage() {
   const { data: invoices = [], isLoading, isFetching } = useListInvoicesQuery();
 
+  const handleDownloadPdf = (invoiceId) => {
+    window.open(`/api/v1/invoices/${invoiceId}/download`, '_blank');
+  };
+
   const columns = [
     {
       header: 'Invoice ID',
@@ -55,7 +59,12 @@ export default function InvoicesPage() {
       header: 'Action',
       key: 'action',
       render: (inv) => (
-        <Button size="sm" variant="outline" leftIcon={<Download size={14} />}>
+        <Button 
+          size="sm" 
+          variant="outline" 
+          leftIcon={<Download size={14} />}
+          onClick={() => handleDownloadPdf(inv._id)}
+        >
           PDF
         </Button>
       ),

@@ -784,6 +784,53 @@ const invoiceController = {
     await recordAudit({ actor: req.user, action: 'INVOICE_CREATED', resourceType: 'Invoice', resourceId: invoice._id });
     sendSuccess(res, 201, 'Invoice created.', { invoice });
   }),
+  downloadPdf: asyncHandler(async (req, res) => {
+    const invoice = await Invoice.findById(req.params.id)
+      .populate('booking')
+      .populate('customer', 'name email phone')
+      .populate('provider', 'displayName email phone');
+    
+    if (!invoice) throw AppError.notFound('Invoice not found.');
+    
+    if (req.user.role === 'CUSTOMER' && invoice.customer._id.toString() !== req.user._id.toString()) {
+      throw AppError.forbidden('Access denied.');
+    }
+    if (req.user.role === 'SERVICE_PROVIDER') {
+      const provider = await getOwnProviderProfile(req.user);
+      if (invoice.provider._id.toString() !== provider._id.toString()) {
+        throw AppError.forbidden('Access denied.');
+      }
+    }
+    
+    const invoiceText = `
+CARECONNECT INVOICE
+==================
+Invoice ID: ${invoice._id}
+Date: ${new Date(invoice.createdAt).toLocaleDateString()}
+Status: ${invoice.status}
+
+CUSTOMER:
+${invoice.customer.name}
+${invoice.customer.email}
+${invoice.customer.phone || ''}
+
+PROVIDER:
+${invoice.provider.displayName}
+${invoice.provider.email}
+
+BOOKING REF: ${invoice.booking._id}
+AMOUNT: ${invoice.currency || 'INR'} ${invoice.total || invoice.totalAmount || 0}
+
+ITEMS:
+${invoice.items?.map(item => `- ${item.description}: ${item.amount}`).join('\n') || 'Service charges'}
+
+TOTAL: ${invoice.currency || 'INR'} ${invoice.total || invoice.totalAmount || 0}
+    `.trim();
+    
+    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Content-Disposition', `attachment; filename="invoice-${invoice._id}.txt"`);
+    res.send(invoiceText);
+  }),
   update: asyncHandler(async (req, res) => {
     requireRole(req.user, ['ADMIN', 'OPERATIONS_MANAGER']);
     const invoice = await Invoice.findById(req.params.id);
