@@ -70,10 +70,11 @@ export const bookingApi = apiSlice.injectEndpoints({
     }),
 
     addEvidence: builder.mutation({
-      query: ({ id, ...data }) => ({
+      query: ({ id, formData }) => ({
         url: `/bookings/${id}/evidence`,
         method: 'POST',
-        body: data,
+        body: formData,
+        formData: true,
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Booking', id }],
     }),

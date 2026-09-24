@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const cloudinary = require('../config/cloudinary');
 const ServiceCategory = require('../models/ServiceCategory');
 const Skill = require('../models/Skill');
 const PricingRule = require('../models/PricingRule');
@@ -22,6 +23,7 @@ const { recordAudit } = require('../services/audit.service');
 const { createNotification } = require('../services/notification.service');
 const { analyzeServiceRequest, summarizeDispute, reanalyzeAfterCorrection } = require('../services/ai.service');
 const { getProviderMatches } = require('../services/matching.service');
+const { assertNoAvailabilityOverlap } = require('../services/availability.service');
 
 const customerRoles = ['CUSTOMER'];
 const elevatedRoles = ['ADMIN', 'OPERATIONS_MANAGER', 'SUPPORT_AGENT'];
@@ -314,6 +316,16 @@ const getOwnProviderProfile = async (user) => {
   return profile;
 };
 
+const ensureProviderOwnership = async (user, providerId) => {
+  if (hasRole(user, ['ADMIN', 'OPERATIONS_MANAGER'])) return;
+  if (user.role !== 'SERVICE_PROVIDER') throw AppError.forbidden('Provider access is required.');
+
+  const profile = await getOwnProviderProfile(user);
+  if (!isSameId(profile._id, providerId)) {
+    throw AppError.forbidden('You cannot modify another provider resource.');
+  }
+};
+
 const providerController = {
   list: asyncHandler(async (req, res) => {
     const query = {};
@@ -380,20 +392,42 @@ const availabilityController = {
   create: asyncHandler(async (req, res) => {
     requireRole(req.user, ['SERVICE_PROVIDER']);
     const provider = await getOwnProviderProfile(req.user);
-    const slot = await AvailabilitySlot.create({ ...req.body, provider: provider._id });
+    const { start, end } = await assertNoAvailabilityOverlap({
+      provider: provider._id,
+      startAt: req.body.startAt,
+      endAt: req.body.endAt,
+    });
+    const slot = await AvailabilitySlot.create({
+      ...req.body,
+      provider: provider._id,
+      startAt: start,
+      endAt: end,
+    });
     sendSuccess(res, 201, 'Availability slot created.', { availabilitySlot: slot });
   }),
   update: asyncHandler(async (req, res) => {
     const slot = await AvailabilitySlot.findById(req.params.id);
     if (!slot) throw AppError.notFound('Availability slot not found.');
+    await ensureProviderOwnership(req.user, slot.provider);
+    const { start, end } = await assertNoAvailabilityOverlap({
+      provider: slot.provider,
+      startAt: req.body.startAt || slot.startAt,
+      endAt: req.body.endAt || slot.endAt,
+      excludeId: slot._id,
+    });
     ['startAt', 'endAt', 'isRecurring', 'recurrence'].forEach((f) => {
       if (req.body[f] !== undefined) slot[f] = req.body[f];
     });
+    slot.startAt = start;
+    slot.endAt = end;
     await slot.save();
     sendSuccess(res, 200, 'Availability slot updated.', { availabilitySlot: slot });
   }),
   remove: asyncHandler(async (req, res) => {
-    await AvailabilitySlot.findByIdAndDelete(req.params.id);
+    const slot = await AvailabilitySlot.findById(req.params.id);
+    if (!slot) throw AppError.notFound('Availability slot not found.');
+    await ensureProviderOwnership(req.user, slot.provider);
+    await slot.deleteOne();
     sendSuccess(res, 200, 'Availability slot removed.');
   }),
 };
@@ -606,11 +640,47 @@ const bookingController = {
   }),
   addEvidence: asyncHandler(async (req, res) => {
     const booking = await getBookingForAccess(req.params.id, req.user);
+    
+    let fileData = {};
+    
+    // Handle file upload
+    if (req.file) {
+      try {
+        // Convert file buffer to base64 for storage
+        const base64 = req.file.buffer.toString('base64');
+        fileData = {
+          url: `data:${req.file.mimetype};base64,${base64}`,
+          name: req.file.originalname,
+          mimeType: req.file.mimetype,
+        };
+      } catch (uploadError) {
+        console.error('File upload error:', uploadError);
+        fileData = {
+          url: '',
+          name: req.file.originalname,
+          mimeType: req.file.mimetype,
+        };
+      }
+    } else {
+      // Handle JSON file data (fallback when no file uploaded)
+      if (typeof req.body.file === 'string') {
+        try {
+          fileData = JSON.parse(req.body.file);
+        } catch (e) {
+          fileData = { url: req.body.file, name: 'Evidence File', mimeType: 'image/jpeg' };
+        }
+      } else if (req.body.file) {
+        fileData = req.body.file;
+      } else {
+        fileData = { url: '', name: 'No file uploaded', mimeType: 'application/octet-stream' };
+      }
+    }
+    
     const evidenceItem = {
       uploadedBy: req.user._id,
       type: req.body.type || 'OTHER_APPROVED_EVIDENCE',
       description: req.body.description || '',
-      file: req.body.file || {},
+      file: fileData,
       relatedScopeChangeId: req.body.relatedScopeChangeId || null,
     };
     booking.evidence.push(evidenceItem);
@@ -773,6 +843,7 @@ const disputeController = {
     if (!booking) throw AppError.notFound('Booking not found.');
     const dispute = await Dispute.create({
       booking: booking._id,
+      serviceRequest: booking.serviceRequest,
       openedBy: req.user._id,
       reason: req.body.reason,
       description: req.body.description || '',
@@ -842,6 +913,28 @@ const notificationController = {
       { isRead: true, readAt: new Date() }
     );
     sendSuccess(res, 200, 'All notifications marked as read.');
+  }),
+  quoteRequest: asyncHandler(async (req, res) => {
+    const { serviceRequestId, providerId } = req.body;
+    
+    // Get the service request
+    const serviceRequest = await ServiceRequest.findById(serviceRequestId);
+    if (!serviceRequest) throw AppError.notFound('Service request not found.');
+    
+    // Get the provider user
+    const providerProfile = await ProviderProfile.findById(providerId).populate('user');
+    if (!providerProfile) throw AppError.notFound('Provider profile not found.');
+    
+    // Create notification for the provider
+    await createNotification({
+      recipient: providerProfile.user._id,
+      type: 'QUOTE_REQUEST',
+      title: 'New Quote Request',
+      message: `A customer has requested a quote for their service request: ${serviceRequest.title}`,
+      relatedResource: { resourceType: 'ServiceRequest', resourceId: serviceRequestId }
+    });
+    
+    sendSuccess(res, 201, 'Quote request notification sent.');
   }),
 };
 

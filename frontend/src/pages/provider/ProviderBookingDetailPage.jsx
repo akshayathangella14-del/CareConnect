@@ -17,7 +17,7 @@ export default function ProviderBookingDetailPage() {
   const [addEvidence, { isLoading: isUploading }] = useAddEvidenceMutation();
 
   const [isEvidenceModalOpen, setIsEvidenceModalOpen] = useState(false);
-  const [evidenceData, setEvidenceData] = useState({ type: 'BEFORE_SERVICE', description: '', url: '' });
+  const [evidenceData, setEvidenceData] = useState({ type: 'BEFORE_SERVICE', description: '', url: '', file: null });
   const [isRequestingScopeChange, setIsRequestingScopeChange] = useState(false);
 
   if (isLoading) return <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading job details...</div>;
@@ -39,16 +39,26 @@ export default function ProviderBookingDetailPage() {
   const handleEvidenceSubmit = async (e) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      formData.append('type', evidenceData.type);
+      formData.append('description', evidenceData.description);
+      
+      if (evidenceData.file) {
+        formData.append('file', evidenceData.file);
+      } else {
+        // Fallback to text data if no file is selected
+        formData.append('file', JSON.stringify({ url: evidenceData.url || '', name: 'Evidence File', mimeType: 'image/jpeg' }));
+      }
+      
       await addEvidence({
         id,
-        type: evidenceData.type,
-        description: evidenceData.description,
-        file: { url: evidenceData.url, name: 'Evidence Image', mimeType: 'image/jpeg' } // Mocking actual file upload
+        formData
       }).unwrap();
       setIsEvidenceModalOpen(false);
-      setEvidenceData({ type: 'BEFORE_SERVICE', description: '', url: '' });
+      setEvidenceData({ type: 'BEFORE_SERVICE', description: '', url: '', file: null });
     } catch (err) {
       console.error('Failed to upload evidence:', err);
+      alert('Failed to upload evidence. Please try again.');
     }
   };
 
@@ -264,13 +274,18 @@ export default function ProviderBookingDetailPage() {
               { value: 'COMPLETION', label: 'Final Completion Proof' },
             ]}
           />
-          <Input
-            label="Image URL (Simulated Upload)"
-            placeholder="https://example.com/image.jpg"
-            value={evidenceData.url}
-            onChange={(e) => setEvidenceData({...evidenceData, url: e.target.value})}
-            helperText="In production, this would be a file input uploading to S3/Cloudinary."
-          />
+          <div>
+            <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Upload File</label>
+            <input
+              type="file"
+              accept="image/*,.pdf"
+              onChange={(e) => setEvidenceData({...evidenceData, file: e.target.files[0]})}
+              style={{ width: '100%', padding: 'var(--space-2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)' }}
+            />
+            <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-muted)', marginTop: 'var(--space-1)' }}>
+              Supported formats: JPEG, PNG, GIF, PDF (Max 10MB)
+            </div>
+          </div>
           <Input
             label="Description"
             placeholder="Briefly describe what this photo shows"

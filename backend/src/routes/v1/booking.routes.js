@@ -1,5 +1,6 @@
 const express = require('express');
 const { authenticate } = require('../../middleware/auth.middleware');
+const { upload, fallbackUpload } = require('../../middleware/upload.middleware');
 const { bookingController, invoiceController } = require('../../controllers/business.controller');
 
 const router = express.Router();
@@ -14,7 +15,7 @@ router.post('/:id/start', bookingController.transition('start'));
 router.post('/:id/request-completion', bookingController.transition('requestCompletion'));
 router.post('/:id/confirm-completion', bookingController.transition('confirmCompletion'));
 router.post('/:id/cancel', bookingController.cancel);
-router.post('/:id/evidence', bookingController.addEvidence);
+router.post('/:id/evidence', fallbackUpload.single('file'), bookingController.addEvidence);
 router.post('/:id/scope-changes', bookingController.requestScopeChange);
 router.post('/:id/scope-changes/:changeId/approve', bookingController.decideScopeChange('APPROVED'));
 router.post('/:id/scope-changes/:changeId/reject', bookingController.decideScopeChange('REJECTED'));

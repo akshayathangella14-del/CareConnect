@@ -42,13 +42,28 @@ export default function ScopeMatchPage() {
   const handleRequestQuote = async (providerId) => {
     setRequestingId(providerId);
     try {
-      // In a real flow, you might just trigger a notification or create a draft quote.
-      // The API `useCreateQuoteForRequestMutation` is typically for the provider to submit to the customer.
-      // Assuming we have an endpoint or we just show a success message for the prototype:
-      alert('Quote request sent to provider! (This is a prototype action)');
-      // navigate(`/service-requests/${id}`);
+      // Notify the provider about the quote request
+      // This creates a notification for the provider to respond
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/notifications/quote-request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          serviceRequestId: id,
+          providerId: providerId
+        })
+      });
+      
+      if (response.ok) {
+        alert('Quote request sent to provider! They will be notified to submit a quote.');
+      } else {
+        throw new Error('Failed to send request');
+      }
     } catch (err) {
       console.error('Failed to request quote:', err);
+      alert('Failed to send quote request. Please try again.');
     } finally {
       setRequestingId(null);
     }
