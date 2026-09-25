@@ -13,7 +13,7 @@ import { MapPin, CalendarClock, Wand2, Check, ShieldAlert, CheckCircle } from 'l
 
 export default function ServiceRequestDetailPage() {
   const { id } = useParams();
-  const { data: request, isLoading, error } = useGetServiceRequestQuery(id);
+  const { data: request, isLoading, error, refetch } = useGetServiceRequestQuery(id);
   const { data: quotes = [] } = useListQuotesForRequestQuery(id, {
     skip: !request || request.status === 'DRAFT',
     pollingInterval: 5000,
@@ -69,6 +69,7 @@ export default function ServiceRequestDetailPage() {
     if (window.confirm('Are you sure you want to accept this quote? This will create a binding booking.')) {
       try {
         await acceptQuote(quoteId).unwrap();
+        await refetch();
       } catch (err) {
         console.error('Failed to accept quote:', err);
       }

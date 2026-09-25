@@ -4,7 +4,7 @@ import { useGetMeProviderQuery, useUpdateMeProviderMutation } from '@/features/p
 import { useListSkillsQuery } from '@/features/skills/skillApi';
 import { selectCurrentUser, updateUser, useUpdateProfileImageMutation } from '@/features/auth';
 import { Card, Input, Textarea, Button, Alert, Badge } from '@/components';
-import { User, MapPin, DollarSign, Briefcase, Plus, X, Wrench, Camera } from 'lucide-react';
+import { User, MapPin, IndianRupee, Briefcase, Plus, X, Wrench, Camera } from 'lucide-react';
 
 export default function ProviderProfilePage() {
   const dispatch = useDispatch();
@@ -263,7 +263,7 @@ export default function ProviderProfilePage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <h3 style={{ fontSize: 'var(--font-size-h4)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-              <DollarSign size={18} color="var(--color-primary)" /> Default Pricing
+              <IndianRupee size={18} color="var(--color-primary)" /> Default Pricing
             </h3>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
@@ -275,7 +275,7 @@ export default function ProviderProfilePage() {
                 step="0.01"
                 value={formData.baseHourlyRate}
                 onChange={handleChange}
-                leftIcon={<DollarSign size={16} />}
+                leftIcon={<IndianRupee size={16} />}
               />
               <Input
                 label="Minimum Visit Charge"
@@ -285,7 +285,7 @@ export default function ProviderProfilePage() {
                 step="0.01"
                 value={formData.minimumVisitCharge}
                 onChange={handleChange}
-                leftIcon={<DollarSign size={16} />}
+                leftIcon={<IndianRupee size={16} />}
               />
             </div>
           </div>

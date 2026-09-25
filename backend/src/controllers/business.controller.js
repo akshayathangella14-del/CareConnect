@@ -1180,18 +1180,20 @@ const analyticsController = {
   }),
   summary: asyncHandler(async (req, res) => {
     requireRole(req.user, ['ADMIN', 'OPERATIONS_MANAGER']);
-    const [totalRequests, activeBookings, completedBookings, totalProviders, totalCustomers, totalUsers, bookings] = await Promise.all([
+    const [totalRequests, activeBookings, completedBookings, totalProviders, totalCustomers, totalUsers, suspendedUsers, bookings] = await Promise.all([
       ServiceRequest.countDocuments(),
       Booking.countDocuments({ status: { $nin: ['COMPLETED', 'CANCELLED'] } }),
       Booking.countDocuments({ status: 'COMPLETED' }),
       ProviderProfile.countDocuments({ verificationStatus: 'VERIFIED' }),
       User.countDocuments({ role: 'CUSTOMER', status: 'ACTIVE' }),
       User.countDocuments(),
+      User.countDocuments({ status: 'SUSPENDED' }),
       Booking.countDocuments(),
     ]);
     sendSuccess(res, 200, 'Analytics summary.', {
-      analytics: { totalRequests, activeBookings, completedBookings, totalProviders, totalCustomers, totalUsers, bookings },
+      analytics: { totalRequests, activeBookings, completedBookings, totalProviders, totalCustomers, totalUsers, suspendedUsers, bookings },
       totalUsers,
+      suspendedUsers,
       bookings,
     });
   }),

@@ -6,12 +6,18 @@ import { selectCurrentUser } from '@/features/auth';
 import { useListServiceRequestsQuery } from '@/features/serviceRequests';
 import { useListBookingsQuery } from '@/features/bookings';
 import { useListProvidersQuery } from '@/features/providers';
+import { useListDisputesQuery } from '@/features/disputes';
 
 export default function OpsDashboard() {
   const user = useSelector(selectCurrentUser);
   const { data: requests = [] } = useListServiceRequestsQuery(undefined, { pollingInterval: 15000 });
   const { data: bookings = [] } = useListBookingsQuery(undefined, { pollingInterval: 15000 });
   const { data: providers = [] } = useListProvidersQuery(undefined, { pollingInterval: 30000 });
+  const { data: disputes = [] } = useListDisputesQuery(undefined, { pollingInterval: 15000 });
+
+  const activeBookings = bookings.filter((booking) => !['COMPLETED', 'CANCELLED'].includes(booking.status));
+  const delayedBookings = activeBookings.filter((booking) => booking.scheduledEndAt && new Date(booking.scheduledEndAt) < new Date());
+  const escalations = disputes.filter((dispute) => !['RESOLVED', 'CLOSED'].includes(dispute.status));
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -20,8 +26,8 @@ export default function OpsDashboard() {
   const metricCards = [
     { label: 'Requests needing dispatch', value: requests.filter((request) => ['MATCHING', 'QUOTING'].includes(request.status)).length, tone: 'primary' },
     { label: 'Pending verifications', value: providers.filter((provider) => provider.verificationStatus === 'PENDING').length, tone: 'warning' },
-    { label: 'Active jobs', value: bookings.filter((booking) => !['COMPLETED', 'CANCELLED'].includes(booking.status)).length, tone: 'success' },
-    { label: 'Jobs awaiting action', value: bookings.filter((booking) => ['PENDING_CONFIRMATION', 'AWAITING_CUSTOMER_CONFIRMATION'].includes(booking.status)).length, tone: 'violet' },
+    { label: 'Active jobs', value: activeBookings.length, tone: 'success' },
+    { label: 'Jobs awaiting action', value: activeBookings.filter((booking) => ['PENDING_CONFIRMATION', 'AWAITING_CUSTOMER_CONFIRMATION'].includes(booking.status)).length, tone: 'violet' },
   ];
 
   const queueItems = [
@@ -91,15 +97,15 @@ export default function OpsDashboard() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
             <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
               <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Provider utilization</div>
-              <div style={{ marginTop: 8, fontWeight: 700 }}>81%</div>
+              <div style={{ marginTop: 8, fontWeight: 700 }}>{activeBookings.length ? `${Math.round((activeBookings.filter((booking) => booking.status !== 'PENDING_CONFIRMATION').length / activeBookings.length) * 100)}%` : '0%'}</div>
             </div>
             <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
               <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Delayed jobs</div>
-              <div style={{ marginTop: 8, fontWeight: 700 }}>8 requiring action</div>
+              <div style={{ marginTop: 8, fontWeight: 700 }}>{delayedBookings.length} requiring action</div>
             </div>
             <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
               <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Escalations</div>
-              <div style={{ marginTop: 8, fontWeight: 700 }}>3 high priority</div>
+              <div style={{ marginTop: 8, fontWeight: 700 }}>{escalations.length} open cases</div>
             </div>
           </div>
         </Card>
@@ -113,15 +119,15 @@ export default function OpsDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-3)' }}>
           <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
             <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Average dispatch time</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>42 minutes</div>
+            <div style={{ marginTop: 8, fontWeight: 700 }}>{requests.length ? 'Live queue active' : 'No queue data'}</div>
           </div>
           <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
             <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>SLA compliance</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>94%</div>
+            <div style={{ marginTop: 8, fontWeight: 700 }}>{delayedBookings.length ? 'Needs attention' : 'On track'}</div>
           </div>
           <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
             <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Quality review backlog</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>5 pending</div>
+            <div style={{ marginTop: 8, fontWeight: 700 }}>{escalations.length} open</div>
           </div>
         </div>
       </Card>

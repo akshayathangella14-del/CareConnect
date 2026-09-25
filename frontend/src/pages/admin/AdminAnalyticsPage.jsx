@@ -1,5 +1,5 @@
 import { Card } from '@/components';
-import { BarChart3, TrendingUp, Users, CircleDollarSign } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, IndianRupee } from 'lucide-react';
 
 export default function AdminAnalyticsPage() {
   return (
@@ -44,7 +44,7 @@ export default function AdminAnalyticsPage() {
         </Card>
 
         <Card padding="lg">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}><CircleDollarSign size={18} color="var(--color-warning)" /> <h3 style={{ margin: 0 }}>Revenue summary</h3></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}><IndianRupee size={18} color="var(--color-warning)" /> <h3 style={{ margin: 0 }}>Revenue summary</h3></div>
           <ul style={{ color: 'var(--color-text-secondary)', margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <li>Gross bookings: ₹ 9.8L</li>
             <li>Commissioned revenue: ₹ 1.6L</li>
