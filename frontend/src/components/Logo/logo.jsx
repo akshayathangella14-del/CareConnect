@@ -5,9 +5,9 @@ import { Sparkles, Home, Shield } from 'lucide-react';
  * Animated Logo Component
  * Combines home services, trust (shield), and AI/magic (sparkles)
  */
-export default function Logo({ size = 'md', animated = true }) {
+export default function Logo({ size = 'md', animated = true, variant = 'default' }) {
   return (
-    <div className={`${styles.logoContainer} ${styles[`size-${size}`]}`}>
+    <div className={`${styles.logoContainer} ${styles[`size-${size}`]} ${variant === 'light' ? styles.light : ''}`}>
       <div className={`${styles.iconWrapper} ${animated ? styles.animated : ''}`}>
         <div className={styles.iconBackground}></div>
         <Home className={styles.homeIcon} />

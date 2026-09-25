@@ -1,54 +1,51 @@
 /* ============================================================
-   CareConnect Design Tokens — v2.0 (Coral Rose UI Redesign)
+   CareConnect Design Tokens — v3.0 (Lagoon Coral)
    
    Visual Identity:
-   - Primary: Coral Rose (#FF6B6B) — Warm, vibrant, welcoming
-   - Secondary: Teal Ocean (#4ECDC4) — Calming, fresh complement
-   - Accent: Amber Gold (#FFB84D) — Premium highlights, ratings
-   - Neutrals: Clean white + warm grays
+   - Primary: Punch Coral (#FF4D6D) — energetic, warm, Indian marketplace
+   - Secondary: Lagoon Teal (#12C4C9) — fresh, trustworthy complement
+   - Accent: Saffron Gold (#FFB347) — highlights, ratings, CTAs
+   - Neutrals: Warm white + soft sand
    
    Fonts: Poppins (headings) + Inter (body)
    ============================================================ */
 
 :root {
   /* ----------------------------------------------------------
-     PRIMARY BRAND COLOR — Rich Purple
-     Creative, modern, premium.
+     PRIMARY BRAND COLOR — Punch Coral
      ---------------------------------------------------------- */
-  --color-primary: #7C3AED;
-  --color-primary-light: #8B5CF6;
-  --color-primary-dark: #6D28D9;
-  --color-primary-hover: #6D28D9;
-  --color-primary-active: #5B21B6;
-  --color-primary-soft: #F5F3FF;
-  --color-primary-muted: #EDE9FE;
-  --color-primary-100: #EDE9FE;
-  --color-primary-200: #DDD6FE;
-  --color-primary-700: #6D28D9;
-  --color-primary-800: #5B21B6;
+  --color-primary: #FF4D6D;
+  --color-primary-light: #FF738B;
+  --color-primary-dark: #E83155;
+  --color-primary-hover: #E83155;
+  --color-primary-active: #C91F44;
+  --color-primary-soft: #FFF1F4;
+  --color-primary-muted: #FFD6DE;
+  --color-primary-100: #FFE4EA;
+  --color-primary-200: #FFC2CD;
+  --color-primary-700: #C91F44;
+  --color-primary-800: #A31838;
 
   /* ----------------------------------------------------------
-     SECONDARY — Amber
-     Warm complement
+     SECONDARY — Lagoon Teal
      ---------------------------------------------------------- */
-  --color-secondary: #F59E0B;
-  --color-secondary-light: #FBBF24;
-  --color-secondary-dark: #D97706;
-  --color-secondary-soft: #FFFBEB;
-  --color-secondary-hover: #D97706;
+  --color-secondary: #12C4C9;
+  --color-secondary-light: #3DDEE2;
+  --color-secondary-dark: #0A9BA0;
+  --color-secondary-soft: #E7FBFC;
+  --color-secondary-hover: #0A9BA0;
 
   /* ----------------------------------------------------------
-     ACCENT — Emerald
-     Success states
+     ACCENT — Saffron Gold
      ---------------------------------------------------------- */
-  --color-accent: #10B981;
-  --color-accent-light: #34D399;
-  --color-accent-dark: #059669;
-  --color-accent-hover: #059669;
-  --color-accent-active: #047857;
-  --color-accent-soft: #ECFDF5;
-  --color-accent-100: #D1FAE5;
-  --color-accent-700: #047857;
+  --color-accent: #FFB347;
+  --color-accent-light: #FFC66D;
+  --color-accent-dark: #E89620;
+  --color-accent-hover: #E89620;
+  --color-accent-active: #D07E10;
+  --color-accent-soft: #FFF6E8;
+  --color-accent-100: #FFE8C7;
+  --color-accent-700: #B86A0E;
 
   /* ----------------------------------------------------------
      SUPPORTING — Violet (Kept for compatibility)
@@ -63,23 +60,23 @@
      BACKGROUNDS & SURFACES
      Sophisticated neutrals
      ---------------------------------------------------------- */
-  --color-background: #FFFFFF;
-  --color-surface: #F8FAFC;
-  --color-surface-muted: #F1F5F9;
-  --color-surface-warm: #FFFBEB;
-  --color-surface-alt: #E2E8F0;
+  --color-background: #FFF8F4;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #FFF1EA;
+  --color-surface-warm: #FFF6EC;
+  --color-surface-alt: #F3E7DC;
   --color-surface-elevated: #FFFFFF;
 
   /* ----------------------------------------------------------
      TEXT COLORS
      Deep Navy and Slate
      ---------------------------------------------------------- */
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #475569;
-  --color-text-muted: #94A3B8;
-  --color-text-disabled: #CBD5E1;
+  --color-text-primary: #1A2332;
+  --color-text-secondary: #4A5568;
+  --color-text-muted: #8B95A7;
+  --color-text-disabled: #C5CDD8;
   --color-text-inverse: #FFFFFF;
-  --color-text: #0F172A;
+  --color-text: #1A2332;
 
   /* ----------------------------------------------------------
      BORDER COLORS

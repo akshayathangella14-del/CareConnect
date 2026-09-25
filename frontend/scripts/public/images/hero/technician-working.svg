@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#12C4C9"/>
+      <stop offset="100%" stop-color="#1A2332"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#g)"/>
+  <circle cx="980" cy="140" r="180" fill="rgba(255,255,255,0.12)"/>
+  <circle cx="160" cy="680" r="220" fill="rgba(255,255,255,0.08)"/>
+  <text x="60" y="420" fill="white" font-family="Arial" font-size="52" font-weight="700">Technician at work</text>
+  <text x="60" y="480" fill="rgba(255,255,255,0.8)" font-family="Arial" font-size="28">CareConnect placeholder</text>
+</svg>

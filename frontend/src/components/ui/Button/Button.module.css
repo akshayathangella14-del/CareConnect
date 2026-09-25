@@ -49,18 +49,18 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* ---- Primary Variant (Rich Purple) ---- */
+/* ---- Primary Variant (Punch Coral) ---- */
 .btn--primary {
   background-color: var(--color-primary);
   color: #FFFFFF;
   border-color: var(--color-primary);
-  box-shadow: 0 1px 3px rgba(124, 58, 237, 0.25);
+  box-shadow: 0 1px 3px rgba(255, 77, 109, 0.25);
 }
 
 .btn--primary:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
-  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 6px 16px rgba(255, 77, 109, 0.4);
   transform: scale(1.05);
 }
 
@@ -69,18 +69,19 @@
   transform: scale(0.95);
 }
 
-/* ---- Accent Variant (Emerald) ---- */
+/* ---- Accent Variant (Saffron Gold) ---- */
 .btn--accent {
   background-color: var(--color-accent);
-  color: #FFFFFF;
+  color: #1A2332;
   border-color: var(--color-accent);
-  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 1px 3px rgba(255, 179, 71, 0.35);
 }
 
 .btn--accent:hover:not(:disabled) {
   background-color: var(--color-accent-hover);
   border-color: var(--color-accent-hover);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  color: #1A2332;
+  box-shadow: 0 6px 16px rgba(255, 179, 71, 0.45);
   transform: scale(1.05);
 }
 

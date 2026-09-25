@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Eye, EyeOff, Wrench, AlertCircle, User, Briefcase, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, User, Briefcase, ArrowRight } from 'lucide-react';
 import { Button, Input } from '@/components';
 import { apiSlice } from '@/api/apiSlice';
 import {
@@ -117,14 +117,6 @@ function RegisterPage() {
 
   return (
     <AuthLayout>
-      {/* Mobile Logo */}
-      <div className={styles['auth__form-mobile-logo']}>
-        <span className={styles['auth__form-mobile-logo-icon']}>
-          <Wrench size={20} />
-        </span>
-        <span className={styles['auth__form-mobile-logo-text']}>CareConnect</span>
-      </div>
-
       <div className={styles['auth__form-header']}>
         <h2 className={styles['auth__form-title']}>Create your account</h2>
         <p className={styles['auth__form-subtitle']}>

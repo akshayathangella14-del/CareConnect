@@ -1,0 +1,85 @@
+.footer {
+  position: relative;
+  margin-top: var(--space-16);
+  padding: var(--space-16) var(--space-6) var(--space-8);
+  background: #1A2332;
+  color: #fff;
+  overflow: hidden;
+}
+
+.pattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+}
+
+.pattern img,
+.pattern div {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.grid {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 1fr);
+  gap: var(--space-8);
+}
+
+.blurb {
+  margin: var(--space-4) 0;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 360px;
+}
+
+.social {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.social a {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.grid h4 {
+  color: #fff;
+  margin-bottom: var(--space-3);
+}
+
+.grid a,
+.grid span {
+  display: block;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: var(--space-2);
+}
+
+.grid a:hover {
+  color: var(--color-accent);
+}
+
+.copy {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: var(--space-10) auto 0;
+  padding-top: var(--space-6);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .footer { padding-inline: var(--space-4); }
+}
