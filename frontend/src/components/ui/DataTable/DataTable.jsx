@@ -1,4 +1,25 @@
+import { createElement, isValidElement } from 'react';
 import styles from './DataTable.module.css';
+
+const renderCellValue = (value) => {
+  if (isValidElement(value) || value === null || value === undefined) {
+    return value;
+  }
+
+  if (typeof value === 'function') {
+    return createElement(value);
+  }
+
+  if (typeof value === 'object') {
+    if (value.$$typeof && value.render) {
+      return createElement(value);
+    }
+
+    return Object.keys(value).length > 0 ? JSON.stringify(value) : '';
+  }
+
+  return value;
+};
 
 /**
  * DataTable Component
@@ -38,9 +59,9 @@ export function DataTable({ columns, data, keyField = 'id', onRowClick, emptyMes
           </tr>
         </thead>
         <tbody className={styles.tbody}>
-          {data.map((row) => (
+          {data.map((row, rowIndex) => (
             <tr
-              key={row[keyField] || Math.random()}
+              key={row?.[keyField] || row?._id || `row-${rowIndex}`}
               className={`${styles.tr} ${onRowClick ? styles['tr--clickable'] : ''}`}
               onClick={(event) => handleRowClick(event, row)}
             >
@@ -50,7 +71,9 @@ export function DataTable({ columns, data, keyField = 'id', onRowClick, emptyMes
                   className={`${styles.td} ${col.align === 'right' ? styles['td--right'] : ''}`}
                   data-label={col.header} // For mobile card view
                 >
-                  {col.render ? col.render(row) : row[col.key]}
+                  <div className={styles.cellContent}>
+                    {renderCellValue(col.render ? col.render(row) : row?.[col.key])}
+                  </div>
                 </td>
               ))}
             </tr>

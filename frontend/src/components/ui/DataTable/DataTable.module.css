@@ -56,6 +56,10 @@
   vertical-align: middle;
 }
 
+.cellContent {
+  width: 100%;
+}
+
 .td--right {
   text-align: right;
 }

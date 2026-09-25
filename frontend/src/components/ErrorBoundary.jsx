@@ -13,13 +13,19 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error('Component stack:', errorInfo.componentStack);
   }
 
   render() {
     if (this.state.hasError) {
       return (
         <Alert variant="error" title="Something went wrong">
-          {this.state.error?.message || 'An unexpected error occurred while loading this page.'}
+          <div style={{ marginBottom: 'var(--space-2)' }}>
+            {this.state.error?.message || 'An unexpected error occurred while loading this page.'}
+          </div>
+          <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-muted)' }}>
+            Error: {this.state.error?.toString() || 'Unknown error'}
+          </div>
         </Alert>
       );
     }

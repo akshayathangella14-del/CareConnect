@@ -43,10 +43,11 @@ export default function ServiceRequestsPage() {
       header: 'Urgency',
       key: 'urgency',
       render: (req) => {
-        const urgency = typeof req?.urgency === 'string' ? req.urgency.toUpperCase() : 'NORMAL';
+        const urgency = req?.urgency || 'NORMAL';
         const urgencyClass = urgency.toLowerCase();
+        const urgencyStyle = styles[`urgency--${urgencyClass}`] || styles['urgency--normal'];
         return (
-          <span className={`${styles.urgency} ${styles[`urgency--${urgencyClass}`]}`}>
+          <span className={`${styles.urgency} ${urgencyStyle}`}>
             {urgency}
           </span>
         );
