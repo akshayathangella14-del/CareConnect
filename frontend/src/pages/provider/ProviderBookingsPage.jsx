@@ -71,6 +71,7 @@ export default function ProviderBookingsPage() {
       <Card padding="md" style={{ backgroundColor: 'var(--color-surface-muted)' }}>
         <h3 style={{ margin: 0, marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-body)' }}>Provider workflow</h3>
         <ol style={{ margin: 0, paddingLeft: 'var(--space-5)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)', lineHeight: 1.8 }}>
+          <li>Open Matched Requests and choose work that fits your skills and service area.</li>
           <li>Submit a quote and wait for the customer to accept it.</li>
           <li>Open the new pending booking and confirm the job.</li>
           <li>Mark En Route, Arrived, and Start Work as the job progresses.</li>

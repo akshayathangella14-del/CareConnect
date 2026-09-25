@@ -73,6 +73,17 @@ export default function ServiceRequestsPage() {
         </Link>
       </div>
 
+      <Card padding="md" style={{ backgroundColor: 'var(--color-surface-muted)' }}>
+        <h3 style={{ margin: 0, marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-body)' }}>How to book a service</h3>
+        <ol style={{ margin: 0, paddingLeft: 'var(--space-5)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)', lineHeight: 1.8 }}>
+          <li>Create and submit a service request for AI matching.</li>
+          <li>Wait for verified providers to submit quotes.</li>
+          <li>Open a request to compare provider pricing, timing, and scope.</li>
+          <li>Accept the quote that best fits your needs.</li>
+          <li>Track the booking, confirm completion, pay the invoice, and leave a review.</li>
+        </ol>
+      </Card>
+
       {error && (
         <Alert variant="error" title="Could not load service requests">
           {errorMessage}
