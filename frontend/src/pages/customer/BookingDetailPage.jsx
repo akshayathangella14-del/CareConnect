@@ -5,7 +5,7 @@ import {
   useTransitionBookingMutation,
   useGetServiceTraceQuery
 } from '@/features/bookings';
-import { Card, Button, StatusBadge, Alert, Tabs, Timeline, Badge } from '@/components';
+import { Card, Button, StatusBadge, Alert, Tabs, Timeline, Badge, PaymentModal } from '@/components';
 import { CalendarClock, MapPin, Wrench, Shield, CheckCircle2, FileText, Camera } from 'lucide-react';
 import ScopeChangeApproval from '@/components/booking/ScopeChangeApproval';
 import ServiceTraceTimeline from '@/components/booking/ServiceTraceTimeline';
@@ -16,6 +16,7 @@ export default function BookingDetailPage() {
   const { data: serviceTrace = [] } = useGetServiceTraceQuery(id, { skip: !booking });
   
   const [transitionBooking, { isLoading: isTransitioning }] = useTransitionBookingMutation();
+  const [invoiceToPay, setInvoiceToPay] = useState(null);
 
   if (isLoading) return <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading booking details...</div>;
   
@@ -51,6 +52,12 @@ export default function BookingDetailPage() {
             </span>
           </div>
         </div>
+
+        {booking?.invoice && booking.invoice.status !== 'PAID' && (
+          <Button variant="primary" onClick={() => setInvoiceToPay(booking.invoice)}>
+            Pay Invoice
+          </Button>
+        )}
         
         {isAwaitingCompletion && (
           <Button
@@ -209,6 +216,16 @@ export default function BookingDetailPage() {
           )}
         </div>
       </div>
+
+      <PaymentModal
+        isOpen={Boolean(invoiceToPay)}
+        invoice={invoiceToPay}
+        onClose={() => setInvoiceToPay(null)}
+        onSuccess={() => {
+          setInvoiceToPay(null);
+          window.location.reload();
+        }}
+      />
     </div>
   );
 }

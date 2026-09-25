@@ -41,6 +41,26 @@ export const authApi = apiSlice.injectEndpoints({
       transformResponse: unwrapAuthData,
     }),
 
+    updateMe: builder.mutation({
+      query: (updates) => ({
+        url: '/auth/me',
+        method: 'PATCH',
+        body: updates,
+      }),
+      transformResponse: unwrapAuthData,
+      invalidatesTags: ['User'],
+    }),
+
+    updateProfileImage: builder.mutation({
+      query: (formData) => ({
+        url: '/auth/me/profile-image',
+        method: 'POST',
+        body: formData,
+      }),
+      transformResponse: unwrapAuthData,
+      invalidatesTags: ['User'],
+    }),
+
     logout: builder.mutation({
       query: () => ({
         url: '/auth/logout',
@@ -54,5 +74,7 @@ export const {
   useRegisterMutation,
   useLoginMutation,
   useGetMeQuery,
+  useUpdateMeMutation,
+  useUpdateProfileImageMutation,
   useLogoutMutation,
 } = authApi;

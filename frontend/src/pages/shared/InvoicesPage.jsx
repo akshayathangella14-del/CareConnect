@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useListInvoicesQuery } from '@/features/invoices';
-import { Card, Button, StatusBadge, DataTable, EmptyState } from '@/components';
+import { Card, Button, StatusBadge, DataTable, EmptyState, PaymentModal } from '@/components';
 import { Receipt, Download } from 'lucide-react';
 
 export default function InvoicesPage() {
   const { data: invoices = [], isLoading, isFetching } = useListInvoicesQuery();
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   const handleDownloadPdf = (invoiceId) => {
     window.open(`/api/v1/invoices/${invoiceId}/download`, '_blank');
@@ -59,14 +61,21 @@ export default function InvoicesPage() {
       header: 'Action',
       key: 'action',
       render: (inv) => (
-        <Button 
-          size="sm" 
-          variant="outline" 
-          leftIcon={<Download size={14} />}
-          onClick={() => handleDownloadPdf(inv._id)}
-        >
-          PDF
-        </Button>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+          {inv.status !== 'PAID' && (
+            <Button size="sm" variant="primary" onClick={() => setSelectedInvoice(inv)}>
+              Pay Now
+            </Button>
+          )}
+          <Button 
+            size="sm" 
+            variant="outline" 
+            leftIcon={<Download size={14} />}
+            onClick={() => handleDownloadPdf(inv._id)}
+          >
+            PDF
+          </Button>
+        </div>
       ),
     },
   ];
@@ -103,6 +112,16 @@ export default function InvoicesPage() {
           </Card>
         </div>
       )}
+
+      <PaymentModal
+        isOpen={Boolean(selectedInvoice)}
+        invoice={selectedInvoice}
+        onClose={() => setSelectedInvoice(null)}
+        onSuccess={() => {
+          setSelectedInvoice(null);
+          window.location.reload();
+        }}
+      />
     </div>
   );
 }

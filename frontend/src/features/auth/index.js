@@ -12,6 +12,8 @@ export {
   useRegisterMutation,
   useLoginMutation,
   useGetMeQuery,
+  useUpdateMeMutation,
+  useUpdateProfileImageMutation,
   useLogoutMutation,
 } from './authApi';
 export {

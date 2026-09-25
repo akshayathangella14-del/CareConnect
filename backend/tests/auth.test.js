@@ -258,6 +258,28 @@ test('valid token is accepted by /auth/me and missing token is rejected', async 
     .expect(401);
 });
 
+test('authenticated users can update their profile image URL through /auth/me', async () => {
+  const payload = validRegistration({ email: 'profile-image@example.com' });
+
+  const registered = await request(app)
+    .post('/api/v1/auth/register')
+    .set('Origin', 'http://localhost:3000')
+    .send(payload)
+    .expect(201);
+
+  const profileImageUrl = 'https://images.example.com/customer-avatar.png';
+
+  const response = await request(app)
+    .patch('/api/v1/auth/me')
+    .set('Origin', 'http://localhost:3000')
+    .set('Authorization', `Bearer ${registered.body.data.token}`)
+    .send({ profileImage: profileImageUrl })
+    .expect(200);
+
+  assert.equal(response.body.success, true);
+  assert.equal(response.body.data.user.profileImage, profileImageUrl);
+});
+
 test('malformed and invalid tokens are rejected', async () => {
   await request(app)
     .get('/api/v1/auth/me')

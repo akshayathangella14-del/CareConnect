@@ -9,6 +9,7 @@ export { Badge } from './ui/Badge';
 export { Card } from './ui/Card';
 export { Divider } from './ui/Divider';
 export { Modal } from './ui/Modal';
+export { default as PaymentModal } from './payments/PaymentModal';
 export { Select } from './ui/Select';
 export { Tabs } from './ui/Tabs';
 export { StatusBadge } from './ui/StatusBadge';

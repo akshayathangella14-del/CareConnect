@@ -5,6 +5,8 @@ const { Schema } = mongoose;
 const INVOICE_STATUSES = ['DRAFT', 'ISSUED', 'UNPAID', 'PAID', 'VOID'];
 const INVOICE_PAYMENT_STATUSES = [
   'NOT_APPLICABLE',
+  'UNPAID',
+  'PAID',
   'REFUND_PENDING',
   'PARTIALLY_REFUNDED',
   'REFUNDED',
@@ -73,6 +75,10 @@ const invoiceSchema = new Schema(
       default: null,
     },
     dueAt: {
+      type: Date,
+      default: null,
+    },
+    paidAt: {
       type: Date,
       default: null,
     },

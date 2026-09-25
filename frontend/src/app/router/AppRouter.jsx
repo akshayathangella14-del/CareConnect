@@ -11,6 +11,7 @@ import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 
 /* Customer Pages */
+import CustomerProfilePage from '@/pages/customer/CustomerProfilePage';
 import CreateServiceRequestPage from '@/pages/customer/CreateServiceRequestPage';
 import ServiceRequestsPage from '@/pages/customer/ServiceRequestsPage';
 import ServiceRequestDetailPage from '@/pages/customer/ServiceRequestDetailPage';
@@ -34,12 +35,17 @@ import ProviderVerificationPage from '@/pages/operations/ProviderVerificationPag
 import OpsServiceRequestsPage from '@/pages/operations/OpsServiceRequestsPage';
 import AdminCategoriesPage from '@/pages/admin/AdminCategoriesPage';
 import AdminAuditPage from '@/pages/admin/AdminAuditPage';
+import AdminUsersPage from '@/pages/admin/AdminUsersPage';
+import AdminProvidersPage from '@/pages/admin/AdminProvidersPage';
+import AdminAnalyticsPage from '@/pages/admin/AdminAnalyticsPage';
+import AdminPricingPage from '@/pages/admin/AdminPricingPage';
 
 /* Support & Shared Pages */
 import SupportDisputesPage from '@/pages/support/SupportDisputesPage';
 import SupportDisputeDetailPage from '@/pages/support/SupportDisputeDetailPage';
 import InvoicesPage from '@/pages/shared/InvoicesPage';
 import NotificationsPage from '@/pages/shared/NotificationsPage';
+import PaymentsPage from '@/pages/shared/PaymentsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 /**
@@ -93,6 +99,7 @@ function AppRouter() {
           }
         />
         {/* Customer Routes */}
+        <Route path="/profile" element={<RoleRoute roles={['CUSTOMER']}><CustomerProfilePage /></RoleRoute>} />
         <Route path="/service-requests/new" element={<RoleRoute roles={['CUSTOMER']}><CreateServiceRequestPage /></RoleRoute>} />
         <Route path="/service-requests" element={<RoleRoute roles={['CUSTOMER']}><ServiceRequestsPage /></RoleRoute>} />
         <Route path="/service-requests/:id/matches" element={<RoleRoute roles={['CUSTOMER']}><ProviderMatchesPage /></RoleRoute>} />
@@ -117,6 +124,10 @@ function AppRouter() {
         <Route path="/operations/requests" element={<RoleRoute roles={['OPERATIONS_MANAGER', 'ADMIN']}><OpsServiceRequestsPage /></RoleRoute>} />
 
         {/* Admin Routes */}
+        <Route path="/admin/users" element={<RoleRoute roles={['ADMIN']}><AdminUsersPage /></RoleRoute>} />
+        <Route path="/admin/providers" element={<RoleRoute roles={['ADMIN']}><AdminProvidersPage /></RoleRoute>} />
+        <Route path="/admin/analytics" element={<RoleRoute roles={['ADMIN']}><AdminAnalyticsPage /></RoleRoute>} />
+        <Route path="/admin/pricing" element={<RoleRoute roles={['ADMIN']}><AdminPricingPage /></RoleRoute>} />
         <Route path="/admin/categories" element={<RoleRoute roles={['ADMIN']}><AdminCategoriesPage /></RoleRoute>} />
         <Route path="/admin/audit" element={<RoleRoute roles={['ADMIN']}><AdminAuditPage /></RoleRoute>} />
 
@@ -127,6 +138,7 @@ function AppRouter() {
 
         {/* Shared Authenticated Routes */}
         <Route path="/invoices" element={<ProtectedRoute><InvoicesPage /></ProtectedRoute>} />
+          <Route path="/payments" element={<ProtectedRoute><PaymentsPage /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

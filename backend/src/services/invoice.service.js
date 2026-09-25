@@ -57,7 +57,7 @@ const createInvoiceForBooking = async (booking) => {
     issuedAt: new Date(),
     dueAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     status: 'ISSUED',
-    paymentStatus: 'NOT_APPLICABLE',
+    paymentStatus: 'UNPAID',
   });
 };
 

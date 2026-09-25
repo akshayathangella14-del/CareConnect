@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useGetMeProviderQuery, useUpdateMeProviderMutation } from '@/features/providers';
 import { useListSkillsQuery } from '@/features/skills/skillApi';
+import { selectCurrentUser, updateUser, useUpdateProfileImageMutation } from '@/features/auth';
 import { Card, Input, Textarea, Button, Alert, Badge } from '@/components';
-import { User, MapPin, DollarSign, Briefcase, Plus, X, Wrench } from 'lucide-react';
+import { User, MapPin, DollarSign, Briefcase, Plus, X, Wrench, Camera } from 'lucide-react';
 
 export default function ProviderProfilePage() {
+  const dispatch = useDispatch();
+  const currentUser = useSelector(selectCurrentUser);
   const { data: profile, isLoading } = useGetMeProviderQuery();
   const [updateProfile, { isLoading: isUpdating, error: updateError, isSuccess }] = useUpdateMeProviderMutation();
+  const [uploadProfileImage, { isLoading: isUploading, error: uploadError }] = useUpdateProfileImageMutation();
   const { data: availableSkills = [], isLoading: isLoadingSkills } = useListSkillsQuery();
 
   const [formData, setFormData] = useState({
@@ -85,6 +90,21 @@ export default function ProviderProfilePage() {
     }
   };
 
+  const handleImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const result = await uploadProfileImage(formData).unwrap();
+      dispatch(updateUser(result.user));
+    } catch (error) {
+      console.error('Failed to upload provider photo:', error);
+    }
+  };
+
   if (isLoading) return <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading profile...</div>;
 
   return (
@@ -104,6 +124,12 @@ export default function ProviderProfilePage() {
         </Alert>
       )}
 
+      {uploadError && (
+        <Alert variant="error" title="Image upload failed">
+          {uploadError.data?.error?.message || 'Unable to upload your profile image.'}
+        </Alert>
+      )}
+
       <Card padding="lg">
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
           
@@ -112,13 +138,19 @@ export default function ProviderProfilePage() {
               <User size={18} color="var(--color-primary)" /> Basic Information
             </h3>
             
-            <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center' }}>
-              <div style={{ width: 80, height: 80, borderRadius: '50%', backgroundColor: 'var(--color-surface-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--font-size-h2)', color: 'var(--color-text-secondary)' }}>
-                {formData.displayName?.charAt(0) || 'P'}
+            <div style={{ display: 'flex', gap: 'var(--space-4)', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ width: 80, height: 80, borderRadius: '50%', backgroundColor: 'var(--color-surface-muted)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--font-size-h2)', color: 'var(--color-text-secondary)' }}>
+                {currentUser?.profileImage ? <img src={currentUser.profileImage} alt={formData.displayName || 'Provider'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (formData.displayName?.charAt(0) || 'P')}
               </div>
-              <Badge variant={profile?.verificationStatus === 'VERIFIED' ? 'success' : 'warning'}>
-                {profile?.verificationStatus || 'PENDING VERIFICATION'}
-              </Badge>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                <Badge variant={profile?.verificationStatus === 'VERIFIED' ? 'success' : 'warning'}>
+                  {profile?.verificationStatus || 'PENDING VERIFICATION'}
+                </Badge>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', background: 'var(--color-primary-soft)', color: 'var(--color-primary)', padding: 'var(--space-2) var(--space-3)', borderRadius: 'var(--radius-full)', cursor: 'pointer', fontWeight: 600 }}>
+                  <Camera size={16} /> Update photo
+                  <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
+                </label>
+              </div>
             </div>
 
             <Input
@@ -259,7 +291,7 @@ export default function ProviderProfilePage() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'var(--space-2)' }}>
-            <Button type="submit" loading={isUpdating}>Save Profile</Button>
+            <Button type="submit" loading={isUpdating || isUploading}>Save Profile</Button>
           </div>
         </form>
       </Card>

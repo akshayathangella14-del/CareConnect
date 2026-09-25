@@ -9,6 +9,7 @@ const ServiceRequest = require('../models/ServiceRequest');
 const Quote = require('../models/Quote');
 const Booking = require('../models/Booking');
 const Invoice = require('../models/Invoice');
+const Payment = require('../models/Payment');
 const Review = require('../models/Review');
 const Dispute = require('../models/Dispute');
 const Notification = require('../models/Notification');
@@ -609,7 +610,10 @@ const bookingController = {
   }),
   get: asyncHandler(async (req, res) => {
     const booking = await getBookingForAccess(req.params.id, req.user);
-    sendSuccess(res, 200, 'Booking fetched.', { booking });
+    const invoice = await Invoice.findOne({ booking: booking._id });
+    const bookingData = booking.toObject();
+    bookingData.invoice = invoice;
+    sendSuccess(res, 200, 'Booking fetched.', { booking: bookingData });
   }),
   transition: (transitionName) => asyncHandler(async (req, res) => {
     const transition = bookingTransitions[transitionName];
@@ -627,6 +631,7 @@ const bookingController = {
     });
     if (transition.to === 'COMPLETED') booking.completedAt = new Date();
     await booking.save();
+    if (transition.to === 'COMPLETED') await createInvoiceForBooking(booking);
     await recordAudit({ actor: req.user, action: transition.event, resourceType: 'Booking', resourceId: booking._id });
     await createNotification({
       recipient: transition.to === 'COMPLETED' ? booking.customer : (booking.$locals.providerUser || booking.customer),
@@ -853,6 +858,100 @@ TOTAL: ${invoice.currency || 'INR'} ${invoice.total || invoice.totalAmount || 0}
   }),
 };
 
+const paymentController = {
+  list: asyncHandler(async (req, res) => {
+    const query = {};
+    if (req.user.role === 'CUSTOMER') query.customer = req.user._id;
+    if (req.user.role === 'SERVICE_PROVIDER') {
+      const provider = await getOwnProviderProfile(req.user);
+      query.provider = provider._id;
+    }
+    if (req.query.status) query.status = req.query.status;
+
+    const payments = await Payment.find(query)
+      .populate('invoice', 'invoiceNumber total currency status')
+      .populate('customer', 'name email')
+      .populate('provider', 'displayName')
+      .sort({ createdAt: -1 });
+
+    sendSuccess(res, 200, 'Payments fetched.', { payments });
+  }),
+
+  get: asyncHandler(async (req, res) => {
+    const payment = await Payment.findById(req.params.id)
+      .populate('invoice', 'invoiceNumber total currency status')
+      .populate('customer', 'name email')
+      .populate('provider', 'displayName');
+
+    if (!payment) throw AppError.notFound('Payment not found.');
+
+    if (req.user.role === 'CUSTOMER' && !isSameId(payment.customer, req.user._id)) {
+      throw AppError.forbidden('Access denied.');
+    }
+
+    if (req.user.role === 'SERVICE_PROVIDER') {
+      const provider = await getOwnProviderProfile(req.user);
+      if (!isSameId(payment.provider, provider._id)) {
+        throw AppError.forbidden('Access denied.');
+      }
+    }
+
+    sendSuccess(res, 200, 'Payment fetched.', { payment });
+  }),
+
+  create: asyncHandler(async (req, res) => {
+    const { invoiceId, method = 'CARD', amount, currency = 'INR', metadata = {} } = req.body;
+
+    if (!invoiceId) {
+      throw AppError.badRequest('invoiceId is required.');
+    }
+
+    const invoice = await Invoice.findById(invoiceId);
+    if (!invoice) throw AppError.notFound('Invoice not found.');
+
+    if (req.user.role !== 'CUSTOMER' || invoice.customer.toString() !== req.user._id.toString()) {
+      throw AppError.forbidden('Only the invoice customer can pay this invoice.');
+    }
+
+    const paymentAmount = typeof amount === 'number' ? amount : invoice.total;
+    if (paymentAmount !== invoice.total) {
+      throw AppError.badRequest('Payment amount must match the invoice total.');
+    }
+
+    const existingPayment = await Payment.findOne({ invoice: invoice._id, status: 'SUCCEEDED' }).sort({ createdAt: -1 });
+    if (existingPayment) {
+      throw AppError.conflict('This invoice has already been paid.');
+    }
+
+    const payment = await Payment.create({
+      invoice: invoice._id,
+      customer: invoice.customer,
+      provider: invoice.provider,
+      amount: paymentAmount,
+      currency: currency || invoice.currency || 'INR',
+      method,
+      status: 'SUCCEEDED',
+      gatewayTransactionId: `cc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      paidAt: new Date(),
+      metadata,
+    });
+
+    invoice.status = 'PAID';
+    invoice.paymentStatus = 'PAID';
+    invoice.paidAt = new Date();
+    await invoice.save();
+
+    await recordAudit({
+      actor: req.user,
+      action: 'PAYMENT_COMPLETED',
+      resourceType: 'Payment',
+      resourceId: payment._id,
+    });
+
+    sendSuccess(res, 201, 'Payment processed successfully.', { payment });
+  }),
+};
+
 // --- REVIEW CONTROLLER ---
 const reviewController = {
   create: asyncHandler(async (req, res) => {
@@ -1066,6 +1165,7 @@ module.exports = {
   quoteController,
   bookingController,
   invoiceController,
+  paymentController,
   reviewController,
   disputeController,
   notificationController,

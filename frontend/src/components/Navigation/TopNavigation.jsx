@@ -52,6 +52,7 @@ function getAppLinks(user) {
     links.push({ label: 'Disputes', path: '/support/disputes' });
   }
   links.push({ label: 'Invoices', path: '/invoices' });
+  links.push({ label: 'Payments', path: '/payments' });
   return links;
 }
 
@@ -158,7 +159,13 @@ export default function TopNavigation() {
                   {unreadCount > 0 && <span className={styles.badge}>{unreadCount > 9 ? '9+' : unreadCount}</span>}
                 </Link>
                 <div className={styles.user}>
-                  <span className={styles.avatar}>{initials}</span>
+                  <Link to={user?.role === 'CUSTOMER' ? '/profile' : '/dashboard'} className={styles.avatarLink} aria-label="Open profile">
+                    {user?.profileImage ? (
+                      <img src={user.profileImage} alt={user.name || 'User'} className={styles.avatarImage} />
+                    ) : (
+                      <span className={styles.avatar}>{initials}</span>
+                    )}
+                  </Link>
                   <button type="button" className={styles.iconBtn} onClick={handleLogout} aria-label="Sign out">
                     <LogOut size={18} />
                   </button>

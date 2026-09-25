@@ -55,6 +55,7 @@ export const apiSlice = createApi({
     'Booking',
     'Review',
     'Invoice',
+    'Payment',
     'Notification',
     'Provider',
     'Availability',
