@@ -9,9 +9,15 @@ export default function ServiceRequestsPage() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState('');
   
-  // Use query params to filter by status if provided
-  const queryParams = statusFilter ? { status: statusFilter } : {};
-  const { data: requests = [], isLoading, isFetching, error } = useListServiceRequestsQuery(queryParams);
+  const { data: requests = [], isLoading, isFetching, error } = useListServiceRequestsQuery();
+  const visibleRequests = statusFilter
+    ? requests.filter((request) => request.status === statusFilter)
+    : requests;
+
+  const errorMessage = error?.data?.error?.message
+    || error?.data?.message
+    || error?.error
+    || 'An unexpected error occurred. Please try again.';
 
   const columns = [
     {
@@ -61,7 +67,7 @@ export default function ServiceRequestsPage() {
 
       {error && (
         <Alert variant="error" title="Could not load service requests">
-          {error.data?.error?.message || 'An unexpected error occurred. Please try again.'}
+          {errorMessage}
         </Alert>
       )}
 
@@ -80,7 +86,7 @@ export default function ServiceRequestsPage() {
 
       {isLoading ? (
         <div className={styles.loading}>Loading requests...</div>
-      ) : requests.length === 0 ? (
+      ) : visibleRequests.length === 0 ? (
         <EmptyState
           icon={FileText}
           title="No service requests found"
@@ -95,7 +101,7 @@ export default function ServiceRequestsPage() {
         <div className={styles.tableContainer} style={{ opacity: isFetching ? 0.6 : 1 }}>
           <DataTable
             columns={columns}
-            data={requests}
+            data={visibleRequests}
             keyField="_id"
             onRowClick={(row) => navigate(`/service-requests/${row._id}`)}
           />
