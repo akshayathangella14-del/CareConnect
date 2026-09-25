@@ -209,6 +209,7 @@ test('complete business lifecycle enforces roles, ownership, state, traceability
       validUntil: new Date(now + 5 * 24 * 60 * 60 * 1000).toISOString(),
     })
     .expect(201)).body.data.quote;
+  assert.equal(quote.status, 'SUBMITTED');
 
   const quotes = (await request(app)
     .get(`/api/v1/service-requests/${serviceRequest._id}/quotes`)
@@ -344,6 +345,7 @@ test('complete business lifecycle enforces roles, ownership, state, traceability
     .set(auth(customer.token))
     .expect(200)).body.data.notifications;
   assert.ok(notifications.length > 0);
+  assert.ok(notifications.some((notification) => notification.type === 'QUOTE'));
   await request(app).patch('/api/v1/notifications/read-all').set(auth(customer.token)).expect(200);
 
   const audits = (await request(app)

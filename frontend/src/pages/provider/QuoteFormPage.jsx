@@ -9,7 +9,11 @@ export default function QuoteFormPage() {
   const [searchParams] = useSearchParams();
   const requestId = searchParams.get('requestId');
   
-  const { data: request, isLoading: isLoadingRequest } = useGetServiceRequestQuery(requestId, { skip: !requestId });
+  const {
+    data: request,
+    isLoading: isLoadingRequest,
+    error: requestError,
+  } = useGetServiceRequestQuery(requestId, { skip: !requestId });
   const [createQuote, { isLoading: isCreating, error: createError }] = useCreateQuoteForRequestMutation();
 
   const [formData, setFormData] = useState({
@@ -107,6 +111,14 @@ export default function QuoteFormPage() {
     return <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading request details...</div>;
   }
 
+  if (requestError || !request) {
+    return (
+      <Alert variant="error" title="Could not load service request">
+        {requestError?.data?.error?.message || requestError?.data?.message || 'The requested service is no longer available.'}
+      </Alert>
+    );
+  }
+
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
       <div>
@@ -119,7 +131,7 @@ export default function QuoteFormPage() {
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
         {createError && (
           <Alert variant="error" title="Could not submit quote">
-            {createError.data?.error || 'An unexpected error occurred.'}
+            {createError.data?.error?.message || createError.data?.message || 'An unexpected error occurred.'}
           </Alert>
         )}
 
