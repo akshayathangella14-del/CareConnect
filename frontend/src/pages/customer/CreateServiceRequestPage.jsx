@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useCreateServiceRequestMutation, useSubmitServiceRequestMutation } from '@/features/serviceRequests';
 import { useListCategoriesQuery } from '@/features/categories';
 import { Card, Input, Textarea, Select, Button, Alert } from '@/components';
+import { DatePicker } from '@/components/ui/DatePicker/DatePicker';
+import { TimePicker } from '@/components/ui/TimePicker/TimePicker';
 import { ArrowRight, Wand2, Camera, X, Image as ImageIcon } from 'lucide-react';
 
 export default function CreateServiceRequestPage() {
@@ -238,42 +240,27 @@ export default function CreateServiceRequestPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <h3 style={{ fontSize: 'var(--font-size-h4)', color: 'var(--color-text-primary)' }}>3. Preferred Time Slot</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Start Date</label>
-                <Input
-                  name="preferredStartDate"
-                  type="date"
+              <DatePicker
+                  label="Start Date"
                   value={formData.preferredStartDate}
-                  onChange={handleChange}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, preferredStartDate: value }))}
                 />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Start Time</label>
-                <Input
-                  name="preferredStartTime"
-                  type="time"
+              <TimePicker
+                  label="Start Time"
                   value={formData.preferredStartTime}
-                  onChange={handleChange}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, preferredStartTime: value }))}
                 />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>End Date</label>
-                <Input
-                  name="preferredEndDate"
-                  type="date"
+              <DatePicker
+                  label="End Date"
                   value={formData.preferredEndDate}
-                  onChange={handleChange}
+                  min={formData.preferredStartDate}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, preferredEndDate: value }))}
                 />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>End Time</label>
-                <Input
-                  name="preferredEndTime"
-                  type="time"
+              <TimePicker
+                  label="End Time"
                   value={formData.preferredEndTime}
-                  onChange={handleChange}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, preferredEndTime: value }))}
                 />
-              </div>
             </div>
           </div>
 

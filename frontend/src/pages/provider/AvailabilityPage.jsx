@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useListAvailabilityQuery, useCreateAvailabilityMutation, useRemoveAvailabilityMutation } from '@/features/availability';
 import { Card, Button, Select, Input, Alert, EmptyState } from '@/components';
+import { DatePicker } from '@/components/ui/DatePicker/DatePicker';
+import { TimePicker } from '@/components/ui/TimePicker/TimePicker';
 import { CalendarDays, Plus, Trash2, Clock } from 'lucide-react';
 
 export default function AvailabilityPage() {
@@ -53,46 +55,27 @@ export default function AvailabilityPage() {
         <h3 style={{ fontSize: 'var(--font-size-h4)', marginBottom: 'var(--space-4)' }}>Add Availability Slot</h3>
         <form onSubmit={handleAdd} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Start Date</label>
-              <Input
-                name="startDate"
-                type="date"
+            <DatePicker
+                label="Start Date"
                 value={formData.startDate}
-                onChange={handleChange}
-                required
+                onChange={(value) => setFormData((prev) => ({ ...prev, startDate: value }))}
               />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Start Time</label>
-              <Input
-                name="startTime"
-                type="time"
+            <TimePicker
+                label="Start Time"
                 value={formData.startTime}
-                onChange={handleChange}
-                required
+                onChange={(value) => setFormData((prev) => ({ ...prev, startTime: value }))}
               />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>End Date</label>
-              <Input
-                name="endDate"
-                type="date"
+            <DatePicker
+                label="End Date"
                 value={formData.endDate}
-                onChange={handleChange}
-                required
+                min={formData.startDate}
+                onChange={(value) => setFormData((prev) => ({ ...prev, endDate: value }))}
               />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>End Time</label>
-              <Input
-                name="endTime"
-                type="time"
+            <TimePicker
+                label="End Time"
                 value={formData.endTime}
-                onChange={handleChange}
-                required
+                onChange={(value) => setFormData((prev) => ({ ...prev, endTime: value }))}
               />
-            </div>
           </div>
           <div>
             <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Timezone</label>

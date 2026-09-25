@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Clock } from 'lucide-react';
+import { Dropdown } from '../Dropdown/Dropdown';
 import styles from './TimePicker.module.css';
 
 const toDisplay = (value) => {
@@ -48,18 +49,6 @@ export function TimePicker({ label, value, onChange, error, required = false }) 
     onChange(`${String(actualHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`);
   };
 
-  const handleHoursChange = (e) => {
-    updateTime(e.target.value, display.minutes, display.period);
-  };
-
-  const handleMinutesChange = (e) => {
-    updateTime(display.hours, e.target.value, display.period);
-  };
-
-  const handlePeriodChange = (period) => {
-    updateTime(display.hours, display.minutes, period);
-  };
-
   const hoursOptions = Array.from({ length: 12 }, (_, index) => ({ value: String(index + 1), label: String(index + 1) }));
   const minutesOptions = Array.from({ length: 12 }, (_, index) => ({ value: String(index * 5).padStart(2, '0'), label: String(index * 5).padStart(2, '0') }));
 
@@ -78,43 +67,21 @@ export function TimePicker({ label, value, onChange, error, required = false }) 
           aria-label={label || 'Choose time'}
         >
           <div className={styles.controls}>
-            <div className={styles.selectGroup}>
-              <label className={styles.selectLabel}>Hour</label>
-              <select
-                className={styles.select}
-                value={display.hours.toString()}
-                onChange={handleHoursChange}
-              >
-                {hoursOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
+            <Dropdown label="Hour" options={hoursOptions} value={String(display.hours)} onChange={(hours) => updateTime(hours, display.minutes, display.period)} />
             <div className={styles.separator}>:</div>
-            <div className={styles.selectGroup}>
-              <label className={styles.selectLabel}>Minute</label>
-              <select
-                className={styles.select}
-                value={display.minutes}
-                onChange={handleMinutesChange}
-              >
-                {minutesOptions.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
+            <Dropdown label="Minute" options={minutesOptions} value={display.minutes} onChange={(minutes) => updateTime(display.hours, minutes, display.period)} />
             <div className={styles.periodGroup}>
               <button
                 type="button"
                 className={`${styles.periodButton} ${display.period === 'AM' ? styles.periodActive : ''}`}
-                onClick={() => handlePeriodChange('AM')}
+                onClick={() => updateTime(display.hours, display.minutes, 'AM')}
               >
                 AM
               </button>
               <button
                 type="button"
                 className={`${styles.periodButton} ${display.period === 'PM' ? styles.periodActive : ''}`}
-                onClick={() => handlePeriodChange('PM')}
+                onClick={() => updateTime(display.hours, display.minutes, 'PM')}
               >
                 PM
               </button>
