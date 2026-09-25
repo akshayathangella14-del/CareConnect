@@ -5,9 +5,7 @@
 .input:hover, .input:focus { border-color: var(--color-primary); outline: none; box-shadow: 0 0 0 3px var(--color-primary-soft); }
 .inputError { border-color: var(--color-error); }
 .icon { color: var(--color-primary); }
-.calendar { position: absolute; left: 0; right: 0; z-index: 1000; padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); min-width: 280px; max-height: 400px; overflow-y: auto; }
-.calendar--bottom { top: calc(100% + var(--space-2)); }
-.calendar--top { bottom: calc(100% + var(--space-2)); top: auto; }
+.calendar { position: fixed; z-index: 2000; box-sizing: border-box; padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); max-height: calc(100vh - 24px); overflow-y: auto; }
 .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); color: var(--color-text-primary); }
 .navButton { display: grid; place-items: center; padding: var(--space-1); border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--color-text-primary); cursor: pointer; }
 .navButton:hover { background: var(--color-surface-muted); }
