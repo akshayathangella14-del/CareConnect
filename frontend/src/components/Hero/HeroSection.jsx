@@ -2,9 +2,15 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Sparkles, Star } from 'lucide-react';
 import { Button } from '@/components';
 import SafeImage from '@/components/media/SafeImage';
+import { useListFeaturedProvidersQuery } from '@/features/providers';
+import { useGetPlatformStatsQuery } from '@/features/stats';
 import styles from './HeroSection.module.css';
 
 export default function HeroSection({ isAuthenticated, onSignIn }) {
+  const { data: stats } = useGetPlatformStatsQuery();
+  const { data: featuredProviders = [] } = useListFeaturedProvidersQuery(2);
+  const featuredCards = featuredProviders.slice(0, 2);
+
   return (
     <section className={styles.hero}>
       <div className={styles.orb} aria-hidden="true" />
@@ -49,7 +55,7 @@ export default function HeroSection({ isAuthenticated, onSignIn }) {
         <div className={`${styles.trust} animate-fade-in-up animate-delay-400`}>
           <span><ShieldCheck size={16} /> 100% verified pros</span>
           <span><Sparkles size={16} /> AI job matching</span>
-          <span><Star size={16} /> 4.8 average rating</span>
+          <span><Star size={16} /> {stats?.averageRating ? `${Number(stats.averageRating).toFixed(1)} average rating` : 'Live rating'}</span>
         </div>
       </div>
 
@@ -61,30 +67,34 @@ export default function HeroSection({ isAuthenticated, onSignIn }) {
           className={styles.heroImg}
           lazy={false}
         />
-        <div className={`${styles.floatCard} ${styles.floatOne} animate-float`}>
-          <SafeImage
-            src="/images/team/technician-1.jpg"
-            fallbackSrc="/images/team/technician-1.svg"
-            alt="Verified technician"
-            className={styles.mini}
-          />
-          <div>
-            <strong>Arjun Patel</strong>
-            <p>AC specialist · 12 min away</p>
-          </div>
-        </div>
-        <div className={`${styles.floatCard} ${styles.floatTwo} animate-float`}>
-          <SafeImage
-            src="/images/hero/happy-customer.jpg"
-            fallbackSrc="/images/hero/happy-customer.svg"
-            alt="Happy customer"
-            className={styles.mini}
-          />
-          <div>
-            <strong>Job completed</strong>
-            <p>ScopeGuard protected</p>
-          </div>
-        </div>
+
+        {featuredCards.length > 0 && featuredCards.map((provider, index) => {
+          const providerName = provider.displayName || provider.user?.name || 'Verified provider';
+          const serviceArea = provider.serviceAreas?.[0];
+          const rating = provider.ratingSummary?.averageRating || 0;
+          const skillName = provider.skills?.[0]?.name || 'Care specialist';
+          const locationLabel = serviceArea ? `${serviceArea.city || 'City'}${serviceArea.state ? `, ${serviceArea.state}` : ''}` : 'Available now';
+
+          return (
+            <div
+              key={provider._id || providerName}
+              className={`${styles.floatCard} ${index === 0 ? styles.floatOne : styles.floatTwo} animate-float`}
+            >
+              <SafeImage
+                src={index === 0 ? '/images/team/technician-1.jpg' : '/images/team/technician-2.jpg'}
+                fallbackSrc={index === 0 ? '/images/team/technician-1.svg' : '/images/team/technician-2.svg'}
+                alt={`${providerName} profile`}
+                className={styles.mini}
+              />
+              <div>
+                <strong>{providerName}</strong>
+                <p>
+                  {skillName} · {rating ? `${Number(rating).toFixed(1)}★` : 'New provider'} · {locationLabel}
+                </p>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
