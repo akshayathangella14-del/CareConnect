@@ -5,11 +5,18 @@
 .input:hover, .input:focus { border-color: var(--color-primary); outline: none; box-shadow: 0 0 0 3px var(--color-primary-soft); }
 .inputError { border-color: var(--color-error); }
 .icon { color: var(--color-primary); }
-.popover { position: absolute; top: 100%; left: 0; right: 0; z-index: 20; margin-top: var(--space-2); padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); }
-.controls { display: flex; align-items: end; justify-content: center; gap: var(--space-3); }
-.controls > strong { padding-bottom: var(--space-3); }
-.periodGroup { display: flex; gap: var(--space-2); padding-bottom: var(--space-1); }
-.periodButton { padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface-muted); color: var(--color-text-primary); cursor: pointer; font-weight: 600; }
+.popover { position: absolute; left: 0; right: 0; z-index: 1000; padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); min-width: 300px; }
+.popover--bottom { top: calc(100% + var(--space-2)); }
+.popover--top { bottom: calc(100% + var(--space-2)); top: auto; }
+.controls { display: flex; align-items: center; justify-content: center; gap: var(--space-3); }
+.selectGroup { display: flex; flex-direction: column; gap: var(--space-1); }
+.selectLabel { font-size: var(--font-size-caption); color: var(--color-text-muted); font-weight: 500; }
+.select { padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-background); color: var(--color-text-primary); font-size: var(--font-size-body); cursor: pointer; transition: all var(--transition-fast); }
+.select:hover { border-color: var(--color-primary); }
+.select:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-soft); }
+.separator { font-size: var(--font-size-h4); font-weight: 600; color: var(--color-text-primary); }
+.periodGroup { display: flex; gap: var(--space-2); }
+.periodButton { padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface-muted); color: var(--color-text-primary); cursor: pointer; font-weight: 600; transition: all var(--transition-fast); }
 .periodButton:hover { background: var(--color-surface); }
 .periodActive { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
 .error { color: var(--color-error); font-size: var(--font-size-caption); }

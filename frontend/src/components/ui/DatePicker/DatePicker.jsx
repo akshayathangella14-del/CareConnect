@@ -10,8 +10,10 @@ const monthNames = [
 export function DatePicker({ label, value, onChange, error, required = false, min }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
+  const calendarRef = useRef(null);
   const selectedDate = value ? new Date(`${value}T00:00:00`) : null;
   const [currentMonth, setCurrentMonth] = useState(() => selectedDate || new Date());
+  const [position, setPosition] = useState('bottom');
 
   useEffect(() => {
     const closeOnOutsideClick = (event) => {
@@ -20,6 +22,21 @@ export function DatePicker({ label, value, onChange, error, required = false, mi
     document.addEventListener('mousedown', closeOnOutsideClick);
     return () => document.removeEventListener('mousedown', closeOnOutsideClick);
   }, []);
+
+  useEffect(() => {
+    if (isOpen && containerRef.current && calendarRef.current) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const calendarHeight = calendarRef.current.offsetHeight;
+      const spaceBelow = window.innerHeight - containerRect.bottom;
+      const spaceAbove = containerRect.top;
+      
+      if (spaceBelow < calendarHeight + 20 && spaceAbove > calendarHeight + 20) {
+        setPosition('top');
+      } else {
+        setPosition('bottom');
+      }
+    }
+  }, [isOpen]);
 
   const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
   const firstDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
@@ -49,7 +66,12 @@ export function DatePicker({ label, value, onChange, error, required = false, mi
         <Calendar size={18} className={styles.icon} />
       </button>
       {isOpen && (
-        <div className={styles.calendar} role="dialog" aria-label={label || 'Choose date'}>
+        <div 
+          ref={calendarRef}
+          className={`${styles.calendar} ${styles[`calendar--${position}`]}`} 
+          role="dialog" 
+          aria-label={label || 'Choose date'}
+        >
           <div className={styles.header}>
             <button type="button" className={styles.navButton} onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))} aria-label="Previous month"><ChevronLeft size={16} /></button>
             <div className={styles.monthYear}>
