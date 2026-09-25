@@ -96,7 +96,7 @@ export default function ServiceRequestsPage() {
         <div className={styles.loading}>Loading requests...</div>
       ) : visibleRequests.length === 0 ? (
         <EmptyState
-          icon={FileText}
+          icon={<FileText size={28} />}
           title="No service requests found"
           description={statusFilter ? `You have no requests with status: ${statusFilter}` : "You haven't created any service requests yet."}
           action={

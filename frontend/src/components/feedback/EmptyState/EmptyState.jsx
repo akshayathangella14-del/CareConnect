@@ -22,7 +22,11 @@ function EmptyState({
     <div className={`${styles['empty-state']} ${className}`} {...props}>
       <div className={styles['empty-state__icon']} aria-hidden="true">
         {icon ? (
-          typeof icon === 'function' ? React.createElement(icon, { size: 28 }) : icon
+          React.isValidElement(icon)
+            ? icon
+            : typeof icon === 'function' || (typeof icon === 'object' && icon.$$typeof)
+            ? React.createElement(icon, { size: 28 })
+            : icon
         ) : (
           <Inbox size={28} />
         )}
