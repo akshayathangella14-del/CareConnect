@@ -39,6 +39,11 @@ const userSchema = new Schema(
       trim: true,
       maxlength: 30,
     },
+    profileImage: {
+      type: String,
+      trim: true,
+      default: '',
+    },
     role: {
       type: String,
       enum: USER_ROLES,

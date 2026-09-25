@@ -6,6 +6,7 @@ const sanitizeUser = (user) => {
     name: source.name,
     email: source.email,
     phone: source.phone || '',
+    profileImage: source.profileImage || '',
     role: source.role,
     status: source.status,
     lastLoginAt: source.lastLoginAt || null,
