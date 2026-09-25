@@ -2,35 +2,63 @@ import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import SafeImage from '@/components/media/SafeImage';
+import { useListCategoriesQuery } from '@/features/categories';
 import styles from './ServiceCategories.module.css';
 
-const CATEGORIES = [
-  { slug: 'ac-repair', name: 'AC Repair', desc: 'Gas leak, cooling, service', price: 'From ₹499', img: '/images/categories/ac-repair.jpg' },
-  { slug: 'refrigerator-repair', name: 'Refrigerator Repair', desc: 'Cooling, compressor, ice', price: 'From ₹399', img: '/images/categories/refrigerator-repair.jpg' },
-  { slug: 'plumbing', name: 'Plumbing', desc: 'Leaks, taps, bathrooms', price: 'From ₹299', img: '/images/categories/plumbing.jpg' },
-  { slug: 'electrical', name: 'Electrical', desc: 'Wiring, fans, switches', price: 'From ₹249', img: '/images/categories/electrical.jpg' },
-  { slug: 'cleaning', name: 'Cleaning', desc: 'Home, kitchen, sofa', price: 'From ₹599', img: '/images/categories/cleaning.jpg' },
-  { slug: 'painting', name: 'Painting', desc: 'Interior & exterior', price: 'From ₹999', img: '/images/categories/painting.jpg' },
-  { slug: 'carpenter', name: 'Carpenter', desc: 'Furniture, fittings', price: 'From ₹349', img: '/images/categories/carpenter.jpg' },
-  { slug: 'pest-control', name: 'Pest Control', desc: 'Safe home treatment', price: 'From ₹799', img: '/images/categories/pest-control.jpg' },
-];
+const categoryImageMap = {
+  plumbing: '/images/categories/plumbing.jpg',
+  'ac-repair': '/images/categories/ac-repair.jpg',
+  'refrigerator-repair': '/images/categories/refrigerator-repair.jpg',
+  electrical: '/images/categories/electrical.jpg',
+  cleaning: '/images/categories/cleaning.jpg',
+  painting: '/images/categories/painting.jpg',
+  carpenter: '/images/categories/carpenter.jpg',
+  'pest-control': '/images/categories/pest-control.jpg',
+};
 
 export default function ServiceCategories() {
   const scroller = useRef(null);
   const location = useLocation();
   const query = new URLSearchParams(location.search).get('q')?.toLowerCase() || '';
+  const { data: categories = [], isLoading, isError } = useListCategoriesQuery();
 
   useEffect(() => {
-    if (!query || !scroller.current) return;
-    const match = CATEGORIES.find((c) => c.name.toLowerCase().includes(query));
+    if (!query || !scroller.current || categories.length === 0) return;
+    const match = categories.find((c) => c.name?.toLowerCase().includes(query));
     if (!match) return;
     const card = scroller.current.querySelector(`[data-slug="${match.slug}"]`);
     card?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-  }, [query]);
+  }, [query, categories]);
 
   const scrollBy = (dir) => {
     scroller.current?.scrollBy({ left: dir * 320, behavior: 'smooth' });
   };
+
+  if (isLoading) {
+    return (
+      <section id="services" className={styles.section}>
+        <div className={styles.head}>
+          <div>
+            <p className={styles.kicker}>Services</p>
+            <h2>Loading live service categories...</h2>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (isError || categories.length === 0) {
+    return (
+      <section id="services" className={styles.section}>
+        <div className={styles.head}>
+          <div>
+            <p className={styles.kicker}>Services</p>
+            <h2>Service categories are being refreshed</h2>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="services" className={styles.section}>
@@ -45,25 +73,31 @@ export default function ServiceCategories() {
         </div>
       </div>
       <div className={styles.track} ref={scroller}>
-        {CATEGORIES.map((cat) => (
-          <article
-            key={cat.slug}
-            data-slug={cat.slug}
-            className={`${styles.card} ${query && cat.name.toLowerCase().includes(query) ? styles.highlight : ''}`}
-          >
-            <div className={styles.imageWrap}>
-              <SafeImage src={cat.img} fallbackSrc={cat.img.replace('.jpg', '.svg')} alt={`${cat.name} service`} />
-            </div>
-            <div className={styles.body}>
-              <h3>{cat.name}</h3>
-              <p>{cat.desc}</p>
-              <div className={styles.meta}>
-                <span>{cat.price}</span>
-                <Link to="/register">Book now</Link>
+        {categories.map((cat) => {
+          const slug = cat.slug || cat.name?.toLowerCase().replace(/\s+/g, '-');
+          const image = cat.image || categoryImageMap[slug] || '/images/categories/plumbing.jpg';
+          const priceText = cat.basePrice ? `From ₹${cat.basePrice}` : 'Flexible pricing';
+
+          return (
+            <article
+              key={cat._id || slug}
+              data-slug={slug}
+              className={`${styles.card} ${query && cat.name?.toLowerCase().includes(query) ? styles.highlight : ''}`}
+            >
+              <div className={styles.imageWrap}>
+                <SafeImage src={image} fallbackSrc={image.replace('.jpg', '.svg')} alt={`${cat.name} service`} />
               </div>
-            </div>
-          </article>
-        ))}
+              <div className={styles.body}>
+                <h3>{cat.name}</h3>
+                <p>{cat.description || 'Tailored service for your home.'}</p>
+                <div className={styles.meta}>
+                  <span>{priceText}</span>
+                  <Link to="/register">Book now</Link>
+                </div>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </section>
   );

@@ -334,8 +334,18 @@ const providerController = {
     if (req.query.skill) query.skills = req.query.skill;
     const providers = await ProviderProfile.find(query)
       .populate('user', 'name email phone status')
-      .populate('skills', 'name slug');
+      .populate('skills', 'name slug')
+      .sort({ createdAt: -1 });
     sendSuccess(res, 200, 'Providers fetched.', { providers });
+  }),
+  featured: asyncHandler(async (req, res) => {
+    const limit = Number(req.query.limit) || 4;
+    const providers = await ProviderProfile.find({ verificationStatus: 'VERIFIED' })
+      .populate('user', 'name email phone status')
+      .populate('skills', 'name slug')
+      .sort({ 'ratingSummary.averageRating': -1, 'ratingSummary.reviewCount': -1, createdAt: -1 })
+      .limit(limit);
+    sendSuccess(res, 200, 'Featured providers fetched.', { providers });
   }),
   get: asyncHandler(async (req, res) => {
     const provider = await ProviderProfile.findById(req.params.id)
@@ -1002,6 +1012,34 @@ const auditController = {
 
 // --- ANALYTICS CONTROLLER ---
 const analyticsController = {
+  publicStats: asyncHandler(async (_req, res) => {
+    const [totalRequests, activeBookings, completedBookings, totalProviders, totalCustomers, ratingSummary] = await Promise.all([
+      ServiceRequest.countDocuments(),
+      Booking.countDocuments({ status: { $nin: ['COMPLETED', 'CANCELLED'] } }),
+      Booking.countDocuments({ status: 'COMPLETED' }),
+      ProviderProfile.countDocuments({ verificationStatus: 'VERIFIED' }),
+      User.countDocuments({ role: 'CUSTOMER', status: 'ACTIVE' }),
+      Review.aggregate([
+        { $match: { status: 'PUBLISHED' } },
+        { $group: { _id: null, averageRating: { $avg: '$rating' }, reviewCount: { $sum: 1 } } },
+      ]),
+    ]);
+
+    const averageRating = ratingSummary?.[0]?.averageRating || 0;
+    const reviewCount = ratingSummary?.[0]?.reviewCount || 0;
+
+    sendSuccess(res, 200, 'Platform stats fetched.', {
+      stats: {
+        totalRequests,
+        activeBookings,
+        completedBookings,
+        totalProviders,
+        totalCustomers,
+        averageRating: Number(averageRating.toFixed(2)),
+        reviewCount,
+      },
+    });
+  }),
   summary: asyncHandler(async (req, res) => {
     requireRole(req.user, ['ADMIN', 'OPERATIONS_MANAGER']);
     const [totalRequests, activeBookings, completedBookings, totalProviders, totalCustomers] = await Promise.all([

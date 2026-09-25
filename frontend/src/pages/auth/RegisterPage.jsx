@@ -30,16 +30,20 @@ function RegisterPage() {
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     phone: '',
     role: 'CUSTOMER',
+    acceptTerms: false,
+    promotionalEmails: false,
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState('');
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
@@ -52,6 +56,18 @@ function RegisterPage() {
       setErrors((prev) => ({ ...prev, role: '' }));
     }
   };
+
+  const passwordScore = (() => {
+    let score = 0;
+    if (form.password.length >= 8) score += 1;
+    if (/[A-Z]/.test(form.password)) score += 1;
+    if (/[0-9]/.test(form.password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(form.password)) score += 1;
+    return score;
+  })();
+
+  const passwordStrength =
+    !form.password ? 'None' : passwordScore <= 1 ? 'Weak' : passwordScore === 2 ? 'Fair' : passwordScore === 3 ? 'Good' : 'Strong';
 
   const validate = () => {
     const newErrors = {};
@@ -69,6 +85,14 @@ function RegisterPage() {
       newErrors.password = 'Password must be at least 8 characters.';
     } else if (!/[A-Za-z]/.test(form.password) || !/\d/.test(form.password)) {
       newErrors.password = 'Password must contain at least one letter and one number.';
+    }
+    if (!form.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password.';
+    } else if (form.confirmPassword !== form.password) {
+      newErrors.confirmPassword = 'Passwords do not match.';
+    }
+    if (!form.acceptTerms) {
+      newErrors.acceptTerms = 'Please accept the terms and privacy policy.';
     }
     if (form.phone && form.phone.length > 30) {
       newErrors.phone = 'Phone must be 30 characters or fewer.';
@@ -212,6 +236,7 @@ function RegisterPage() {
           error={errors.password}
           autoComplete="new-password"
           required
+          helperText={form.password ? `Strength: ${passwordStrength}` : 'Use 8+ characters with a letter and number.'}
           rightAction={
             <button
               type="button"
@@ -220,6 +245,29 @@ function RegisterPage() {
               tabIndex={-1}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          }
+        />
+
+        <Input
+          label="Confirm Password"
+          id="register-confirm-password"
+          name="confirmPassword"
+          type={showConfirmPassword ? 'text' : 'password'}
+          placeholder="Re-enter your password"
+          value={form.confirmPassword}
+          onChange={handleChange}
+          error={errors.confirmPassword}
+          autoComplete="new-password"
+          required
+          rightAction={
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((open) => !open)}
+              aria-label={showConfirmPassword ? 'Hide confirmation password' : 'Show confirmation password'}
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           }
         />
@@ -235,6 +283,29 @@ function RegisterPage() {
           helperText="Optional — for appointment updates"
           autoComplete="tel"
         />
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-small)' }}>
+            <input
+              type="checkbox"
+              name="acceptTerms"
+              checked={form.acceptTerms}
+              onChange={handleChange}
+            />
+            <span>I agree to the <Link to="/terms">Terms & Conditions</Link> and <Link to="/privacy">Privacy Policy</Link>.</span>
+          </label>
+          {errors.acceptTerms && <span style={{ color: 'var(--color-error)', fontSize: 'var(--font-size-caption)' }}>{errors.acceptTerms}</span>}
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-size-small)' }}>
+            <input
+              type="checkbox"
+              name="promotionalEmails"
+              checked={form.promotionalEmails}
+              onChange={handleChange}
+            />
+            <span>Send me offers and service updates.</span>
+          </label>
+        </div>
 
         <Button
           type="submit"

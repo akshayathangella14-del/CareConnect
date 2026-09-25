@@ -24,6 +24,20 @@ test('GET /api/v1/health returns process health without secrets', async () => {
   assert.equal(Object.hasOwn(response.body.data, 'uri'), false);
 });
 
+test('GET /api/v1/stats returns a public platform summary payload', async () => {
+  const app = createApp();
+
+  const response = await request(app)
+    .get('/api/v1/stats')
+    .set('Origin', 'http://localhost:3000')
+    .expect(200);
+
+  assert.equal(response.body.success, true);
+  assert.ok(response.body.data.stats);
+  assert.equal(typeof response.body.data.stats.totalRequests, 'number');
+  assert.equal(typeof response.body.data.stats.totalProviders, 'number');
+});
+
 test('unknown API routes return a consistent JSON 404 response', async () => {
   const app = createApp();
 

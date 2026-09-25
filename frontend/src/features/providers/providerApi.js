@@ -30,6 +30,11 @@ export const providerApi = apiSlice.injectEndpoints({
           : [{ type: 'Provider', id: 'LIST' }],
     }),
 
+    listFeaturedProviders: builder.query({
+      query: (limit = 4) => `/providers/featured?limit=${limit}`,
+      transformResponse: (response) => response?.data?.providers || response?.providers || [],
+    }),
+
     getMeProvider: builder.query({
       query: () => '/providers/me',
       transformResponse: (response) => response?.data?.provider || response?.provider || response,
@@ -68,6 +73,7 @@ export const providerApi = apiSlice.injectEndpoints({
 
 export const {
   useListProvidersQuery,
+  useListFeaturedProvidersQuery,
   useGetMeProviderQuery,
   useUpdateMeProviderMutation,
   useGetProviderQuery,

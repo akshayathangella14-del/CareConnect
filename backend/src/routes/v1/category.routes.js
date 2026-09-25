@@ -4,10 +4,11 @@ const { categoryController } = require('../../controllers/business.controller');
 
 const router = express.Router();
 
-router.get('/', authenticate, categoryController.list);
-router.get('/:id', authenticate, categoryController.get);
-router.post('/', authenticate, categoryController.create);
-router.patch('/:id', authenticate, categoryController.update);
-router.delete('/:id', authenticate, categoryController.remove);
+router.get('/', categoryController.list);
+router.get('/:id', categoryController.get);
+router.use(authenticate);
+router.post('/', categoryController.create);
+router.patch('/:id', categoryController.update);
+router.delete('/:id', categoryController.remove);
 
 module.exports = router;

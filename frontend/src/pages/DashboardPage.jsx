@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { selectCurrentUser } from '@/features/auth';
+import { useGetPlatformStatsQuery } from '@/features/stats';
 import {
   LayoutDashboard,
   Wrench,
@@ -83,10 +84,18 @@ function DashboardPage() {
   const user = useSelector(selectCurrentUser);
   const config = roleConfig[user?.role] || roleConfig.CUSTOMER;
   const RoleIcon = config.icon;
+  const { data: stats } = useGetPlatformStatsQuery();
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'U';
+
+  const metricCards = [
+    { label: 'Active requests', value: stats?.totalRequests || 0, tone: 'primary' },
+    { label: 'Pending quotes', value: stats?.activeBookings || 0, tone: 'warning' },
+    { label: 'Active bookings', value: stats?.activeBookings || 0, tone: 'success' },
+    { label: 'Completed services', value: stats?.completedBookings || 0, tone: 'violet' },
+  ];
 
   return (
     <div className={styles.dashboard}>
@@ -115,8 +124,19 @@ function DashboardPage() {
       </div>
 
       {/* Account Info & Next Actions Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
+        {metricCards.map((card) => (
+          <Card key={card.label} padding="md" style={{ background: 'linear-gradient(135deg, rgba(107, 126, 255, 0.12), rgba(255,255,255,0.04))' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-3)' }}>
+              <span style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)' }}>{card.label}</span>
+              <span style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-primary)' }}>{card.tone}</span>
+            </div>
+            <div style={{ fontSize: 'var(--font-size-h3)', fontWeight: 800, color: 'var(--color-text-primary)' }}>{card.value}</div>
+          </Card>
+        ))}
+      </div>
+
       <div className={styles.grid}>
-        {/* Account Details */}
         <Card variant="default" padding="md">
           <Card.Header
             title="Profile Details"
@@ -143,7 +163,6 @@ function DashboardPage() {
           </Card.Body>
         </Card>
 
-        {/* What Can I Do Next */}
         <Card variant="default" padding="md">
           <Card.Header
             title="What's Next?"
@@ -169,7 +188,6 @@ function DashboardPage() {
         </Card>
       </div>
 
-      {/* AI Foundation Note */}
       <Card variant="outlined" padding="md">
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
           <div
@@ -189,17 +207,12 @@ function DashboardPage() {
           </div>
           <div style={{ flex: 1 }}>
             <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 600, color: 'var(--color-text-primary)', display: 'block' }}>
-              Gemini AI Service Foundation Active
+              CareConnect is tracking the latest platform activity.
             </span>
             <span style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-secondary)' }}>
-              Request classification and skill matching engine is ready on the backend with automatic fallback.
+              Live service requests, provider matches, and completion data are reflected in your dashboard.
             </span>
           </div>
-          <Link to="/design-system">
-            <Button variant="secondary" size="sm">
-              Design System
-            </Button>
-          </Link>
         </div>
       </Card>
     </div>

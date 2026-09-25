@@ -30,7 +30,7 @@ export const bookingApi = apiSlice.injectEndpoints({
       }),
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
-        return response?.data?.bookings || response?.bookings || [];
+        return response?.data?.bookings || response?.bookings || response?.data?.data?.bookings || [];
       },
       providesTags: (result) =>
         Array.isArray(result)

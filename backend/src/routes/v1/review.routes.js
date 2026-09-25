@@ -4,8 +4,8 @@ const { reviewController } = require('../../controllers/business.controller');
 
 const router = express.Router();
 
+router.get('/', reviewController.list);
 router.use(authenticate);
 router.post('/', reviewController.create);
-router.get('/', reviewController.list);
 
 module.exports = router;

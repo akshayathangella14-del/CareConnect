@@ -98,12 +98,20 @@ export default function ServiceRequestDetailPage() {
   const hasAiUnderstanding = !!request.aiUnderstanding;
   const isConfirmed = !!request.confirmedUnderstanding;
   const isDraft = request.status === 'DRAFT';
+  const providerQuote = quotes.find((quote) => quote.status === 'ACCEPTED') || quotes[0];
 
-  const conf = request.aiUnderstanding?.confidence || 0;
-  let confidenceColor = 'var(--color-primary)';
-  if (conf >= 0.8) confidenceColor = 'var(--color-success)';
-  else if (conf < 0.7) confidenceColor = 'var(--color-error)';
-  else confidenceColor = 'var(--color-warning)';
+  const statusSteps = [
+    { key: 'MATCHING', label: 'Provider Found & Notified', icon: '✅', tone: 'success' },
+    { key: 'QUOTING', label: 'Provider Reviewing Your Request', icon: '⏳', tone: 'warning' },
+    { key: 'PROVIDER_SELECTED', label: 'Provider Confirmed', icon: '🏁', tone: 'success' },
+    { key: 'BOOKED', label: 'Provider En Route', icon: '🚗', tone: 'info' },
+    { key: 'IN_PROGRESS', label: 'Service In Progress', icon: '🔧', tone: 'primary' },
+    { key: 'COMPLETED', label: 'Service Completed', icon: '✓', tone: 'success' },
+  ];
+
+  const requestedStatus = request.status === 'BOOKED' ? 'BOOKED' : request.status;
+  const currentStepIndex = Math.max(0, statusSteps.findIndex((step) => step.key === requestedStatus));
+  const requestState = statusSteps[currentStepIndex] || statusSteps[0];
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
@@ -153,120 +161,46 @@ export default function ServiceRequestDetailPage() {
           </Card>
 
           {hasAiUnderstanding && (
-            <Card padding="lg" style={{ borderLeft: isConfirmed ? '4px solid var(--color-success)' : '4px solid var(--color-primary)' }}>
+            <Card padding="lg" style={{ borderLeft: '4px solid var(--color-success)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                  <Wand2 size={20} color="var(--color-primary)" />
-                  <h3 style={{ fontSize: 'var(--font-size-h4)', margin: 0 }}>AI Scope & Understanding</h3>
-                  {request.aiUnderstanding.source === 'FALLBACK_RULES' ? (
-                    <Badge variant="warning" size="sm">Rule-Based Analysis</Badge>
-                  ) : (
-                    <Badge variant="primary" size="sm">Powered by Gemini</Badge>
-                  )}
+                  <CheckCircle size={20} color="var(--color-success)" />
+                  <h3 style={{ fontSize: 'var(--font-size-h4)', margin: 0 }}>Request Status</h3>
                 </div>
-
-                {isConfirmed && (
-                  <Badge variant="success" size="sm" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <CheckCircle size={12} /> Scope Confirmed
-                  </Badge>
-                )}
+                <Badge variant="success" size="sm">{requestState.label}</Badge>
               </div>
 
-              {request.aiUnderstanding.confidence !== undefined && (
-                <div style={{ marginBottom: 'var(--space-4)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-1)' }}>
-                    <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-muted)' }}>
-                      AI Confidence Score
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginBottom: 'var(--space-4)' }}>
+                {statusSteps.map((step, index) => {
+                  const isActive = index <= currentStepIndex;
+                  return (
+                    <div key={step.key} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', opacity: isActive ? 1 : 0.5 }}>
+                      <div style={{ width: 32, height: 32, borderRadius: '50%', background: isActive ? 'var(--color-success-soft)' : 'var(--color-surface-muted)', display: 'grid', placeItems: 'center', fontSize: 16 }}>
+                        {step.icon}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 600 }}>{step.label}</div>
+                        <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)' }}>
+                          {step.key === 'MATCHING' && 'We will notify the best-fit providers for this request.'}
+                          {step.key === 'QUOTING' && 'Providers are reviewing your work description and schedule.'}
+                          {step.key === 'PROVIDER_SELECTED' && 'Your provider has been confirmed and is ready to proceed.'}
+                          {step.key === 'BOOKED' && 'Provider is on the way and will update ETA soon.'}
+                          {step.key === 'IN_PROGRESS' && 'The service is currently underway at your location.'}
+                          {step.key === 'COMPLETED' && 'The task has been completed and verified.'}
+                        </div>
+                      </div>
                     </div>
-                    <span style={{ fontSize: 'var(--font-size-small)', fontWeight: 600, color: confidenceColor }}>
-                      {Math.round(conf * 100)}%
-                    </span>
-                  </div>
-                  <div style={{ 
-                    width: '100%', 
-                    height: 8, 
-                    backgroundColor: 'var(--color-surface-muted)', 
-                    borderRadius: 4,
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{ 
-                      width: `${conf * 100}%`,
-                      height: '100%',
-                      backgroundColor: confidenceColor,
-                      transition: 'width 0.3s ease'
-                    }} />
-                  </div>
-                  
-                  {conf < 0.7 && !isConfirmed && (
-                    <Alert variant="warning" title="Low Confidence Analysis" style={{ marginTop: 'var(--space-3)' }}>
-                      The AI analysis has low confidence. A manual review has been requested, or you can provide more details below.
-                    </Alert>
-                  )}
-                </div>
-              )}
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
-                <div>
-                  <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-muted)' }}>Diagnosed Problem</div>
-                  <div style={{ fontWeight: 600, fontSize: 'var(--font-size-body)' }}>{request.aiUnderstanding.problemType || 'Home Repair'}</div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-muted)' }}>Assigned Category</div>
-                  <div style={{ fontWeight: 600, fontSize: 'var(--font-size-body)' }}>{request.category?.name || 'Appliance Repair'}</div>
-                </div>
+                  );
+                })}
               </div>
 
-              {request.aiUnderstanding.missingInformation?.length > 0 && !isConfirmed && (
-                <div style={{ marginBottom: 'var(--space-4)', backgroundColor: 'var(--color-surface-muted)', padding: 'var(--space-3)', borderRadius: 'var(--radius-sm)' }}>
-                  <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-warning)', display: 'flex', alignItems: 'center', gap: 'var(--space-1)', marginBottom: 'var(--space-2)', fontWeight: 600 }}>
-                    <ShieldAlert size={14} /> Recommended Information to Clarify
-                  </div>
-                  <ul style={{ margin: 0, paddingLeft: 'var(--space-4)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>
-                    {request.aiUnderstanding.missingInformation.map((info, idx) => (
-                      <li key={idx} style={{ marginBottom: 'var(--space-1)' }}>
-                        {info}
-                        <Button 
-                          variant="link" 
-                          size="sm" 
-                          onClick={() => {
-                            setIsCorrecting(true);
-                            setCorrectionNote(prev => prev + (prev ? '\n' : '') + `- Clarify: ${info} `);
-                          }}
-                          style={{ marginLeft: 'var(--space-2)', padding: 0 }}
-                        >
-                          Add to correction
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Action Buttons for AI Scope Confirmation */}
-              {!isCorrecting && (
-                <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap', marginTop: 'var(--space-4)' }}>
-                  {!isConfirmed && (
-                    <Button variant="primary" size="sm" onClick={handleConfirmUnderstanding} loading={isConfirming} leftIcon={<Check size={16} />}>
-                      Confirm AI Understanding
-                    </Button>
-                  )}
-                  <Button variant="outline" size="sm" onClick={() => setIsCorrecting(true)}>
-                    {isConfirmed ? 'Edit / Update Scope Notes' : 'Correct AI Understanding'}
-                  </Button>
-                </div>
-              )}
-
-              {isCorrecting && (
-                <div style={{ marginTop: 'var(--space-4)', padding: 'var(--space-3)', backgroundColor: 'var(--color-surface-muted)', borderRadius: 'var(--radius-md)' }}>
-                  <textarea
-                    value={correctionNote}
-                    onChange={(e) => setCorrectionNote(e.target.value)}
-                    placeholder="Describe what the AI missed or update specific scope requirements..."
-                    style={{ width: '100%', padding: 'var(--space-2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', minHeight: 80, marginBottom: 'var(--space-2)' }}
-                  />
-                  <div style={{ display: 'flex', gap: 'var(--space-2)', justifyContent: 'flex-end' }}>
-                    <Button variant="secondary" size="sm" onClick={() => setIsCorrecting(false)}>Cancel</Button>
-                    <Button size="sm" onClick={handleCorrectionSubmit} disabled={!correctionNote.trim()}>Save Scope Correction</Button>
+              {providerQuote && (
+                <div style={{ display: 'grid', gap: 'var(--space-2)', backgroundColor: 'var(--color-surface-muted)', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Provider</div>
+                  <div style={{ fontWeight: 700 }}>{providerQuote.provider?.displayName || 'Verified provider'}</div>
+                  <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>
+                    {providerQuote.provider?.ratingSummary?.averageRating > 0 ? `⭐ ${providerQuote.provider.ratingSummary.averageRating.toFixed(1)} rating` : 'New provider added'}
+                    {request.preferredSchedule?.startAt ? ` • ETA: ${new Date(request.preferredSchedule.startAt).toLocaleString()}` : ''}
                   </div>
                 </div>
               )}

@@ -1,6 +1,7 @@
 const express = require('express');
 const env = require('../config/env');
 const { getDatabaseStatus } = require('../config/database');
+const { analyticsController, reviewController } = require('../controllers/business.controller');
 const authRoutes = require('./v1/auth.routes');
 const categoryRoutes = require('./v1/category.routes');
 const skillRoutes = require('./v1/skill.routes');
@@ -33,6 +34,8 @@ router.get('/health', (_req, res) => {
   });
 });
 
+router.get('/stats', analyticsController.publicStats);
+router.get('/testimonials', reviewController.list);
 router.use('/auth', authRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/skills', skillRoutes);
