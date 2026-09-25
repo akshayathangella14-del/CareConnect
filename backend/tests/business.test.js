@@ -226,6 +226,11 @@ test('complete business lifecycle enforces roles, ownership, state, traceability
   await request(app)
     .post(`/api/v1/bookings/${booking._id}/confirm`)
     .set(auth(admin.token))
+    .expect(403);
+
+  await request(app)
+    .post(`/api/v1/bookings/${booking._id}/confirm`)
+    .set(auth(provider.token))
     .expect(200);
 
   const conflictingRequest = (await request(app)

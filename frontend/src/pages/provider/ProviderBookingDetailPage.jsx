@@ -64,9 +64,8 @@ export default function ProviderBookingDetailPage() {
 
   const getNextAction = () => {
     switch (booking.status) {
-      // Providers cannot confirm - only ADMIN/OPERATIONS_MANAGER can
       case 'PENDING_CONFIRMATION':
-        return null; // Waiting for operations/admin to confirm
+        return { action: 'confirm', label: 'Confirm Booking', icon: <CheckCircle2 size={16} /> };
       case 'CONFIRMED':
         return { action: 'en-route', label: 'Mark En Route', icon: <Navigation size={16} /> };
       case 'PROVIDER_EN_ROUTE':
@@ -103,8 +102,8 @@ export default function ProviderBookingDetailPage() {
             Upload Proof
           </Button>
           {booking.status === 'PENDING_CONFIRMATION' && (
-            <Alert variant="info" title="Awaiting Confirmation" style={{ flex: 1 }}>
-              This booking is pending confirmation by operations or admin. You'll be notified when confirmed.
+            <Alert variant="info" title="Confirm this job" style={{ flex: 1 }}>
+              Review the schedule and scope, then confirm that you can take this booking.
             </Alert>
           )}
           {['CONFIRMED', 'PROVIDER_EN_ROUTE', 'ARRIVED', 'IN_PROGRESS'].includes(booking.status) && (

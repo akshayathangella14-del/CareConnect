@@ -3,21 +3,25 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Briefcase, ClipboardList, Gauge, ShieldCheck, TimerReset } from 'lucide-react';
 import { Card, Badge } from '@/components';
 import { selectCurrentUser } from '@/features/auth';
-import { useGetPlatformStatsQuery } from '@/features/stats';
+import { useListServiceRequestsQuery } from '@/features/serviceRequests';
+import { useListBookingsQuery } from '@/features/bookings';
+import { useListProvidersQuery } from '@/features/providers';
 
 export default function OpsDashboard() {
   const user = useSelector(selectCurrentUser);
-  const { data: stats } = useGetPlatformStatsQuery();
+  const { data: requests = [] } = useListServiceRequestsQuery(undefined, { pollingInterval: 15000 });
+  const { data: bookings = [] } = useListBookingsQuery(undefined, { pollingInterval: 15000 });
+  const { data: providers = [] } = useListProvidersQuery(undefined, { pollingInterval: 30000 });
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'OP';
 
   const metricCards = [
-    { label: 'Active bookings', value: stats?.activeBookings ?? 26, tone: 'primary' },
-    { label: 'Pending verifications', value: stats?.totalProviders ?? 17, tone: 'warning' },
-    { label: 'Completed jobs', value: stats?.completedBookings ?? 143, tone: 'success' },
-    { label: 'Avg rating', value: `${Number(stats?.averageRating || 4.8).toFixed(1)}/5`, tone: 'violet' },
+    { label: 'Requests needing dispatch', value: requests.filter((request) => ['MATCHING', 'QUOTING'].includes(request.status)).length, tone: 'primary' },
+    { label: 'Pending verifications', value: providers.filter((provider) => provider.verificationStatus === 'PENDING').length, tone: 'warning' },
+    { label: 'Active jobs', value: bookings.filter((booking) => !['COMPLETED', 'CANCELLED'].includes(booking.status)).length, tone: 'success' },
+    { label: 'Jobs awaiting action', value: bookings.filter((booking) => ['PENDING_CONFIRMATION', 'AWAITING_CUSTOMER_CONFIRMATION'].includes(booking.status)).length, tone: 'violet' },
   ];
 
   const queueItems = [

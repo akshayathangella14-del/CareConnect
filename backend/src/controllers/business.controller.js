@@ -601,7 +601,7 @@ const quoteController = {
 // --- BOOKING CONTROLLER ---
 const providerRolesArr = ['SERVICE_PROVIDER'];
 const bookingTransitions = {
-  confirm: { from: ['PENDING_CONFIRMATION'], to: 'CONFIRMED', roles: ['ADMIN', 'OPERATIONS_MANAGER'], event: 'BOOKING_CONFIRMED' },
+  confirm: { from: ['PENDING_CONFIRMATION'], to: 'CONFIRMED', roles: providerRolesArr, event: 'BOOKING_CONFIRMED' },
   enRoute: { from: ['CONFIRMED'], to: 'PROVIDER_EN_ROUTE', roles: providerRolesArr, event: 'PROVIDER_EN_ROUTE' },
   arrived: { from: ['PROVIDER_EN_ROUTE'], to: 'ARRIVED', roles: providerRolesArr, event: 'PROVIDER_ARRIVED' },
   start: { from: ['ARRIVED'], to: 'IN_PROGRESS', roles: providerRolesArr, event: 'SERVICE_STARTED' },
@@ -660,7 +660,7 @@ const bookingController = {
     if (transition.to === 'COMPLETED') await createInvoiceForBooking(booking);
     await recordAudit({ actor: req.user, action: transition.event, resourceType: 'Booking', resourceId: booking._id });
     await createNotification({
-      recipient: transition.to === 'COMPLETED' ? booking.customer : (booking.$locals.providerUser || booking.customer),
+      recipient: booking.customer,
       type: transition.event,
       title: `Booking ${transition.to.replace(/_/g, ' ').toLowerCase()}`,
       message: `Booking #${booking._id.toString().slice(-6)} status changed to ${transition.to}.`,

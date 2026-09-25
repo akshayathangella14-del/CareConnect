@@ -4,10 +4,12 @@ import { ArrowRight, BriefcaseBusiness, ShieldCheck, Users, Wrench } from 'lucid
 import { Card, Badge } from '@/components';
 import { selectCurrentUser } from '@/features/auth';
 import { useGetPlatformStatsQuery } from '@/features/stats';
+import { useListProvidersQuery } from '@/features/providers';
 
 export default function AdminDashboard() {
   const user = useSelector(selectCurrentUser);
   const { data: stats } = useGetPlatformStatsQuery();
+  const { data: providers = [] } = useListProvidersQuery(undefined, { pollingInterval: 30000 });
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -16,8 +18,8 @@ export default function AdminDashboard() {
   const metricCards = [
     { label: 'Total users', value: (stats?.totalCustomers ?? 220) + (stats?.totalProviders ?? 45), tone: 'primary' },
     { label: 'Verified providers', value: stats?.totalProviders ?? 45, tone: 'success' },
-    { label: 'Bookings', value: stats?.activeBookings ?? 18, tone: 'warning' },
-    { label: 'Avg rating', value: `${Number(stats?.averageRating || 4.8).toFixed(1)}/5`, tone: 'violet' },
+    { label: 'Active bookings', value: stats?.activeBookings ?? 0, tone: 'warning' },
+    { label: 'Verification backlog', value: providers.filter((provider) => provider.verificationStatus === 'PENDING').length, tone: 'violet' },
   ];
 
   const actions = [
@@ -91,7 +93,7 @@ export default function AdminDashboard() {
             </div>
             <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
               <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Verification backlog</div>
-              <div style={{ marginTop: 8, fontWeight: 700 }}>9 pending</div>
+              <div style={{ marginTop: 8, fontWeight: 700 }}>{providers.filter((provider) => provider.verificationStatus === 'PENDING').length} pending</div>
             </div>
             <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
               <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Trust score</div>
