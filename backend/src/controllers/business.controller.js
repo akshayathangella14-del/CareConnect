@@ -24,7 +24,7 @@ const { recordAudit } = require('../services/audit.service');
 const { createNotification } = require('../services/notification.service');
 const { analyzeServiceRequest, summarizeDispute, reanalyzeAfterCorrection } = require('../services/ai.service');
 const { getProviderMatches } = require('../services/matching.service');
-const { assertNoAvailabilityOverlap } = require('../services/availability.service');
+const { assertNoAvailabilityOverlap, assertNoBookingConflict } = require('../services/availability.service');
 
 const customerRoles = ['CUSTOMER'];
 const elevatedRoles = ['ADMIN', 'OPERATIONS_MANAGER', 'SUPPORT_AGENT'];
@@ -470,11 +470,21 @@ const quoteController = {
       serviceRequest: serviceRequest._id,
       provider: provider._id,
       ...req.body,
-      status: 'DRAFT',
+      status: req.body.submit === true ? 'SUBMITTED' : 'DRAFT',
     });
     if (serviceRequest.status === 'MATCHING') {
       serviceRequest.status = 'QUOTING';
       await serviceRequest.save();
+    }
+    if (quote.status === 'SUBMITTED') {
+      await createNotification({
+        recipient: serviceRequest.customer,
+        type: 'QUOTE',
+        title: 'New quote received',
+        message: `${provider.displayName} submitted a quote for "${serviceRequest.title}".`,
+        resourceType: 'Quote',
+        resourceId: quote._id,
+      });
     }
     await recordAudit({ actor: req.user, action: 'QUOTE_CREATED', resourceType: 'Quote', resourceId: quote._id });
     sendSuccess(res, 201, 'Quote created.', { quote });
@@ -483,7 +493,11 @@ const quoteController = {
     const serviceRequest = await ServiceRequest.findById(req.params.id);
     if (!serviceRequest) throw AppError.notFound('Service request not found.');
     if (!canAccessServiceRequest(req.user, serviceRequest)) throw AppError.forbidden('Access denied.');
-    const quotes = await Quote.find({ serviceRequest: serviceRequest._id })
+    const quoteQuery = { serviceRequest: serviceRequest._id };
+    if (req.user.role === 'CUSTOMER') {
+      quoteQuery.status = { $nin: ['DRAFT', 'WITHDRAWN'] };
+    }
+    const quotes = await Quote.find(quoteQuery)
       .populate({ path: 'provider', populate: { path: 'user', select: 'name email' } })
       .sort({ totalAmount: 1 });
     sendSuccess(res, 200, 'Quotes fetched.', { quotes });
@@ -508,7 +522,19 @@ const quoteController = {
     const quote = await Quote.findById(req.params.id).populate('serviceRequest');
     if (!quote) throw AppError.notFound('Quote not found.');
     if (!isSameId(quote.serviceRequest.customer, req.user._id)) throw AppError.forbidden('Not your request.');
+    if (quote.validUntil && new Date(quote.validUntil) < new Date()) {
+      quote.status = 'EXPIRED';
+      await quote.save();
+      throw AppError.conflict('This quote has expired.');
+    }
     if (quote.status === 'ACCEPTED') throw AppError.conflict('Quote already accepted.');
+
+    await assertNoBookingConflict({
+      provider: quote.provider,
+      startAt: quote.serviceRequest.preferredSchedule?.startAt,
+      endAt: quote.serviceRequest.preferredSchedule?.endAt,
+    });
+
     quote.status = 'ACCEPTED';
     quote.acceptedAt = new Date();
     await quote.save();
@@ -551,7 +577,7 @@ const quoteController = {
       statusEvents: [{ type: 'BOOKING_CREATED', actor: req.user._id, description: 'Booking created from accepted quote.' }],
     });
 
-    await recordAudit({ actor: req.user, action: 'QUOTE_ACCEPTED', resourceType: 'Quote', resourceId: quote._id });
+    await recordAudit({ actor: req.user, action: 'QUOTE_ACCEPTED_BOOKING_CREATED', resourceType: 'Quote', resourceId: quote._id });
     sendSuccess(res, 200, 'Quote accepted. Booking created.', { quote, booking });
   }),
   requestChanges: asyncHandler(async (req, res) => {
@@ -701,7 +727,7 @@ const bookingController = {
     booking.evidence.push(evidenceItem);
     await booking.save();
     await recordAudit({ actor: req.user, action: 'EVIDENCE_ADDED', resourceType: 'Booking', resourceId: booking._id });
-    sendSuccess(res, 201, 'Evidence added.', { booking });
+    sendSuccess(res, 201, 'Evidence added.', { booking, evidence: booking.evidence[booking.evidence.length - 1] });
   }),
   requestScopeChange: asyncHandler(async (req, res) => {
     const booking = await getBookingForAccess(req.params.id, req.user);
@@ -729,9 +755,10 @@ const bookingController = {
       resourceId: booking._id,
     });
     await recordAudit({ actor: req.user, action: 'SCOPE_CHANGE_REQUESTED', resourceType: 'Booking', resourceId: booking._id });
-    sendSuccess(res, 201, 'Scope change requested.', { booking });
+    sendSuccess(res, 201, 'Scope change requested.', { booking, scopeChange: booking.scopeChanges[booking.scopeChanges.length - 1] });
   }),
   decideScopeChange: (decision) => asyncHandler(async (req, res) => {
+    requireRole(req.user, customerRoles);
     const booking = await getBookingForAccess(req.params.id, req.user);
     const change = booking.scopeChanges.id(req.params.changeId);
     if (!change) throw AppError.notFound('Scope change not found.');
@@ -762,6 +789,7 @@ const bookingController = {
       status: booking.status,
       evidence: booking.evidence || [],
       scopeChanges: booking.scopeChanges || [],
+      approvedScopeChanges: (booking.scopeChanges || []).filter((change) => change.status === 'APPROVED'),
       statusEvents: booking.statusEvents || [],
       scopeSnapshot: booking.scopeSnapshot,
       pricingSnapshot: booking.pricingSnapshot,
@@ -1084,10 +1112,11 @@ const notificationController = {
     // Create notification for the provider
     await createNotification({
       recipient: providerProfile.user._id,
-      type: 'QUOTE_REQUEST',
+      type: 'QUOTE',
       title: 'New Quote Request',
       message: `A customer has requested a quote for their service request: ${serviceRequest.title}`,
-      relatedResource: { resourceType: 'ServiceRequest', resourceId: serviceRequestId }
+      resourceType: 'ServiceRequest',
+      resourceId: serviceRequestId,
     });
     
     sendSuccess(res, 201, 'Quote request notification sent.');
@@ -1141,15 +1170,19 @@ const analyticsController = {
   }),
   summary: asyncHandler(async (req, res) => {
     requireRole(req.user, ['ADMIN', 'OPERATIONS_MANAGER']);
-    const [totalRequests, activeBookings, completedBookings, totalProviders, totalCustomers] = await Promise.all([
+    const [totalRequests, activeBookings, completedBookings, totalProviders, totalCustomers, totalUsers, bookings] = await Promise.all([
       ServiceRequest.countDocuments(),
       Booking.countDocuments({ status: { $nin: ['COMPLETED', 'CANCELLED'] } }),
       Booking.countDocuments({ status: 'COMPLETED' }),
       ProviderProfile.countDocuments({ verificationStatus: 'VERIFIED' }),
       User.countDocuments({ role: 'CUSTOMER', status: 'ACTIVE' }),
+      User.countDocuments(),
+      Booking.countDocuments(),
     ]);
     sendSuccess(res, 200, 'Analytics summary.', {
-      analytics: { totalRequests, activeBookings, completedBookings, totalProviders, totalCustomers },
+      analytics: { totalRequests, activeBookings, completedBookings, totalProviders, totalCustomers, totalUsers, bookings },
+      totalUsers,
+      bookings,
     });
   }),
 };

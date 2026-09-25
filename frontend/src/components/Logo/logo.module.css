@@ -40,62 +40,17 @@
   box-shadow: 0 6px 16px rgba(255, 77, 109, 0.45);
 }
 
-.iconBackground {
+.logoMark {
   position: absolute;
   inset: 0;
-  background: linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
-  background-size: 200% 200%;
-  z-index: 1;
-}
-
-.homeIcon {
-  position: absolute;
-  z-index: 2;
-  width: 50%;
-  height: 50%;
-  transform: translateY(-2px);
-}
-
-.shieldIcon {
-  position: absolute;
-  z-index: 1;
-  width: 75%;
-  height: 75%;
-  opacity: 0.3;
-}
-
-.sparklesIcon {
-  position: absolute;
-  z-index: 3;
-  width: 35%;
-  height: 35%;
-  top: 15%;
-  right: 15%;
-  color: var(--color-accent);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Animations */
-.animated .iconBackground {
-  animation: shimmer 3s infinite linear;
-}
-
-.animated .sparklesIcon {
-  animation: pulseRotate 4s infinite ease-in-out;
-  transform-origin: center;
-}
-
-.animated .homeIcon {
+.animated .logoMark {
   animation: subtleFloat 6s infinite ease-in-out;
-}
-
-@keyframes shimmer {
-  0% { background-position: -100% -100%; }
-  100% { background-position: 200% 200%; }
-}
-
-@keyframes pulseRotate {
-  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
-  50% { transform: scale(1.2) rotate(15deg); opacity: 1; filter: drop-shadow(0 0 4px var(--color-accent)); }
 }
 
 @keyframes subtleFloat {

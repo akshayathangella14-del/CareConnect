@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGetServiceRequestQuery, useCreateQuoteForRequestMutation } from '@/features/serviceRequests';
 import { Card, Input, Textarea, Select, Button, Alert, Badge } from '@/components';
-import { DollarSign, Clock, Plus, Trash2 } from 'lucide-react';
+import { IndianRupee, Clock, Plus, Trash2 } from 'lucide-react';
 
 export default function QuoteFormPage() {
   const navigate = useNavigate();
@@ -202,7 +202,7 @@ export default function QuoteFormPage() {
                 step="0.01"
                 value={formData.labor}
                 onChange={handleChange}
-                leftIcon={<DollarSign size={16} />}
+                leftIcon={<IndianRupee size={16} />}
                 required
               />
               <Input
@@ -213,7 +213,7 @@ export default function QuoteFormPage() {
                 step="0.01"
                 value={formData.materials}
                 onChange={handleChange}
-                leftIcon={<DollarSign size={16} />}
+                leftIcon={<IndianRupee size={16} />}
               />
               <Input
                 label="Estimated Tax"
@@ -223,7 +223,7 @@ export default function QuoteFormPage() {
                 step="0.01"
                 value={formData.tax}
                 onChange={handleChange}
-                leftIcon={<DollarSign size={16} />}
+                leftIcon={<IndianRupee size={16} />}
               />
               
               <div style={{ padding: 'var(--space-3)', backgroundColor: 'var(--color-surface-muted)', borderRadius: 'var(--radius-md)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--space-2)' }}>

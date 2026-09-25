@@ -1,13 +1,8 @@
 const Invoice = require('../models/Invoice');
 
-const sumApprovedScopeChanges = (booking) => booking.scopeChanges
-  .filter((change) => change.status === 'APPROVED')
-  .reduce((sum, change) => sum + (change.costDifference || 0), 0);
-
 const buildInvoiceFromBooking = (booking) => {
   const baseTotal = booking.pricingSnapshot.totalAmount || 0;
-  const scopeChangeTotal = sumApprovedScopeChanges(booking);
-  const subtotal = baseTotal + scopeChangeTotal;
+  const subtotal = baseTotal;
   const tax = 0;
   const discount = 0;
   const total = subtotal + tax - discount;
@@ -20,15 +15,6 @@ const buildInvoiceFromBooking = (booking) => {
       amount: baseTotal,
     },
   ];
-
-  if (scopeChangeTotal > 0) {
-    lineItems.push({
-      description: 'Approved scope changes',
-      quantity: 1,
-      unitPrice: scopeChangeTotal,
-      amount: scopeChangeTotal,
-    });
-  }
 
   return {
     lineItems,

@@ -1,6 +1,6 @@
 const ProviderProfile = require('../models/ProviderProfile');
 const Booking = require('../models/Booking');
-const { hasAvailability } = require('./availability.service');
+const { hasAvailability, assertNoBookingConflict } = require('./availability.service');
 
 const normalize = (value) => String(value || '').trim().toLowerCase();
 
@@ -24,7 +24,7 @@ const getProviderMatches = async (serviceRequest) => {
 
   const providers = await ProviderProfile.find({
     verificationStatus: 'VERIFIED',
-    ...(requiredSkills.length ? { skills: { $in: requiredSkills } } : {}),
+    ...(requiredSkills.length ? { skills: { $all: requiredSkills } } : {}),
   })
     .populate('user', 'name email phone status')
     .populate('skills', 'name slug')
@@ -49,6 +49,12 @@ const getProviderMatches = async (serviceRequest) => {
       : false;
 
     if (!availabilityMatch) {
+      continue;
+    }
+
+    try {
+      await assertNoBookingConflict({ provider: provider._id, startAt, endAt });
+    } catch (error) {
       continue;
     }
 

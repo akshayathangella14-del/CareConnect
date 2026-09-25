@@ -14,7 +14,11 @@ import { MapPin, CalendarClock, Wand2, Check, ShieldAlert, CheckCircle } from 'l
 export default function ServiceRequestDetailPage() {
   const { id } = useParams();
   const { data: request, isLoading, error } = useGetServiceRequestQuery(id);
-  const { data: quotes = [] } = useListQuotesForRequestQuery(id, { skip: !request || request.status === 'DRAFT' });
+  const { data: quotes = [] } = useListQuotesForRequestQuery(id, {
+    skip: !request || request.status === 'DRAFT',
+    pollingInterval: 5000,
+    refetchOnFocus: true,
+  });
   
   const [submitRequest, { isLoading: isSubmitting }] = useSubmitServiceRequestMutation();
   const [acceptQuote, { isLoading: isAccepting }] = useAcceptQuoteMutation();

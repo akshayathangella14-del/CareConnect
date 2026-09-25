@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80" role="img" aria-labelledby="title">
+  <title>CareConnect</title>
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FF4D6D"/>
+      <stop offset="1" stop-color="#E83155"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="8" width="64" height="64" rx="16" fill="url(#brand)"/>
+  <path d="M36 18 17 33v24h38V33L36 18Z" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round" opacity=".34"/>
+  <path d="m26 37 10-8 10 8v13H26V37Z" fill="#fff"/>
+  <path d="M32 50v-7h8v7" fill="url(#brand)"/>
+  <path d="m52 17 1.7 4.3L58 23l-4.3 1.7L52 29l-1.7-4.3L46 23l4.3-1.7L52 17Z" fill="#FFB347"/>
+  <path d="m22 26 1 2.5 2.5 1-2.5 1-1 2.5-1-2.5-2.5-1 2.5-1 1-2.5Z" fill="#FFB347" opacity=".9"/>
+  <text x="82" y="53" font-family="Poppins, Inter, sans-serif" font-size="35" font-weight="800" letter-spacing="-1.2"><tspan fill="#172033">Care</tspan><tspan fill="url(#brand)">Connect</tspan></text>
+</svg>

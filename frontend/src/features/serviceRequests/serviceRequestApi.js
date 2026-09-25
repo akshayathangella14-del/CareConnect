@@ -106,13 +106,14 @@ export const serviceRequestApi = apiSlice.injectEndpoints({
 
     createQuoteForRequest: builder.mutation({
       query: ({ requestId, ...data }) => ({
-        url: `/service-requests/${requestId}/quotes`,
+        url: `/quotes/requests/${requestId}`,
         method: 'POST',
         body: data,
       }),
       transformResponse: (response) => response?.data?.quote || response?.quote || response,
       invalidatesTags: (result, error, { requestId }) => [
         { type: 'Quote', id: 'LIST' },
+        { type: 'Quote', id: `request-${requestId}` },
         { type: 'ServiceRequest', id: requestId },
       ],
     }),

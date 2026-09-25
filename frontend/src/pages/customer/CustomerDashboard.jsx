@@ -4,10 +4,13 @@ import { ArrowRight, CalendarClock, Clock3, Sparkles, Wallet } from 'lucide-reac
 import { Card, Badge } from '@/components';
 import { selectCurrentUser } from '@/features/auth';
 import { useGetPlatformStatsQuery } from '@/features/stats';
+import { useListNotificationsQuery } from '@/features/notifications';
 
 export default function CustomerDashboard() {
   const user = useSelector(selectCurrentUser);
   const { data: stats } = useGetPlatformStatsQuery();
+  const { data: notifications = [] } = useListNotificationsQuery(undefined, { pollingInterval: 5000 });
+  const pendingQuoteCount = notifications.filter((notification) => notification.type === 'QUOTE' && !notification.isRead).length;
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -15,7 +18,7 @@ export default function CustomerDashboard() {
 
   const metricCards = [
     { label: 'Active requests', value: stats?.totalRequests ?? 18, tone: 'primary' },
-    { label: 'Quotes pending', value: stats?.activeBookings ?? 6, tone: 'warning' },
+    { label: 'Quotes pending', value: pendingQuoteCount, tone: 'warning' },
     { label: 'Upcoming bookings', value: stats?.completedBookings ?? 9, tone: 'success' },
     { label: 'Avg rating', value: `${Number(stats?.averageRating || 4.8).toFixed(1)}/5`, tone: 'violet' },
   ];
