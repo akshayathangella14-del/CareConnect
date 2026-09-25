@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useListBookingsQuery } from '@/features/bookings';
-import { Card, Button, StatusBadge, DataTable, EmptyState } from '@/components';
+import { Card, Button, StatusBadge, DataTable, EmptyState, Alert } from '@/components';
 import { CalendarClock, MapPin } from 'lucide-react';
 
 export default function ProviderBookingsPage() {
   const navigate = useNavigate();
-  const { data: bookings = [], isLoading, isFetching } = useListBookingsQuery();
+  const { data: bookings = [], isLoading, isFetching, error } = useListBookingsQuery(undefined, {
+    pollingInterval: 10000,
+    refetchOnFocus: true,
+  });
+
+  const errorMessage = error?.data?.error?.message
+    || error?.data?.message
+    || error?.error
+    || 'Unable to load your bookings right now.';
 
   const columns = [
     {
@@ -59,6 +67,19 @@ export default function ProviderBookingsPage() {
         <h1 style={{ fontSize: 'var(--font-size-h2)', marginBottom: 'var(--space-2)' }}>My Active Jobs</h1>
         <p style={{ color: 'var(--color-text-secondary)' }}>Manage your upcoming, active, and completed service bookings.</p>
       </div>
+
+      <Card padding="md" style={{ backgroundColor: 'var(--color-surface-muted)' }}>
+        <h3 style={{ margin: 0, marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-body)' }}>Provider workflow</h3>
+        <ol style={{ margin: 0, paddingLeft: 'var(--space-5)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)', lineHeight: 1.8 }}>
+          <li>Submit a quote and wait for the customer to accept it.</li>
+          <li>Open the new pending booking and confirm the job.</li>
+          <li>Mark En Route, Arrived, and Start Work as the job progresses.</li>
+          <li>Upload before or after evidence, then Request Completion.</li>
+          <li>The customer confirms completion, then receives the invoice.</li>
+        </ol>
+      </Card>
+
+      {error && <Alert variant="error" title="Could not load bookings">{errorMessage}</Alert>}
 
       {isLoading ? (
         <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading bookings...</div>

@@ -34,7 +34,8 @@ export const serviceRequestApi = apiSlice.injectEndpoints({
       }),
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
-        return response?.data?.serviceRequests || response?.serviceRequests || [];
+        const serviceRequests = response?.data?.serviceRequests || response?.serviceRequests;
+        return Array.isArray(serviceRequests) ? serviceRequests : [];
       },
       providesTags: (result) =>
         Array.isArray(result)

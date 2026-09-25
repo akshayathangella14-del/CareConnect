@@ -217,6 +217,7 @@ const serviceRequestController = {
     if (req.query.urgency) query.urgency = req.query.urgency;
     const serviceRequests = await ServiceRequest.find(query)
       .populate('category', 'name slug')
+      .populate('service', 'name slug')
       .sort({ createdAt: -1 });
     sendSuccess(res, 200, 'Service requests fetched.', { serviceRequests });
   }),
@@ -575,6 +576,15 @@ const quoteController = {
         totalAmount: quote.totalAmount,
       },
       statusEvents: [{ type: 'BOOKING_CREATED', actor: req.user._id, description: 'Booking created from accepted quote.' }],
+    });
+
+    await createNotification({
+      recipient: provider.user._id,
+      type: 'BOOKING',
+      title: 'Customer accepted your quote',
+      message: `A booking is ready for your confirmation: ${quote.serviceRequest.title}.`,
+      resourceType: 'Booking',
+      resourceId: booking._id,
     });
 
     await recordAudit({ actor: req.user, action: 'QUOTE_ACCEPTED_BOOKING_CREATED', resourceType: 'Quote', resourceId: quote._id });

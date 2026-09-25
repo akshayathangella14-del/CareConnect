@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useListServiceRequestsQuery } from '@/features/serviceRequests';
 import { Card, Button, StatusBadge, DataTable, EmptyState, Alert } from '@/components';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { Plus, FileText, CalendarClock } from 'lucide-react';
 import styles from './ServiceRequestsPage.module.css';
 
@@ -10,9 +11,10 @@ export default function ServiceRequestsPage() {
   const [statusFilter, setStatusFilter] = useState('');
   
   const { data: requests = [], isLoading, isFetching, error } = useListServiceRequestsQuery();
+  const safeRequests = Array.isArray(requests) ? requests.filter(Boolean) : [];
   const visibleRequests = statusFilter
-    ? requests.filter((request) => request.status === statusFilter)
-    : requests;
+    ? safeRequests.filter((request) => request.status === statusFilter)
+    : safeRequests;
 
   const errorMessage = error?.data?.error?.message
     || error?.data?.message
@@ -25,9 +27,9 @@ export default function ServiceRequestsPage() {
       key: 'title',
       render: (req) => (
         <div>
-          <div className={styles.requestTitle}>{req.title}</div>
+          <div className={styles.requestTitle}>{req?.title || 'Untitled service request'}</div>
           <div className={styles.requestDate}>
-            Created {new Date(req.createdAt).toLocaleDateString()}
+            Created {req?.createdAt ? new Date(req.createdAt).toLocaleDateString() : 'N/A'}
           </div>
         </div>
       ),
@@ -35,26 +37,31 @@ export default function ServiceRequestsPage() {
     {
       header: 'Category',
       key: 'category',
-      render: (req) => req.category?.name || 'Unknown',
+      render: (req) => req?.category?.name || req?.service?.name || 'Not categorized',
     },
     {
       header: 'Urgency',
       key: 'urgency',
-      render: (req) => (
-        <span className={`${styles.urgency} ${styles[`urgency--${req.urgency?.toLowerCase() || 'normal'}`]}`}>
-          {req.urgency}
-        </span>
-      ),
+      render: (req) => {
+        const urgency = typeof req?.urgency === 'string' ? req.urgency.toUpperCase() : 'NORMAL';
+        const urgencyClass = urgency.toLowerCase();
+        return (
+          <span className={`${styles.urgency} ${styles[`urgency--${urgencyClass}`]}`}>
+            {urgency}
+          </span>
+        );
+      },
     },
     {
       header: 'Status',
       key: 'status',
-      render: (req) => <StatusBadge status={req.status} />,
+      render: (req) => <StatusBadge status={req?.status || 'DRAFT'} />,
     },
   ];
 
   return (
-    <div className={`${styles.serviceRequests} animate-fade-in-up`}>
+    <ErrorBoundary>
+      <div className={`${styles.serviceRequests} animate-fade-in-up`}>
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <h1>My Service Requests</h1>
@@ -107,6 +114,7 @@ export default function ServiceRequestsPage() {
           />
         </div>
       )}
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
