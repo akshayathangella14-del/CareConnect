@@ -1,0 +1,18 @@
+.wrapper { position: relative; display: flex; flex-direction: column; gap: var(--space-2); }
+.label { font-size: var(--font-size-small); font-weight: var(--font-weight-medium); color: var(--color-text-primary); }
+.required { color: var(--color-error); }
+.input { width: 100%; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-background); color: var(--color-text-primary); display: flex; align-items: center; justify-content: space-between; cursor: pointer; font: inherit; text-align: left; }
+.input:hover, .input:focus { border-color: var(--color-primary); outline: none; box-shadow: 0 0 0 3px var(--color-primary-soft); }
+.inputError { border-color: var(--color-error); }
+.icon { color: var(--color-primary); }
+.calendar { position: absolute; top: 100%; left: 0; right: 0; z-index: 20; margin-top: var(--space-2); padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-3); color: var(--color-text-primary); }
+.navButton { display: grid; place-items: center; padding: var(--space-1); border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--color-text-primary); cursor: pointer; }
+.navButton:hover { background: var(--color-surface-muted); }
+.days { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--space-1); }
+.dayName { padding: var(--space-1); color: var(--color-text-muted); font-size: var(--font-size-caption); text-align: center; }
+.day { min-height: 32px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--color-text-primary); cursor: pointer; }
+.day:hover:not(:disabled) { background: var(--color-primary-soft); color: var(--color-primary-dark); }
+.day:disabled { color: var(--color-text-disabled); cursor: not-allowed; }
+.selected { background: var(--color-primary); color: #fff; }
+.error { color: var(--color-error); font-size: var(--font-size-caption); }

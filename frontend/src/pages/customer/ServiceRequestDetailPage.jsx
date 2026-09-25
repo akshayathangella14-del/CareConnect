@@ -9,6 +9,8 @@ import {
 } from '@/features/serviceRequests';
 import { useAcceptQuoteMutation } from '@/features/quotes';
 import { Card, Button, StatusBadge, Alert, Badge, Input } from '@/components';
+import { DatePicker } from '@/components/ui/DatePicker/DatePicker';
+import { TimePicker } from '@/components/ui/TimePicker/TimePicker';
 import { MapPin, CalendarClock, Wand2, Check, ShieldAlert, CheckCircle } from 'lucide-react';
 
 export default function ServiceRequestDetailPage() {
@@ -35,6 +37,10 @@ export default function ServiceRequestDetailPage() {
     preferredEndTime: '',
   });
   const [showScheduleForm, setShowScheduleForm] = useState(false);
+  const [scheduleError, setScheduleError] = useState('');
+  const [scheduleSuccess, setScheduleSuccess] = useState('');
+  const [quoteError, setQuoteError] = useState('');
+  const [quoteSuccess, setQuoteSuccess] = useState('');
 
   if (isLoading) return <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading request details...</div>;
   
@@ -63,29 +69,48 @@ export default function ServiceRequestDetailPage() {
   const handleAcceptQuote = async (quoteId) => {
     if (!request.preferredSchedule?.startAt || !request.preferredSchedule?.endAt) {
       setShowScheduleForm(true);
+      setQuoteError('Please save your preferred schedule before accepting a quote.');
       return;
     }
 
     if (window.confirm('Are you sure you want to accept this quote? This will create a binding booking.')) {
       try {
+        setQuoteError('');
+        setQuoteSuccess('');
         await acceptQuote(quoteId).unwrap();
         await refetch();
+        setQuoteSuccess('Quote accepted successfully. Your booking is now waiting for provider confirmation.');
       } catch (err) {
         console.error('Failed to accept quote:', err);
+        setQuoteError(err?.data?.error?.message || err?.data?.message || 'Failed to accept quote. Please try again.');
       }
     }
   };
 
   const handleScheduleSubmit = async () => {
+    setScheduleError('');
+    setScheduleSuccess('');
+    const { preferredStartDate, preferredStartTime, preferredEndDate, preferredEndTime } = scheduleForm;
+    if (!preferredStartDate || !preferredStartTime || !preferredEndDate || !preferredEndTime) {
+      setScheduleError('Please fill in all four schedule fields.');
+      return;
+    }
+
     try {
       const preferredSchedule = {
-        startAt: new Date(`${scheduleForm.preferredStartDate}T${scheduleForm.preferredStartTime}`).toISOString(),
-        endAt: new Date(`${scheduleForm.preferredEndDate}T${scheduleForm.preferredEndTime}`).toISOString(),
+        startAt: new Date(`${preferredStartDate}T${preferredStartTime}`).toISOString(),
+        endAt: new Date(`${preferredEndDate}T${preferredEndTime}`).toISOString(),
       };
+      if (new Date(preferredSchedule.endAt) <= new Date(preferredSchedule.startAt)) {
+        setScheduleError('End time must be after the start time.');
+        return;
+      }
       await updateRequest({ id, preferredSchedule }).unwrap();
       setShowScheduleForm(false);
+      setScheduleSuccess('Schedule saved successfully. You can now accept a quote.');
     } catch (err) {
       console.error('Failed to update schedule:', err);
+      setScheduleError(err?.data?.error?.message || err?.data?.message || 'Failed to save schedule. Please try again.');
     }
   };
 
@@ -217,6 +242,10 @@ export default function ServiceRequestDetailPage() {
             <div>
               <h3 style={{ fontSize: 'var(--font-size-h3)', marginBottom: 'var(--space-4)' }}>Received Quotes</h3>
 
+              {quoteError && <Alert variant="error" title="Quote could not be accepted">{quoteError}</Alert>}
+              {quoteSuccess && <Alert variant="success" title="Booking created">{quoteSuccess}</Alert>}
+              {scheduleSuccess && <Alert variant="success" title="Schedule saved">{scheduleSuccess}</Alert>}
+
               {!request.preferredSchedule?.startAt && (
                 <Alert variant="warning" title="Schedule Required" style={{ marginBottom: 'var(--space-4)' }}>
                   You need to provide your preferred schedule before accepting any quote.
@@ -283,43 +312,33 @@ export default function ServiceRequestDetailPage() {
                 Providers will check their availability against this schedule before you can accept quotes.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Preferred Start Date</label>
-                  <Input
-                    name="preferredStartDate"
-                    type="date"
+                <DatePicker
+                    label="Preferred Start Date"
                     value={scheduleForm.preferredStartDate}
-                    onChange={(e) => setScheduleForm(prev => ({ ...prev, preferredStartDate: e.target.value }))}
+                    onChange={(value) => setScheduleForm(prev => ({ ...prev, preferredStartDate: value }))}
+                    required
                   />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Preferred Start Time</label>
-                  <Input
-                    name="preferredStartTime"
-                    type="time"
+                <TimePicker
+                    label="Preferred Start Time"
                     value={scheduleForm.preferredStartTime}
-                    onChange={(e) => setScheduleForm(prev => ({ ...prev, preferredStartTime: e.target.value }))}
+                    onChange={(value) => setScheduleForm(prev => ({ ...prev, preferredStartTime: value }))}
+                    required
                   />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Preferred End Date</label>
-                  <Input
-                    name="preferredEndDate"
-                    type="date"
+                <DatePicker
+                    label="Preferred End Date"
                     value={scheduleForm.preferredEndDate}
-                    onChange={(e) => setScheduleForm(prev => ({ ...prev, preferredEndDate: e.target.value }))}
+                    onChange={(value) => setScheduleForm(prev => ({ ...prev, preferredEndDate: value }))}
+                    min={scheduleForm.preferredStartDate}
+                    required
                   />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Preferred End Time</label>
-                  <Input
-                    name="preferredEndTime"
-                    type="time"
+                <TimePicker
+                    label="Preferred End Time"
                     value={scheduleForm.preferredEndTime}
-                    onChange={(e) => setScheduleForm(prev => ({ ...prev, preferredEndTime: e.target.value }))}
+                    onChange={(value) => setScheduleForm(prev => ({ ...prev, preferredEndTime: value }))}
+                    required
                   />
-                </div>
               </div>
+              {scheduleError && <Alert variant="error" title="Schedule could not be saved">{scheduleError}</Alert>}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
                 <Button variant="secondary" onClick={() => setShowScheduleForm(false)}>Cancel</Button>
                 <Button onClick={handleScheduleSubmit}>Save Schedule</Button>

@@ -1,0 +1,14 @@
+.wrapper { position: relative; display: flex; flex-direction: column; gap: var(--space-2); }
+.label { font-size: var(--font-size-small); font-weight: var(--font-weight-medium); color: var(--color-text-primary); }
+.required { color: var(--color-error); }
+.input { width: 100%; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-background); color: var(--color-text-primary); display: flex; align-items: center; justify-content: space-between; cursor: pointer; font: inherit; text-align: left; }
+.input:hover, .input:focus { border-color: var(--color-primary); outline: none; box-shadow: 0 0 0 3px var(--color-primary-soft); }
+.inputError { border-color: var(--color-error); }
+.icon { color: var(--color-primary); }
+.popover { position: absolute; top: 100%; left: 0; right: 0; z-index: 20; margin-top: var(--space-2); padding: var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); }
+.controls { display: flex; align-items: center; justify-content: center; gap: var(--space-3); }
+.unit { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+.unit button, .period { border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-surface-muted); color: var(--color-text-primary); cursor: pointer; padding: var(--space-1) var(--space-3); }
+.unit button:hover, .period:hover { background: var(--color-primary-soft); color: var(--color-primary-dark); }
+.period { background: var(--color-primary); color: #fff; font-weight: 700; }
+.error { color: var(--color-error); font-size: var(--font-size-caption); }
