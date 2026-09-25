@@ -33,6 +33,14 @@ export function DatePicker({ label, value, onChange, error, required = false, mi
     setIsOpen(false);
   };
 
+  const goToToday = () => setCurrentMonth(new Date());
+  const isToday = (day) => {
+    const today = new Date();
+    return day === today.getDate()
+      && currentMonth.getMonth() === today.getMonth()
+      && currentMonth.getFullYear() === today.getFullYear();
+  };
+
   return (
     <div className={styles.wrapper} ref={containerRef}>
       {label && <label className={styles.label}>{label}{required && <span className={styles.required}> *</span>}</label>}
@@ -44,19 +52,28 @@ export function DatePicker({ label, value, onChange, error, required = false, mi
         <div className={styles.calendar} role="dialog" aria-label={label || 'Choose date'}>
           <div className={styles.header}>
             <button type="button" className={styles.navButton} onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))} aria-label="Previous month"><ChevronLeft size={16} /></button>
-            <strong>{monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}</strong>
+            <div className={styles.monthYear}>
+              <button type="button" className={styles.yearButton} onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear() - 1, currentMonth.getMonth(), 1))} aria-label="Previous year"><ChevronLeft size={14} /></button>
+              <strong>{monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}</strong>
+              <button type="button" className={styles.yearButton} onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear() + 1, currentMonth.getMonth(), 1))} aria-label="Next year"><ChevronRight size={14} /></button>
+            </div>
             <button type="button" className={styles.navButton} onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))} aria-label="Next month"><ChevronRight size={16} /></button>
           </div>
+          <div className={styles.daysHeader}>
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => <span key={day} className={styles.dayName}>{day}</span>)}
+          </div>
           <div className={styles.days}>
-            {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => <span key={day} className={styles.dayName}>{day}</span>)}
             {Array.from({ length: firstDay }, (_, index) => <span key={`empty-${index}`} />)}
             {Array.from({ length: daysInMonth }, (_, index) => {
               const day = index + 1;
               const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
               const disabled = minimumDate && date < minimumDate;
               const selected = selectedDate && date.toDateString() === selectedDate.toDateString();
-              return <button key={day} type="button" disabled={disabled} className={`${styles.day} ${selected ? styles.selected : ''}`} onClick={() => handleDateClick(day)}>{day}</button>;
+              return <button key={day} type="button" disabled={disabled} className={`${styles.day} ${selected ? styles.selected : ''} ${isToday(day) ? styles.today : ''}`} onClick={() => handleDateClick(day)}>{day}</button>;
             })}
+          </div>
+          <div className={styles.footer}>
+            <button type="button" className={styles.todayButton} onClick={goToToday}>Today</button>
           </div>
         </div>
       )}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Clock } from 'lucide-react';
+import { Dropdown } from '../Dropdown/Dropdown';
 import styles from './TimePicker.module.css';
 
 const toDisplay = (value) => {
@@ -31,9 +32,8 @@ export function TimePicker({ label, value, onChange, error, required = false }) 
     onChange(`${String(actualHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`);
   };
 
-  const adjustHours = (delta) => updateTime((display.hours - 1 + delta + 12) % 12 + 1, display.minutes, display.period);
-  const adjustMinutes = (delta) => updateTime(display.hours, (Number(display.minutes) + delta + 60) % 60, display.period);
-  const togglePeriod = () => updateTime(display.hours, display.minutes, display.period === 'AM' ? 'PM' : 'AM');
+  const hoursOptions = Array.from({ length: 12 }, (_, index) => ({ value: String(index + 1), label: String(index + 1) }));
+  const minutesOptions = Array.from({ length: 12 }, (_, index) => ({ value: String(index * 5).padStart(2, '0'), label: String(index * 5).padStart(2, '0') }));
 
   return (
     <div className={styles.wrapper} ref={containerRef}>
@@ -45,10 +45,12 @@ export function TimePicker({ label, value, onChange, error, required = false }) 
       {isOpen && (
         <div className={styles.popover} role="dialog" aria-label={label || 'Choose time'}>
           <div className={styles.controls}>
-            <div className={styles.unit}><button type="button" onClick={() => adjustHours(1)}>+</button><strong>{display.hours}</strong><button type="button" onClick={() => adjustHours(-1)}>-</button></div>
+            <Dropdown label="Hour" options={hoursOptions} value={String(display.hours)} onChange={(hours) => updateTime(hours, display.minutes, display.period)} />
             <strong>:</strong>
-            <div className={styles.unit}><button type="button" onClick={() => adjustMinutes(5)}>+</button><strong>{display.minutes}</strong><button type="button" onClick={() => adjustMinutes(-5)}>-</button></div>
-            <button type="button" className={styles.period} onClick={togglePeriod}>{display.period}</button>
+            <Dropdown label="Minute" options={minutesOptions} value={display.minutes} onChange={(minutes) => updateTime(display.hours, minutes, display.period)} />
+            <div className={styles.periodGroup}>
+              {['AM', 'PM'].map((period) => <button key={period} type="button" className={`${styles.periodButton} ${display.period === period ? styles.periodActive : ''}`} onClick={() => updateTime(display.hours, display.minutes, period)}>{period}</button>)}
+            </div>
           </div>
         </div>
       )}
