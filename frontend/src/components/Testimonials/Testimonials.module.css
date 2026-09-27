@@ -3,7 +3,7 @@
 }
 
 .kicker {
-  color: var(--color-secondary-dark);
+  color: var(--color-primary);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -133,7 +133,7 @@
 
 .active {
   border-color: var(--color-primary);
-  box-shadow: 0 10px 24px rgba(255, 77, 109, 0.12);
+  box-shadow: 0 10px 24px rgba(124, 58, 237, 0.12);
 }
 
 @media (max-width: 1023px) {
@@ -146,4 +146,9 @@
   .section {
     padding-inline: var(--space-4);
   }
+}
+
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
 }

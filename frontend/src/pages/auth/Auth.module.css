@@ -12,8 +12,8 @@
   min-height: 100vh;
   width: 100%;
   background:
-    radial-gradient(circle at 12% 20%, rgba(255, 77, 109, 0.18), transparent 32%),
-    radial-gradient(circle at 88% 80%, rgba(18, 196, 201, 0.18), transparent 30%),
+    radial-gradient(circle at 12% 20%, rgba(124, 58, 237, 0.18), transparent 32%),
+    radial-gradient(circle at 88% 80%, rgba(245, 158, 11, 0.12), transparent 30%),
     var(--color-background);
 }
 
@@ -213,7 +213,7 @@
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   color: #FFFFFF;
   border-radius: var(--radius-md);
-  box-shadow: 0 2px 6px rgba(255, 77, 109, 0.3);
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.3);
 }
 
 .auth__form-mobile-logo-text {

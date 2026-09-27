@@ -51,3 +51,8 @@
   .band { margin-inline: var(--space-4); }
   .grid { grid-template-columns: 1fr 1fr; }
 }
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}

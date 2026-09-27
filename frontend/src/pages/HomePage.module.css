@@ -1,9 +1,13 @@
+/* ============================================================
+   HomePage — Master page layout
+   ============================================================ */
+
 .home {
   width: 100%;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 12% -10%, rgba(255, 77, 109, 0.12), transparent 36%),
-    radial-gradient(circle at 90% 8%, rgba(18, 196, 201, 0.14), transparent 32%),
+    radial-gradient(circle at 12% -10%, rgba(124, 58, 237, 0.08), transparent 36%),
+    radial-gradient(circle at 90% 8%, rgba(245, 158, 11, 0.06), transparent 32%),
     var(--color-background);
 }
 
@@ -16,6 +20,7 @@
   margin-bottom: var(--space-2);
 }
 
+/* ---- Professionals Section ---- */
 .pros {
   max-width: 1280px;
   margin: 0 auto;
@@ -26,50 +31,162 @@
   align-items: center;
 }
 
-.pros p {
-  margin: var(--space-4) 0 var(--space-6);
+.prosContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.prosContent h2 {
+  margin-bottom: var(--space-2);
+}
+
+.prosDesc {
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin: var(--space-3) 0 var(--space-6) !important;
   max-width: 520px;
 }
 
-.prosPhotos {
+.prosGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-4);
+  margin-bottom: var(--space-6);
 }
 
-.prosPhotos img,
-.prosPhotos div {
-  height: 320px;
+.proBenefit {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.proBenefit:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.1);
+}
+
+.proBenefitIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--color-primary-soft), var(--color-primary-muted));
+  color: var(--color-primary);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.proBenefit strong {
+  display: block;
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.proBenefit span {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+/* Professionals visual — stacked images */
+.prosVisual {
+  display: flex;
+  justify-content: center;
+}
+
+.prosImageStack {
+  position: relative;
   width: 100%;
+  max-width: 480px;
+}
+
+.prosImg1 {
+  width: 85%;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
-  border-radius: 28px;
+  border-radius: 24px;
+  box-shadow: 0 16px 40px rgba(124, 58, 237, 0.15);
+  position: relative;
+  z-index: 1;
+  transition: transform 0.4s ease;
 }
 
-.prosPhotos img:last-child,
-.prosPhotos div:last-child {
-  margin-top: var(--space-8);
+.prosImg2 {
+  width: 55%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(124, 58, 237, 0.12);
+  position: absolute;
+  right: 0;
+  bottom: -32px;
+  z-index: 2;
+  border: 4px solid #fff;
+  transition: transform 0.4s ease;
 }
 
+.prosImageStack:hover .prosImg1 {
+  transform: translateY(-6px);
+}
+
+.prosImageStack:hover .prosImg2 {
+  transform: translateY(-4px) scale(1.02);
+}
+
+/* ---- CTA Banner ---- */
 .cta {
   margin: var(--space-8) var(--space-6) 0;
   padding: var(--space-16) var(--space-8);
   border-radius: 36px;
   text-align: center;
   color: #fff;
-  background: linear-gradient(120deg, var(--color-primary), var(--color-secondary) 55%, var(--color-accent));
+  background: linear-gradient(120deg, var(--color-primary), var(--color-primary-dark) 55%, var(--color-primary-800));
   background-size: 180% 180%;
   animation: gradientShift 10s ease infinite;
   box-shadow: var(--shadow-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -20%;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
+}
+
+.cta::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
 }
 
 .cta h2,
 .cta p {
   color: #fff;
+  position: relative;
+  z-index: 1;
 }
 
 .cta p {
   margin: var(--space-3) auto var(--space-6);
   max-width: 520px;
+  opacity: 0.92;
 }
 
 .ctaActions {
@@ -77,16 +194,33 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-3);
+  position: relative;
+  z-index: 1;
 }
 
+.ctaActions span {
+  opacity: 0.85;
+  font-size: var(--font-size-small);
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ---- Responsive ---- */
 @media (max-width: 1023px) {
   .pros {
     grid-template-columns: 1fr;
   }
 
-  .prosPhotos img:last-child,
-  .prosPhotos div:last-child {
-    margin-top: 0;
+  .prosGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .prosImageStack {
+    max-width: 400px;
+    margin: 0 auto;
   }
 }
 
@@ -97,12 +231,15 @@
     margin-inline: var(--space-4);
   }
 
-  .prosPhotos {
+  .prosGrid {
     grid-template-columns: 1fr;
   }
 
-  .prosPhotos img,
-  .prosPhotos div {
-    height: 220px;
+  .prosImg2 {
+    display: none;
+  }
+
+  .prosImg1 {
+    width: 100%;
   }
 }

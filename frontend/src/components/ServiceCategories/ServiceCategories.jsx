@@ -8,6 +8,7 @@ import styles from './ServiceCategories.module.css';
 const categoryImageMap = {
   plumbing: '/images/categories/plumbing.jpg',
   'ac-repair': '/images/categories/ac-repair.jpg',
+  'appliance-repair': '/images/categories/ac-repair.jpg',
   'refrigerator-repair': '/images/categories/refrigerator-repair.jpg',
   electrical: '/images/categories/electrical.jpg',
   cleaning: '/images/categories/cleaning.jpg',
