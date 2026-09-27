@@ -251,8 +251,8 @@ function DesignSystemPage() {
         <div className={styles.ds__subsection}>
           <h3 className={styles['ds__subsection-title']}>Variants</h3>
           <div className={styles.ds__row}>
-            <Button variant="primary">Primary (Coral)</Button>
-            <Button variant="accent">Accent (Amber)</Button>
+            <Button variant="primary">Primary (Purple)</Button>
+            <Button variant="accent">Accent (Emerald)</Button>
             <Button variant="secondary">Secondary</Button>
             <Button variant="ghost">Ghost</Button>
             <Button variant="destructive">Destructive</Button>
@@ -658,42 +658,42 @@ function ColorSwatch({ name, value, textColor }) {
    DATA
    ================================================================ */
 const brandColors = [
-  { name: 'Primary (Coral)', value: '#FF6B6B' },
-  { name: 'Primary Hover', value: '#E55A5A' },
-  { name: 'Primary Soft', value: '#FFF0F0' },
-  { name: 'Primary 100', value: '#FFD4D4' },
-  { name: 'Primary Dark', value: '#CC4444' },
-  { name: 'Secondary (Teal)', value: '#4ECDC4' },
-  { name: 'Secondary Hover', value: '#3DB5AD' },
-  { name: 'Secondary Soft', value: '#E8F8F7' },
-  { name: 'Accent (Amber)', value: '#FFB84D' },
-  { name: 'Accent Soft', value: '#FFF8E8' },
+  { name: 'Primary (Purple)', value: '#7C3AED' },
+  { name: 'Primary Light', value: '#8B5CF6' },
+  { name: 'Primary Dark', value: '#6D28D9' },
+  { name: 'Primary Soft', value: '#F5F3FF' },
+  { name: 'Primary 100', value: '#EDE9FE' },
+  { name: 'Secondary (Amber)', value: '#F59E0B' },
+  { name: 'Secondary Dark', value: '#D97706' },
+  { name: 'Secondary Soft', value: '#FFFBEB' },
+  { name: 'Accent (Emerald)', value: '#10B981' },
+  { name: 'Accent Soft', value: '#ECFDF5' },
 ];
 
 const neutralColors = [
   { name: 'Background', value: '#FFFFFF' },
-  { name: 'Surface', value: '#FAFAFA' },
-  { name: 'Surface Muted', value: '#F5F5F5' },
-  { name: 'Surface Warm', value: '#FFF9F9' },
-  { name: 'Border', value: '#E0E0E0' },
-  { name: 'Border Strong', value: '#CCCCCC' },
+  { name: 'Surface', value: '#F8FAFC' },
+  { name: 'Surface Muted', value: '#F1F5F9' },
+  { name: 'Surface Warm', value: '#FFFBEB' },
+  { name: 'Border', value: '#E2E8F0' },
+  { name: 'Border Strong', value: '#CBD5E1' },
 ];
 
 const textColors = [
-  { name: 'Primary Text', value: '#2D3436' },
-  { name: 'Secondary Text', value: '#636E72' },
-  { name: 'Muted Text', value: '#B2BEC3' },
-  { name: 'Disabled Text', value: '#DFE6E9' },
+  { name: 'Primary Text', value: '#0F172A' },
+  { name: 'Secondary Text', value: '#475569' },
+  { name: 'Muted Text', value: '#94A3B8' },
+  { name: 'Disabled Text', value: '#CBD5E1' },
 ];
 
 const semanticColors = [
-  { name: 'Success', value: '#16A34A' },
-  { name: 'Success Soft', value: '#F0FDF4' },
-  { name: 'Warning', value: '#D97706' },
+  { name: 'Success', value: '#10B981' },
+  { name: 'Success Soft', value: '#ECFDF5' },
+  { name: 'Warning', value: '#F59E0B' },
   { name: 'Warning Soft', value: '#FFFBEB' },
-  { name: 'Error', value: '#DC2626' },
+  { name: 'Error', value: '#EF4444' },
   { name: 'Error Soft', value: '#FEF2F2' },
-  { name: 'Info', value: '#2563EB' },
+  { name: 'Info', value: '#3B82F6' },
   { name: 'Info Soft', value: '#EFF6FF' },
 ];
 

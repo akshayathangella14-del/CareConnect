@@ -5,7 +5,7 @@ import {
   useGetMatchesQuery, 
   useCreateQuoteForRequestMutation 
 } from '@/features/serviceRequests';
-import { Card, Button, Alert, Badge } from '@/components';
+import { Card, Button, Alert, Badge, Dropdown } from '@/components';
 import { ArrowLeft, SlidersHorizontal, Search, Info } from 'lucide-react';
 import ProviderMatchCard from '@/components/matching/ProviderMatchCard';
 
@@ -109,30 +109,30 @@ export default function ScopeMatchPage() {
           </div>
           
           <div style={{ marginBottom: 'var(--space-4)' }}>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Sort By</label>
-            <select 
-              value={sortBy} 
-              onChange={(e) => setSortBy(e.target.value)}
-              style={{ width: '100%', padding: 'var(--space-2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}
-            >
-              <option value="score_desc">Highest Match Score</option>
-              <option value="rating_desc">Highest Rating</option>
-              <option value="exp_desc">Most Experience</option>
-            </select>
+            <Dropdown
+              label="Sort By"
+              value={sortBy}
+              onChange={(val) => setSortBy(val)}
+              options={[
+                { value: 'score_desc', label: 'Highest Match Score' },
+                { value: 'rating_desc', label: 'Highest Rating' },
+                { value: 'exp_desc', label: 'Most Experience' },
+              ]}
+            />
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Minimum Rating</label>
-            <select 
-              value={filterRating} 
-              onChange={(e) => setFilterRating(Number(e.target.value))}
-              style={{ width: '100%', padding: 'var(--space-2)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}
-            >
-              <option value={0}>Any Rating</option>
-              <option value={4.5}>4.5 & up</option>
-              <option value={4.0}>4.0 & up</option>
-              <option value={3.5}>3.5 & up</option>
-            </select>
+            <Dropdown
+              label="Minimum Rating"
+              value={filterRating}
+              onChange={(val) => setFilterRating(Number(val))}
+              options={[
+                { value: 0, label: 'Any Rating' },
+                { value: 4.5, label: '4.5 & up' },
+                { value: 4.0, label: '4.0 & up' },
+                { value: 3.5, label: '3.5 & up' },
+              ]}
+            />
           </div>
         </Card>
 

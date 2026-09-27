@@ -1,7 +1,12 @@
+/* ============================================================
+   Select Component — Custom Dropdown Styles
+   ============================================================ */
+
 .wrapper {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  position: relative;
 }
 
 .label {
@@ -12,13 +17,15 @@
 
 .inputContainer {
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
+/* Trigger Button */
 .select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
-  padding: 10px 36px 10px var(--space-3);
+  padding: 10px var(--space-3);
   font-family: inherit;
   font-size: var(--font-size-body);
   color: var(--color-text-primary);
@@ -26,12 +33,13 @@
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
-  appearance: none;
+  cursor: pointer;
   box-sizing: border-box;
+  text-align: left;
 }
 
 .select:hover:not(:disabled) {
-  border-color: var(--color-text-muted);
+  border-color: var(--color-primary-light);
 }
 
 .select:focus-visible {
@@ -40,7 +48,7 @@
   box-shadow: var(--focus-ring);
 }
 
-.select:disabled {
+.select--disabled {
   background-color: var(--color-surface-muted);
   color: var(--color-text-disabled);
   cursor: not-allowed;
@@ -55,18 +63,88 @@
   box-shadow: 0 0 0 4px var(--color-error-soft);
 }
 
-.iconWrapper {
-  position: absolute;
-  right: var(--space-3);
-  pointer-events: none;
-  color: var(--color-text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Value display */
+.selectValueChosen {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.select:disabled + .iconWrapper {
-  color: var(--color-text-disabled);
+.selectValuePlaceholder {
+  flex: 1;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Chevron */
+.chevron {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* Dropdown Menu */
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: 240px;
+  overflow-y: auto;
+  padding: var(--space-1);
+  animation: selectFadeIn 0.15s ease-out;
+}
+
+@keyframes selectFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Menu Items */
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  text-align: left;
+}
+
+.menuItem:hover {
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.menuItemSelected {
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.menuEmpty {
+  padding: var(--space-3);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-small);
 }
 
 .error {

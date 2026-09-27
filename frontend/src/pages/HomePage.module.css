@@ -56,7 +56,7 @@
   border-radius: 36px;
   text-align: center;
   color: #fff;
-  background: linear-gradient(120deg, #FF4D6D, #12C4C9 55%, #FFB347);
+  background: linear-gradient(120deg, var(--color-primary), var(--color-secondary) 55%, var(--color-accent));
   background-size: 180% 180%;
   animation: gradientShift 10s ease infinite;
   box-shadow: var(--shadow-xl);

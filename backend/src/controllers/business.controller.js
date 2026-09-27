@@ -235,8 +235,20 @@ const serviceRequestController = {
     const serviceRequest = await ServiceRequest.findById(req.params.id);
     if (!serviceRequest) throw AppError.notFound('Service request not found.');
     if (!isSameId(serviceRequest.customer, req.user._id)) throw AppError.forbidden('You cannot update this service request.');
-    if (!['DRAFT', 'MANUAL_REVIEW'].includes(serviceRequest.status)) throw AppError.conflict('Only draft or manual-review requests can be edited.');
-    ['title', 'description', 'category', 'service', 'location', 'preferredSchedule', 'urgency', 'attachments'].forEach((field) => {
+    const editableStatuses = ['DRAFT', 'MANUAL_REVIEW'];
+    const scheduleOnlyStatuses = ['MATCHING', 'QUOTING'];
+    const requestedFields = Object.keys(req.body || {});
+    const isScheduleOnlyUpdate = requestedFields.length > 0 && requestedFields.every((field) => field === 'preferredSchedule');
+
+    if (!editableStatuses.includes(serviceRequest.status)
+      && !(scheduleOnlyStatuses.includes(serviceRequest.status) && isScheduleOnlyUpdate)) {
+      throw AppError.conflict('Only draft or manual-review requests can be edited. A schedule can be added while providers are matching or quoting.');
+    }
+
+    const allowedFields = editableStatuses.includes(serviceRequest.status)
+      ? ['title', 'description', 'category', 'service', 'location', 'preferredSchedule', 'urgency', 'attachments']
+      : ['preferredSchedule'];
+    allowedFields.forEach((field) => {
       if (req.body[field] !== undefined) serviceRequest[field] = req.body[field];
     });
     await serviceRequest.save();
