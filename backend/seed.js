@@ -11,18 +11,18 @@ mongoose.connect(MONGO_URI).then(async () => {
   
   try {
     // Seed categories
-    const categoryCount = await ServiceCategory.countDocuments();
-    if (categoryCount === 0) {
-      await ServiceCategory.insertMany([
-        { name: 'Plumbing', slug: 'plumbing', description: 'Plumbing and water works' },
-        { name: 'Electrical', slug: 'electrical', description: 'Electrical repairs' },
-        { name: 'Appliance Repair', slug: 'appliance-repair', description: 'Fixing home appliances' },
-        { name: 'Cleaning', slug: 'cleaning', description: 'Home cleaning' }
-      ]);
-      console.log('Seeded 4 categories successfully.');
-    } else {
-      console.log('Categories already exist, skipping seed.');
-    }
+    await ServiceCategory.deleteMany({}); // Clear old categories
+    await ServiceCategory.insertMany([
+      { name: 'Plumbing', slug: 'plumbing', description: 'Plumbing and water works', basePrice: 299 },
+      { name: 'Electrical', slug: 'electrical', description: 'Electrical repairs and wiring', basePrice: 199 },
+      { name: 'AC Repair', slug: 'ac-repair', description: 'Air conditioning service', basePrice: 499 },
+      { name: 'Refrigerator Repair', slug: 'refrigerator-repair', description: 'Fridge & appliance repair', basePrice: 399 },
+      { name: 'Cleaning', slug: 'cleaning', description: 'Deep home cleaning', basePrice: 999 },
+      { name: 'Painting', slug: 'painting', description: 'Home painting & touchups', basePrice: 1499 },
+      { name: 'Carpenter', slug: 'carpenter', description: 'Furniture & wood works', basePrice: 349 },
+      { name: 'Pest Control', slug: 'pest-control', description: 'Complete pest management', basePrice: 799 }
+    ]);
+    console.log('Seeded 8 categories successfully.');
 
     // Seed customer user
     const customerCount = await User.countDocuments({ role: 'CUSTOMER' });
