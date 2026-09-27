@@ -11,7 +11,7 @@ const categoryImageMap = {
   'refrigerator-repair': '/images/categories/refrigerator-repair.jpg',
   electrical: '/images/categories/electrical.jpg',
   cleaning: '/images/categories/cleaning.jpg',
-  painting: '/images/categories/painting.jpg',
+  painting: '/images/categories/paining.jpg',
   carpenter: '/images/categories/carpenter.jpg',
   'pest-control': '/images/categories/pest-control.jpg',
 };
@@ -85,7 +85,7 @@ export default function ServiceCategories() {
               className={`${styles.card} ${query && cat.name?.toLowerCase().includes(query) ? styles.highlight : ''}`}
             >
               <div className={styles.imageWrap}>
-                <SafeImage src={image} fallbackSrc={image.replace('.jpg', '.svg')} alt={`${cat.name} service`} />
+                <SafeImage src={image} fallbackSrc={image} alt={`${cat.name} service`} />
               </div>
               <div className={styles.body}>
                 <h3>{cat.name}</h3>
