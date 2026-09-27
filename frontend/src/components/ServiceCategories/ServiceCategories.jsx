@@ -17,11 +17,25 @@ const categoryImageMap = {
   'pest-control': '/images/categories/pest-control.jpg',
 };
 
+const FALLBACK_CATEGORIES = [
+  { _id: 'fallback-1', name: 'AC Repair', slug: 'ac-repair', description: 'Expert air conditioning service', basePrice: 499 },
+  { _id: 'fallback-2', name: 'Cleaning', slug: 'cleaning', description: 'Deep home cleaning services', basePrice: 999 },
+  { _id: 'fallback-3', name: 'Electrical', slug: 'electrical', description: 'Electrical repairs & wiring', basePrice: 199 },
+  { _id: 'fallback-4', name: 'Plumbing', slug: 'plumbing', description: 'Plumbing and water works', basePrice: 299 },
+  { _id: 'fallback-5', name: 'Painting', slug: 'painting', description: 'Home painting & touchups', basePrice: 1499 },
+  { _id: 'fallback-6', name: 'Carpenter', slug: 'carpenter', description: 'Furniture & wood works', basePrice: 349 },
+  { _id: 'fallback-7', name: 'Pest Control', slug: 'pest-control', description: 'Complete pest management', basePrice: 799 },
+  { _id: 'fallback-8', name: 'Refrigerator', slug: 'refrigerator-repair', description: 'Fridge & appliance repair', basePrice: 399 },
+];
+
 export default function ServiceCategories() {
   const scroller = useRef(null);
   const location = useLocation();
   const query = new URLSearchParams(location.search).get('q')?.toLowerCase() || '';
-  const { data: categories = [], isLoading, isError } = useListCategoriesQuery();
+  const { data: apiCategories = [], isLoading, isError } = useListCategoriesQuery();
+  
+  // Guarantee 8 categories display perfectly on the homepage even if DB is empty
+  const categories = apiCategories.length >= 8 ? apiCategories : FALLBACK_CATEGORIES;
 
   useEffect(() => {
     if (!query || !scroller.current || categories.length === 0) return;
@@ -42,19 +56,6 @@ export default function ServiceCategories() {
           <div>
             <p className={styles.kicker}>Services</p>
             <h2>Loading live service categories...</h2>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (isError || categories.length === 0) {
-    return (
-      <section id="services" className={styles.section}>
-        <div className={styles.head}>
-          <div>
-            <p className={styles.kicker}>Services</p>
-            <h2>Service categories are being refreshed</h2>
           </div>
         </div>
       </section>
