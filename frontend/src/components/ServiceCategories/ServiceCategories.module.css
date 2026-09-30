@@ -1,3 +1,7 @@
+/* ============================================================
+   ServiceCategories — Horizontal scroll carousel
+   ============================================================ */
+
 .section {
   padding: var(--space-8) var(--space-6) var(--space-16);
 }
@@ -33,11 +37,15 @@
   background: #fff;
   display: grid;
   place-items: center;
+  transition: all 0.25s ease;
+  color: var(--color-text-secondary);
 }
 
 .controls button:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
+  background: var(--color-primary-soft);
+  transform: scale(1.08);
 }
 
 .track {
@@ -48,6 +56,20 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   padding-bottom: var(--space-4);
+  scrollbar-width: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Skeleton loading */
+.skeleton {
+  min-height: 340px;
+  border-radius: 24px;
+  background: linear-gradient(110deg, var(--color-surface-muted) 30%, var(--color-surface) 50%, var(--color-surface-muted) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
 }
 
 .card {
@@ -56,13 +78,14 @@
   border-radius: 24px;
   overflow: hidden;
   border: 1px solid var(--color-border-subtle);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  animation: scaleIn 0.45s ease both;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  animation: cardReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(var(--index) * 80ms);
 }
 
 .card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 18px 40px rgba(124, 58, 237, 0.18);
+  transform: translateY(-10px);
+  box-shadow: 0 20px 48px rgba(124, 58, 237, 0.14);
 }
 
 .highlight {
@@ -73,18 +96,34 @@
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
+  position: relative;
 }
 
 .imageWrap img,
-.imageWrap div {
+.imageWrap div:not(.priceBadge) {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card:hover .imageWrap img {
-  transform: scale(1.08);
+  transform: scale(1.1);
+}
+
+.priceBadge {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .body {
@@ -93,31 +132,52 @@
 
 .body h3 {
   margin-bottom: 4px;
+  font-weight: 700;
 }
 
-.meta {
-  margin-top: var(--space-4);
-  display: flex;
-  justify-content: space-between;
+.body p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: 1.5;
+  margin-bottom: var(--space-3);
+}
+
+.bookLink {
+  display: inline-flex;
   align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: var(--font-size-small);
+  color: var(--color-primary);
+  transition: gap 0.2s ease;
 }
 
-.meta span {
-  font-weight: 700;
-  color: var(--color-secondary-dark);
+.bookLink:hover {
+  gap: 8px;
 }
 
-.meta a {
-  font-weight: 700;
+/* Keyframes */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 @media (max-width: 640px) {
   .section {
     padding-inline: var(--space-4);
   }
-}
 
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.92); }
-  to { opacity: 1; transform: scale(1); }
+  .track {
+    grid-auto-columns: minmax(240px, 260px);
+  }
 }

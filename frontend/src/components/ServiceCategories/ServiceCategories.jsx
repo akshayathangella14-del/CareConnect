@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import SafeImage from '@/components/media/SafeImage';
 import { useListCategoriesQuery } from '@/features/categories';
 import styles from './ServiceCategories.module.css';
@@ -18,23 +18,22 @@ const categoryImageMap = {
 };
 
 const FALLBACK_CATEGORIES = [
-  { _id: 'fallback-1', name: 'AC Repair', slug: 'ac-repair', description: 'Expert air conditioning service', basePrice: 499 },
-  { _id: 'fallback-2', name: 'Cleaning', slug: 'cleaning', description: 'Deep home cleaning services', basePrice: 999 },
-  { _id: 'fallback-3', name: 'Electrical', slug: 'electrical', description: 'Electrical repairs & wiring', basePrice: 199 },
-  { _id: 'fallback-4', name: 'Plumbing', slug: 'plumbing', description: 'Plumbing and water works', basePrice: 299 },
-  { _id: 'fallback-5', name: 'Painting', slug: 'painting', description: 'Home painting & touchups', basePrice: 1499 },
-  { _id: 'fallback-6', name: 'Carpenter', slug: 'carpenter', description: 'Furniture & wood works', basePrice: 349 },
-  { _id: 'fallback-7', name: 'Pest Control', slug: 'pest-control', description: 'Complete pest management', basePrice: 799 },
-  { _id: 'fallback-8', name: 'Refrigerator', slug: 'refrigerator-repair', description: 'Fridge & appliance repair', basePrice: 399 },
+  { _id: 'fb-1', name: 'AC Repair', slug: 'ac-repair', description: 'Expert air conditioning service & maintenance', basePrice: 499 },
+  { _id: 'fb-2', name: 'Cleaning', slug: 'cleaning', description: 'Deep home & office cleaning by experts', basePrice: 999 },
+  { _id: 'fb-3', name: 'Electrical', slug: 'electrical', description: 'Wiring, switches, and electrical repairs', basePrice: 199 },
+  { _id: 'fb-4', name: 'Plumbing', slug: 'plumbing', description: 'Leak fixing, pipe fitting & water works', basePrice: 299 },
+  { _id: 'fb-5', name: 'Painting', slug: 'painting', description: 'Wall painting, texture & home touchups', basePrice: 1499 },
+  { _id: 'fb-6', name: 'Carpenter', slug: 'carpenter', description: 'Furniture repair, fitting & wood works', basePrice: 349 },
+  { _id: 'fb-7', name: 'Pest Control', slug: 'pest-control', description: 'Termite, cockroach & complete pest treatment', basePrice: 799 },
+  { _id: 'fb-8', name: 'Refrigerator', slug: 'refrigerator-repair', description: 'Fridge repair, gas refill & compressor fix', basePrice: 399 },
 ];
 
 export default function ServiceCategories() {
   const scroller = useRef(null);
   const location = useLocation();
   const query = new URLSearchParams(location.search).get('q')?.toLowerCase() || '';
-  const { data: apiCategories = [], isLoading, isError } = useListCategoriesQuery();
-  
-  // Guarantee 8 categories display perfectly on the homepage even if DB is empty
+  const { data: apiCategories = [], isLoading } = useListCategoriesQuery();
+
   const categories = apiCategories.length >= 8 ? apiCategories : FALLBACK_CATEGORIES;
 
   useEffect(() => {
@@ -58,6 +57,11 @@ export default function ServiceCategories() {
             <h2>Loading live service categories...</h2>
           </div>
         </div>
+        <div className={styles.track}>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className={styles.skeleton} />
+          ))}
+        </div>
       </section>
     );
   }
@@ -70,12 +74,16 @@ export default function ServiceCategories() {
           <h2>Book the help your home needs</h2>
         </div>
         <div className={styles.controls}>
-          <button type="button" onClick={() => scrollBy(-1)} aria-label="Previous services"><ChevronLeft /></button>
-          <button type="button" onClick={() => scrollBy(1)} aria-label="Next services"><ChevronRight /></button>
+          <button type="button" onClick={() => scrollBy(-1)} aria-label="Previous services">
+            <ChevronLeft size={20} />
+          </button>
+          <button type="button" onClick={() => scrollBy(1)} aria-label="Next services">
+            <ChevronRight size={20} />
+          </button>
         </div>
       </div>
       <div className={styles.track} ref={scroller}>
-        {categories.map((cat) => {
+        {categories.map((cat, index) => {
           const slug = cat.slug || cat.name?.toLowerCase().replace(/\s+/g, '-');
           const image = cat.image || categoryImageMap[slug] || '/images/categories/plumbing.jpg';
           const priceText = cat.basePrice ? `From ₹${cat.basePrice}` : 'Flexible pricing';
@@ -85,17 +93,18 @@ export default function ServiceCategories() {
               key={cat._id || slug}
               data-slug={slug}
               className={`${styles.card} ${query && cat.name?.toLowerCase().includes(query) ? styles.highlight : ''}`}
+              style={{ '--index': index }}
             >
               <div className={styles.imageWrap}>
                 <SafeImage src={image} fallbackSrc={image} alt={`${cat.name} service`} />
+                <div className={styles.priceBadge}>{priceText}</div>
               </div>
               <div className={styles.body}>
                 <h3>{cat.name}</h3>
                 <p>{cat.description || 'Tailored service for your home.'}</p>
-                <div className={styles.meta}>
-                  <span>{priceText}</span>
-                  <Link to="/register">Book now</Link>
-                </div>
+                <Link to="/register" className={styles.bookLink}>
+                  Book now <ArrowRight size={14} />
+                </Link>
               </div>
             </article>
           );

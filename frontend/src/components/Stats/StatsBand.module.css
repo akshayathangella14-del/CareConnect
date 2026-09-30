@@ -1,23 +1,40 @@
+/* ============================================================
+   StatsBand — Dark stats section with marquee
+   ============================================================ */
+
 .band {
+  position: relative;
   margin: 0 var(--space-6);
   padding: var(--space-10) var(--space-6);
   border-radius: 32px;
-  background: linear-gradient(135deg, #1A2332 0%, #243044 100%);
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
   color: #fff;
   overflow: hidden;
+}
+
+.bgPattern {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(245, 158, 11, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 40%);
+  pointer-events: none;
 }
 
 .marquee {
   overflow: hidden;
   margin-bottom: var(--space-8);
-  opacity: 0.7;
+  opacity: 0.5;
+  position: relative;
+  z-index: 1;
 }
 
 .track {
   display: flex;
   gap: var(--space-8);
   width: max-content;
-  animation: marquee 22s linear infinite;
+  animation: marquee 28s linear infinite;
   font-size: var(--font-size-caption);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -27,32 +44,46 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--space-6);
+  position: relative;
+  z-index: 1;
 }
 
 .stat {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
 }
 
-.stat svg {
-  margin: 0 auto var(--space-3);
-  color: var(--color-accent);
+.statIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--space-2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .stat strong {
   display: block;
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .stat span {
-  color: rgba(255, 255, 255, 0.72);
-}
-
-@media (max-width: 768px) {
-  .band { margin-inline: var(--space-4); }
-  .grid { grid-template-columns: 1fr 1fr; }
+  color: rgba(255, 255, 255, 0.65);
+  font-size: var(--font-size-small);
 }
 
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+
+@media (max-width: 768px) {
+  .band { margin-inline: var(--space-4); }
+  .grid { grid-template-columns: 1fr 1fr; }
 }

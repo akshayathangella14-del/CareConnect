@@ -6,8 +6,8 @@
   width: 100%;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 12% -10%, rgba(124, 58, 237, 0.08), transparent 36%),
-    radial-gradient(circle at 90% 8%, rgba(245, 158, 11, 0.06), transparent 32%),
+    radial-gradient(circle at 12% -10%, rgba(124, 58, 237, 0.06), transparent 36%),
+    radial-gradient(circle at 90% 8%, rgba(245, 158, 11, 0.04), transparent 32%),
     var(--color-background);
 }
 
@@ -18,6 +18,27 @@
   text-transform: uppercase;
   font-size: var(--font-size-caption);
   margin-bottom: var(--space-2);
+}
+
+.gradientText {
+  background: linear-gradient(120deg, var(--color-primary), var(--color-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---- Scroll Animations ---- */
+.fadeInLeft {
+  animation: slideInLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fadeInRight {
+  animation: slideInRight 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fadeInUp > * {
+  animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--delay, 0ms);
 }
 
 /* ---- Professionals Section ---- */
@@ -39,6 +60,7 @@
 
 .prosContent h2 {
   margin-bottom: var(--space-2);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
 }
 
 .prosDesc {
@@ -61,21 +83,20 @@
   gap: var(--space-3);
   padding: var(--space-3);
   border-radius: var(--radius-md);
-  background: var(--color-surface-muted);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background: #fff;
+  border: 1px solid var(--color-border-subtle);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
 }
 
 .proBenefit:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(124, 58, 237, 0.08);
 }
 
 .proBenefitIcon {
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--color-primary-soft), var(--color-primary-muted));
-  color: var(--color-primary);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -111,10 +132,10 @@
   aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: 24px;
-  box-shadow: 0 16px 40px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 20px 50px rgba(124, 58, 237, 0.15);
   position: relative;
   z-index: 1;
-  transition: transform 0.4s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .prosImg2 {
@@ -122,21 +143,122 @@
   aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: 20px;
-  box-shadow: 0 12px 32px rgba(124, 58, 237, 0.12);
+  box-shadow: 0 16px 40px rgba(124, 58, 237, 0.12);
   position: absolute;
   right: 0;
   bottom: -32px;
   z-index: 2;
   border: 4px solid #fff;
-  transition: transform 0.4s ease;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .prosImageStack:hover .prosImg1 {
-  transform: translateY(-6px);
+  transform: translateY(-8px) rotate(-1deg);
 }
 
 .prosImageStack:hover .prosImg2 {
-  transform: translateY(-4px) scale(1.02);
+  transform: translateY(-6px) rotate(1deg) scale(1.02);
+}
+
+.prosStatChip {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  z-index: 3;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 10px 16px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  animation: floatChip 4s ease-in-out infinite;
+}
+
+.prosStatChip strong {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--color-secondary);
+}
+
+.prosStatChip span {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+/* ---- Why CareConnect Section ---- */
+.whySection {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-6) var(--space-16);
+}
+
+.whyHeader {
+  text-align: center;
+  margin-bottom: var(--space-10);
+}
+
+.whyHeader h2 {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+}
+
+.whyGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+
+.whyCard {
+  text-align: center;
+  padding: var(--space-8) var(--space-5);
+  background: #fff;
+  border-radius: 24px;
+  border: 1px solid var(--color-border-subtle);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.fadeInUp .whyCard {
+  animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+.whyCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 48px rgba(124, 58, 237, 0.1);
+}
+
+.whyIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--color-primary-soft), var(--color-primary-muted));
+  color: var(--color-primary);
+  display: grid;
+  place-items: center;
+  margin: 0 auto var(--space-4);
+  transition: transform 0.3s ease;
+}
+
+.whyCard:hover .whyIcon {
+  transform: scale(1.1) rotate(-3deg);
+}
+
+.whyCard h3 {
+  font-size: var(--font-size-body-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+.whyCard p {
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  font-size: var(--font-size-body);
 }
 
 /* ---- CTA Banner ---- */
@@ -146,34 +268,21 @@
   border-radius: 36px;
   text-align: center;
   color: #fff;
-  background: linear-gradient(120deg, var(--color-primary), var(--color-primary-dark) 55%, var(--color-primary-800));
-  background-size: 180% 180%;
-  animation: gradientShift 10s ease infinite;
-  box-shadow: var(--shadow-xl);
+  background: linear-gradient(135deg, #0F172A, #1E293B 40%, #0F172A);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
 }
 
-.cta::before {
-  content: '';
+.ctaOrbs {
   position: absolute;
-  top: -40%;
-  right: -20%;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
-}
-
-.cta::after {
-  content: '';
-  position: absolute;
-  bottom: -30%;
-  left: -10%;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 10%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  animation: ctaShimmer 12s ease-in-out infinite;
 }
 
 .cta h2,
@@ -183,10 +292,15 @@
   z-index: 1;
 }
 
+.cta h2 {
+  font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+}
+
 .cta p {
   margin: var(--space-3) auto var(--space-6);
-  max-width: 520px;
-  opacity: 0.92;
+  max-width: 560px;
+  opacity: 0.85;
+  font-size: var(--font-size-body-lg);
 }
 
 .ctaActions {
@@ -199,13 +313,34 @@
 }
 
 .ctaActions span {
-  opacity: 0.85;
+  opacity: 0.65;
   font-size: var(--font-size-small);
 }
 
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+/* ---- Keyframes ---- */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatChip {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes ctaShimmer {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
 }
 
 /* ---- Responsive ---- */
@@ -221,6 +356,10 @@
   .prosImageStack {
     max-width: 400px;
     margin: 0 auto;
+  }
+
+  .whyGrid {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -241,5 +380,13 @@
 
   .prosImg1 {
     width: 100%;
+  }
+
+  .whyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .whySection {
+    padding-inline: var(--space-4);
   }
 }
