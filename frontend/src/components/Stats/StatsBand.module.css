@@ -32,12 +32,15 @@
 
 .track {
   display: flex;
-  gap: var(--space-8);
   width: max-content;
   animation: marquee 28s linear infinite;
   font-size: var(--font-size-caption);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.track span {
+  padding-right: var(--space-8);
 }
 
 .grid {

@@ -26,10 +26,10 @@ export default function StatsBand() {
   const { data: stats, isLoading } = useGetPlatformStatsQuery();
 
   const items = [
-    { label: 'Happy homes served', target: stats?.totalRequests || 150, suffix: '+', icon: Home, gradient: 'linear-gradient(135deg, #7C3AED, #A78BFA)' },
-    { label: 'Active bookings', target: stats?.activeBookings || 12, suffix: '+', icon: Briefcase, gradient: 'linear-gradient(135deg, #3B82F6, #60A5FA)' },
+    { label: 'Happy homes served', target: Math.max(stats?.totalRequests || 0, 150), suffix: '+', icon: Home, gradient: 'linear-gradient(135deg, #7C3AED, #A78BFA)' },
+    { label: 'Active bookings', target: Math.max(stats?.activeBookings || 0, 12), suffix: '+', icon: Briefcase, gradient: 'linear-gradient(135deg, #3B82F6, #60A5FA)' },
     { label: 'Average rating', target: stats?.averageRating || 4.9, suffix: '/5', decimals: 1, icon: Star, gradient: 'linear-gradient(135deg, #F59E0B, #FBBF24)' },
-    { label: 'Verified professionals', target: stats?.totalProviders || 50, suffix: '+', icon: BadgeCheck, gradient: 'linear-gradient(135deg, #10B981, #34D399)' },
+    { label: 'Verified professionals', target: Math.max(stats?.totalProviders || 0, 50), suffix: '+', icon: BadgeCheck, gradient: 'linear-gradient(135deg, #10B981, #34D399)' },
   ];
 
   if (isLoading) {

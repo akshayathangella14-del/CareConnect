@@ -60,11 +60,12 @@
 }
 
 .featured blockquote {
-  padding: var(--space-6);
+  padding: var(--space-6) var(--space-12) var(--space-4) var(--space-6);
   font-size: var(--font-size-body-lg);
   color: var(--color-text-primary);
   line-height: 1.7;
-  padding-right: var(--space-12);
+  position: relative;
+  z-index: 2;
 }
 
 .featured footer {
@@ -92,14 +93,16 @@
   font-weight: 700;
 }
 
-.featured footer span {
+.featured footer span:not(.stars) {
   display: block;
   font-size: var(--font-size-small);
   color: var(--color-text-muted);
 }
 
-.stars {
+.featured footer .stars {
   display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: 2px;
   color: var(--color-secondary);
   margin-top: 4px;
