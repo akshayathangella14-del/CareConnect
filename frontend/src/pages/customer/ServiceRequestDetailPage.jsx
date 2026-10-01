@@ -142,6 +142,7 @@ export default function ServiceRequestDetailPage() {
   const requestedStatus = request.status === 'BOOKED' ? 'BOOKED' : request.status;
   const currentStepIndex = Math.max(0, statusSteps.findIndex((step) => step.key === requestedStatus));
   const requestState = statusSteps[currentStepIndex] || statusSteps[0];
+  const needsAiConfirmation = request.status === 'AI_REVIEW' && hasAiUnderstanding && !isConfirmed;
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
@@ -190,7 +191,68 @@ export default function ServiceRequestDetailPage() {
             </p>
           </Card>
 
-          {hasAiUnderstanding && (
+          {needsAiConfirmation && (
+            <Card padding="lg" style={{ border: '2px solid var(--color-primary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', color: 'var(--color-primary)' }}>
+                <Wand2 size={24} />
+                <h3 style={{ fontSize: 'var(--font-size-h3)', margin: 0 }}>AI Understanding</h3>
+              </div>
+              <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)' }}>
+                Please review how our AI classified your request. Confirming this helps us match you with the right professionals instantly.
+              </p>
+              
+              <div style={{ display: 'grid', gap: 'var(--space-3)', backgroundColor: 'var(--color-surface-muted)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-4)' }}>
+                <div>
+                  <strong style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Problem Type</strong>
+                  <div>{request.aiUnderstanding.problemType || 'General Service'}</div>
+                </div>
+                <div>
+                  <strong style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Assessed Urgency</strong>
+                  <div><Badge variant="neutral">{request.aiUnderstanding.urgency}</Badge></div>
+                </div>
+                {request.aiUnderstanding.suggestedTasks?.length > 0 && (
+                  <div>
+                    <strong style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Suggested Tasks</strong>
+                    <ul style={{ margin: 'var(--space-1) 0 0 0', paddingLeft: 'var(--space-4)', color: 'var(--color-text-primary)' }}>
+                      {request.aiUnderstanding.suggestedTasks.map((task, idx) => (
+                        <li key={idx}>{task}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {!isCorrecting ? (
+                <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                  <Button variant="primary" onClick={handleConfirmUnderstanding} loading={isConfirming} leftIcon={<Check size={18} />}>
+                    Accept AI Understanding
+                  </Button>
+                  <Button variant="secondary" onClick={() => setIsCorrecting(true)}>
+                    Correct Understanding
+                  </Button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
+                  <Input
+                    label="What did the AI miss?"
+                    value={correctionNote}
+                    onChange={(e) => setCorrectionNote(e.target.value)}
+                    placeholder="e.g., Actually, it's a split AC, not window AC."
+                  />
+                  <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                    <Button variant="primary" onClick={handleCorrectionSubmit} loading={isConfirming} disabled={!correctionNote.trim()}>
+                      Submit Correction
+                    </Button>
+                    <Button variant="secondary" onClick={() => setIsCorrecting(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </Card>
+          )}
+
+          {hasAiUnderstanding && !needsAiConfirmation && (
             <Card padding="lg" style={{ borderLeft: '4px solid var(--color-success)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-4)', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
@@ -237,71 +299,36 @@ export default function ServiceRequestDetailPage() {
             </Card>
           )}
 
-          {/* Quotes Section */}
-          {quotes.length > 0 && (
-            <div>
-              <h3 style={{ fontSize: 'var(--font-size-h3)', marginBottom: 'var(--space-4)' }}>Received Quotes</h3>
+          {/* Quotes Section (ScopeMatch Entry) */}
+          {quotes.length > 0 && !providerQuote && (
+            <Card padding="lg" style={{ border: '2px solid var(--color-primary)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
+                <div>
+                  <h3 style={{ fontSize: 'var(--font-size-h3)', margin: 0, marginBottom: 'var(--space-2)' }}>ScopeMatch™ Available</h3>
+                  <p style={{ margin: 0, color: 'var(--color-text-secondary)' }}>
+                    You have received {quotes.length} quote{quotes.length > 1 ? 's' : ''} from verified providers. Compare them side-by-side to find the best value.
+                  </p>
+                </div>
+                <Link to={`/service-requests/${id}/compare`} style={{ textDecoration: 'none' }}>
+                  <Button variant="primary" size="lg" leftIcon={<ShieldAlert size={18} />}>
+                    Compare Quotes
+                  </Button>
+                </Link>
+              </div>
 
-              {quoteError && <Alert variant="error" title="Quote could not be accepted">{quoteError}</Alert>}
-              {quoteSuccess && <Alert variant="success" title="Booking created">{quoteSuccess}</Alert>}
-              {scheduleSuccess && <Alert variant="success" title="Schedule saved">{scheduleSuccess}</Alert>}
+              {quoteError && <Alert variant="error" title="Quote could not be accepted" style={{ marginTop: 'var(--space-4)' }}>{quoteError}</Alert>}
+              {quoteSuccess && <Alert variant="success" title="Booking created" style={{ marginTop: 'var(--space-4)' }}>{quoteSuccess}</Alert>}
+              {scheduleSuccess && <Alert variant="success" title="Schedule saved" style={{ marginTop: 'var(--space-4)' }}>{scheduleSuccess}</Alert>}
 
               {!request.preferredSchedule?.startAt && (
-                <Alert variant="warning" title="Schedule Required" style={{ marginBottom: 'var(--space-4)' }}>
+                <Alert variant="warning" title="Schedule Required" style={{ marginTop: 'var(--space-4)' }}>
                   You need to provide your preferred schedule before accepting any quote.
                   <Button variant="secondary" size="sm" onClick={() => setShowScheduleForm(true)} style={{ marginTop: 'var(--space-2)' }}>
                     Add Schedule
                   </Button>
                 </Alert>
               )}
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-                {quotes.map(quote => (
-                  <Card key={quote._id} padding="md" style={{ border: quote.status === 'ACCEPTED' ? '2px solid var(--color-success)' : undefined }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: 'var(--font-size-h4)' }}>
-                          {quote.provider?.displayName || 'Service Provider'}
-                        </div>
-                        <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)', marginTop: 'var(--space-1)' }}>
-                          {quote.provider?.ratingSummary?.averageRating > 0 && (
-                            <span>★ {quote.provider.ratingSummary.averageRating.toFixed(1)} • </span>
-                          )}
-                          Estimated Duration: {quote.estimatedDuration?.value} {quote.estimatedDuration?.unit?.toLowerCase()}
-                        </div>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: 'var(--font-size-h3)', fontWeight: 700, color: 'var(--color-primary)' }}>
-                          ₹{quote.totalAmount}
-                        </div>
-                        <StatusBadge status={quote.status} size="sm" />
-                      </div>
-                    </div>
-
-                    <div style={{ marginTop: 'var(--space-4)', backgroundColor: 'var(--color-surface-muted)', padding: 'var(--space-3)', borderRadius: 'var(--radius-sm)' }}>
-                      <div style={{ fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>Scope Summary</div>
-                      <p style={{ margin: 0, fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)' }}>
-                        {quote.scope?.summary}
-                      </p>
-                    </div>
-
-                    {quote.status === 'SUBMITTED' && (
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-3)', marginTop: 'var(--space-4)' }}>
-                        <Button variant="secondary" size="sm">Request Changes</Button>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => handleAcceptQuote(quote._id)}
-                          loading={isAccepting}
-                        >
-                          Accept Quote
-                        </Button>
-                      </div>
-                    )}
-                  </Card>
-                ))}
-              </div>
-            </div>
+            </Card>
           )}
 
           {/* Schedule Form Modal */}

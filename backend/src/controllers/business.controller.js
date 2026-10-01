@@ -195,8 +195,7 @@ const serviceRequestController = {
     }
 
     serviceRequest.aiUnderstanding = analysis;
-    serviceRequest.confirmedUnderstanding = analysis;
-    serviceRequest.status = (analysis.confidence || 0.8) < 0.7 ? 'MANUAL_REVIEW' : 'MATCHING';
+    serviceRequest.status = (analysis.confidence || 0.8) < 0.7 ? 'MANUAL_REVIEW' : 'AI_REVIEW';
 
     await serviceRequest.save();
 

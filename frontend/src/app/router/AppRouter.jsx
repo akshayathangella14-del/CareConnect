@@ -104,7 +104,7 @@ function AppRouter() {
         <Route path="/service-requests" element={<RoleRoute roles={['CUSTOMER']}><ServiceRequestsPage /></RoleRoute>} />
         <Route path="/service-requests/:id/matches" element={<RoleRoute roles={['CUSTOMER']}><ProviderMatchesPage /></RoleRoute>} />
         <Route path="/service-requests/:id" element={<RoleRoute roles={['CUSTOMER']}><ServiceRequestDetailPage /></RoleRoute>} />
-        <Route path="/service-requests/:id/matches" element={<RoleRoute roles={['CUSTOMER']}><ScopeMatchPage /></RoleRoute>} />
+        <Route path="/service-requests/:id/compare" element={<RoleRoute roles={['CUSTOMER']}><ScopeMatchPage /></RoleRoute>} />
         <Route path="/bookings" element={<RoleRoute roles={['CUSTOMER']}><BookingsPage /></RoleRoute>} />
         <Route path="/bookings/:id" element={<RoleRoute roles={['CUSTOMER']}><BookingDetailPage /></RoleRoute>} />
         <Route path="/reviews/new" element={<RoleRoute roles={['CUSTOMER']}><CreateReviewPage /></RoleRoute>} />

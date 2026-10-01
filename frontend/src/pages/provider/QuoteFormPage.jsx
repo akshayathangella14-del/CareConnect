@@ -135,6 +135,36 @@ export default function QuoteFormPage() {
           </Alert>
         )}
 
+        {/* Customer Request Summary */}
+        <Card padding="lg" style={{ borderLeft: '4px solid var(--color-primary)' }}>
+          <h3 style={{ fontSize: 'var(--font-size-h4)', marginBottom: 'var(--space-2)' }}>Customer Request Details</h3>
+          <p style={{ color: 'var(--color-text-secondary)', marginBottom: 'var(--space-4)', whiteSpace: 'pre-wrap' }}>
+            {request.description}
+          </p>
+          
+          {request.aiUnderstanding && (
+            <div style={{ backgroundColor: 'var(--color-surface-muted)', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)' }}>
+              <div style={{ fontWeight: 600, marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-small)', color: 'var(--color-primary)' }}>
+                AI Pre-Assessment
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', fontSize: 'var(--font-size-small)' }}>
+                <div><strong style={{ color: 'var(--color-text-muted)' }}>Problem:</strong> {request.aiUnderstanding.problemType}</div>
+                <div><strong style={{ color: 'var(--color-text-muted)' }}>Urgency:</strong> <Badge variant="neutral">{request.aiUnderstanding.urgency}</Badge></div>
+              </div>
+              {request.aiUnderstanding.suggestedTasks?.length > 0 && (
+                <div style={{ marginTop: 'var(--space-3)' }}>
+                  <strong style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Suggested Tasks (Add these to Scope below if applicable):</strong>
+                  <ul style={{ margin: 'var(--space-1) 0 0 0', paddingLeft: 'var(--space-4)', fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)' }}>
+                    {request.aiUnderstanding.suggestedTasks.map((task, idx) => (
+                      <li key={idx}>{task}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+        </Card>
+
         {/* Scope Section */}
         <Card padding="lg">
           <h3 style={{ fontSize: 'var(--font-size-h4)', marginBottom: 'var(--space-4)' }}>Scope of Work</h3>

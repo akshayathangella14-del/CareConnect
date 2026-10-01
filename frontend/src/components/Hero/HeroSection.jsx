@@ -9,7 +9,7 @@ import styles from './HeroSection.module.css';
 const TRUST_BADGES = [
   { icon: ShieldCheck, text: '100% verified pros', color: 'var(--color-accent)' },
   { icon: Sparkles, text: 'AI-powered matching', color: 'var(--color-primary)' },
-  { icon: MapPin, text: '40+ Indian cities', color: 'var(--color-secondary)' },
+  { icon: Users, text: '3+ verified pros per job', color: 'var(--color-secondary)' },
   { icon: Star, text: '4.9 avg rating', color: '#F59E0B' },
 ];
 

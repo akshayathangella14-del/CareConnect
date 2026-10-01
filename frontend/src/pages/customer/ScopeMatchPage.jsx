@@ -1,88 +1,68 @@
-import React, { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   useGetServiceRequestQuery, 
-  useGetMatchesQuery, 
-  useCreateQuoteForRequestMutation 
+  useListQuotesForRequestQuery 
 } from '@/features/serviceRequests';
-import { Card, Button, Alert, Badge, Dropdown } from '@/components';
-import { ArrowLeft, SlidersHorizontal, Search, Info } from 'lucide-react';
-import ProviderMatchCard from '@/components/matching/ProviderMatchCard';
+import { useAcceptQuoteMutation } from '@/features/quotes';
+import { Card, Button, Alert, Badge } from '@/components';
+import { ArrowLeft, Check, Info, ShieldAlert, Star, IndianRupee, Clock } from 'lucide-react';
+import styles from './ScopeMatchPage.module.css';
 
 export default function ScopeMatchPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   
-  const { data: request, isLoading: isLoadingRequest, error: requestError } = useGetServiceRequestQuery(id);
-  const { data: matches = [], isLoading: isLoadingMatches, error: matchesError } = useGetMatchesQuery(id);
+  const { data: request, isLoading: isLoadingRequest } = useGetServiceRequestQuery(id);
+  const { data: quotes = [], isLoading: isLoadingQuotes } = useListQuotesForRequestQuery(id, {
+    skip: !id,
+    pollingInterval: 5000,
+  });
   
-  const [createQuote, { isLoading: isRequestingQuote }] = useCreateQuoteForRequestMutation();
-  const [requestingId, setRequestingId] = useState(null);
+  const [acceptQuote, { isLoading: isAccepting }] = useAcceptQuoteMutation();
+  const [error, setError] = useState('');
 
-  const [sortBy, setSortBy] = useState('score_desc');
-  const [filterRating, setFilterRating] = useState(0);
-
-  const sortedAndFilteredMatches = useMemo(() => {
-    let result = [...matches];
-    
-    if (filterRating > 0) {
-      result = result.filter(m => (m.provider?.ratingSummary?.averageRating || 0) >= filterRating);
-    }
-
-    result.sort((a, b) => {
-      if (sortBy === 'score_desc') return b.score - a.score;
-      if (sortBy === 'rating_desc') return (b.provider?.ratingSummary?.averageRating || 0) - (a.provider?.ratingSummary?.averageRating || 0);
-      if (sortBy === 'exp_desc') return (b.provider?.experienceYears || 0) - (a.provider?.experienceYears || 0);
-      return 0;
-    });
-
-    return result;
-  }, [matches, sortBy, filterRating]);
-
-  const handleRequestQuote = async (providerId) => {
-    setRequestingId(providerId);
-    try {
-      // Notify the provider about the quote request
-      // This creates a notification for the provider to respond
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/notifications/quote-request`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          serviceRequestId: id,
-          providerId: providerId
-        })
-      });
-      
-      if (response.ok) {
-        alert('Quote request sent to provider! They will be notified to submit a quote.');
-      } else {
-        throw new Error('Failed to send request');
-      }
-    } catch (err) {
-      console.error('Failed to request quote:', err);
-      alert('Failed to send quote request. Please try again.');
-    } finally {
-      setRequestingId(null);
-    }
-  };
-
-  if (isLoadingRequest || isLoadingMatches) {
-    return <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Finding best provider matches...</div>;
+  if (isLoadingRequest || isLoadingQuotes) {
+    return <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading ScopeMatch™ Comparison...</div>;
   }
 
-  if (requestError || matchesError) {
+  const validQuotes = quotes.filter(q => q.status === 'SUBMITTED' || q.status === 'ACCEPTED');
+
+  if (validQuotes.length === 0) {
     return (
-      <Alert variant="error" title="Error loading matches">
-        Could not load provider matches. Please try again later.
-      </Alert>
+      <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+        <Link to={`/service-requests/${id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text-secondary)', textDecoration: 'none' }}>
+          <ArrowLeft size={16} /> Back to Request
+        </Link>
+        <Alert variant="warning" title="No Quotes Available">
+          There are no submitted quotes to compare yet. Providers are still reviewing your request.
+        </Alert>
+      </div>
     );
   }
 
+  // Find lowest price and highest rating for visual indicators
+  const lowestPrice = Math.min(...validQuotes.map(q => q.totalAmount));
+  const highestRating = Math.max(...validQuotes.map(q => q.provider?.ratingSummary?.averageRating || 0));
+
+  const handleAcceptQuote = async (quoteId) => {
+    if (!request.preferredSchedule?.startAt || !request.preferredSchedule?.endAt) {
+      setError('Please set a preferred schedule on the request detail page before accepting a quote.');
+      return;
+    }
+    
+    if (window.confirm('Are you sure you want to accept this quote? This will create a binding booking.')) {
+      try {
+        await acceptQuote(quoteId).unwrap();
+        navigate(`/service-requests/${id}`);
+      } catch (err) {
+        setError(err?.data?.error?.message || err?.data?.message || 'Failed to accept quote.');
+      }
+    }
+  };
+
   return (
-    <div style={{ maxWidth: 1000, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+    <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
       {/* Header */}
       <div>
         <Link to={`/service-requests/${id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text-secondary)', textDecoration: 'none', marginBottom: 'var(--space-4)', fontSize: 'var(--font-size-small)', fontWeight: 500 }}>
@@ -90,74 +70,98 @@ export default function ScopeMatchPage() {
         </Link>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-4)' }}>
           <div>
-            <h1 style={{ fontSize: 'var(--font-size-h2)', margin: 0, marginBottom: 'var(--space-2)' }}>ScopeMatch™ Results</h1>
+            <h1 style={{ fontSize: 'var(--font-size-h2)', margin: 0, marginBottom: 'var(--space-2)' }}>ScopeMatch™ Comparison</h1>
             <p style={{ color: 'var(--color-text-secondary)', margin: 0 }}>
-              We analyzed {matches.length} providers based on skills, location, and your schedule.
+              Compare {validQuotes.length} quotes side-by-side to find the best value for your service.
             </p>
           </div>
-          <Badge variant="primary" size="lg" style={{ fontSize: 'var(--font-size-h4)' }}>
-            {matches.length} Matches Found
-          </Badge>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '250px 1fr', gap: 'var(--space-6)', alignItems: 'start' }}>
-        {/* Filters Sidebar */}
-        <Card padding="md" style={{ position: 'sticky', top: 'var(--space-6)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)', fontWeight: 600 }}>
-            <SlidersHorizontal size={18} /> Filters & Sorting
-          </div>
+      {error && <Alert variant="error" title="Error">{error}</Alert>}
+
+      <div style={{ display: 'flex', gap: 'var(--space-4)', overflowX: 'auto', paddingBottom: 'var(--space-4)' }}>
+        {validQuotes.map(quote => {
+          const isLowestPrice = quote.totalAmount === lowestPrice;
+          const isHighestRating = (quote.provider?.ratingSummary?.averageRating || 0) === highestRating && highestRating > 0;
           
-          <div style={{ marginBottom: 'var(--space-4)' }}>
-            <Dropdown
-              label="Sort By"
-              value={sortBy}
-              onChange={(val) => setSortBy(val)}
-              options={[
-                { value: 'score_desc', label: 'Highest Match Score' },
-                { value: 'rating_desc', label: 'Highest Rating' },
-                { value: 'exp_desc', label: 'Most Experience' },
-              ]}
-            />
-          </div>
+          return (
+            <Card key={quote._id} padding="lg" style={{ minWidth: 320, flex: 1, border: quote.status === 'ACCEPTED' ? '2px solid var(--color-success)' : undefined }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', height: '100%' }}>
+                
+                {/* Provider Info */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                  <div style={{ width: 48, height: 48, borderRadius: '50%', backgroundColor: 'var(--color-surface-muted)', display: 'grid', placeItems: 'center', fontWeight: 'bold', fontSize: 'var(--font-size-h4)', color: 'var(--color-primary)' }}>
+                    {quote.provider?.displayName?.charAt(0) || 'P'}
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: 'var(--font-size-h4)' }}>{quote.provider?.displayName || 'Verified Provider'}</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>
+                      <Star size={14} color={isHighestRating ? '#F59E0B' : 'currentColor'} /> 
+                      {quote.provider?.ratingSummary?.averageRating ? quote.provider.ratingSummary.averageRating.toFixed(1) : 'New'}
+                      {isHighestRating && <Badge variant="warning" size="sm" style={{ marginLeft: 'var(--space-1)' }}>Highest Rated</Badge>}
+                    </div>
+                  </div>
+                </div>
 
-          <div>
-            <Dropdown
-              label="Minimum Rating"
-              value={filterRating}
-              onChange={(val) => setFilterRating(Number(val))}
-              options={[
-                { value: 0, label: 'Any Rating' },
-                { value: 4.5, label: '4.5 & up' },
-                { value: 4.0, label: '4.0 & up' },
-                { value: 3.5, label: '3.5 & up' },
-              ]}
-            />
-          </div>
-        </Card>
+                {/* Pricing */}
+                <div style={{ backgroundColor: 'var(--color-surface-muted)', padding: 'var(--space-4)', borderRadius: 'var(--radius-md)' }}>
+                  <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)', textTransform: 'uppercase', marginBottom: 'var(--space-1)' }}>Total Price</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>₹{quote.totalAmount}</div>
+                    {isLowestPrice && <Badge variant="success">Best Price</Badge>}
+                  </div>
+                  <div style={{ marginTop: 'var(--space-3)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Labor:</span> <span>₹{quote.pricingBreakdown?.labor || 0}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Materials:</span> <span>₹{quote.pricingBreakdown?.materials || 0}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Tax:</span> <span>₹{quote.pricingBreakdown?.tax || 0}</span></div>
+                  </div>
+                </div>
 
-        {/* Results List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          {sortedAndFilteredMatches.length === 0 ? (
-            <Card padding="xl" style={{ textAlign: 'center', color: 'var(--color-text-secondary)' }}>
-              <Search size={48} style={{ margin: '0 auto', marginBottom: 'var(--space-4)', color: 'var(--color-border)' }} />
-              <h3 style={{ fontSize: 'var(--font-size-h4)', marginBottom: 'var(--space-2)' }}>No providers match your criteria</h3>
-              <p>Try adjusting your filters to see more results.</p>
-              <Button variant="secondary" onClick={() => { setSortBy('score_desc'); setFilterRating(0); }} style={{ marginTop: 'var(--space-4)' }}>
-                Clear Filters
-              </Button>
+                {/* Scope & Tasks */}
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ fontSize: 'var(--font-size-body)', marginBottom: 'var(--space-2)' }}>Scope Summary</h4>
+                  <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)', marginBottom: 'var(--space-4)' }}>{quote.scope?.summary}</p>
+                  
+                  <h4 style={{ fontSize: 'var(--font-size-body)', marginBottom: 'var(--space-2)' }}>Included Tasks</h4>
+                  <ul style={{ paddingLeft: 'var(--space-4)', color: 'var(--color-text-primary)', fontSize: 'var(--font-size-small)', margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                    {quote.scope?.tasks?.filter(t => t.included).map((task, idx) => (
+                      <li key={idx}>{task.description}</li>
+                    ))}
+                  </ul>
+
+                  {quote.scope?.exclusions?.length > 0 && (
+                    <div style={{ marginTop: 'var(--space-4)' }}>
+                      <h4 style={{ fontSize: 'var(--font-size-body)', color: 'var(--color-error)', marginBottom: 'var(--space-2)' }}>Exclusions</h4>
+                      <ul style={{ paddingLeft: 'var(--space-4)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)', margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                        {quote.scope.exclusions.map((exclusion, idx) => (
+                          <li key={idx}>{exclusion}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ borderTop: '1px solid var(--color-border-subtle)', paddingTop: 'var(--space-4)', marginTop: 'auto' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)', marginBottom: 'var(--space-4)' }}>
+                    <Clock size={16} /> Est. Duration: {quote.estimatedDuration?.value} {quote.estimatedDuration?.unit?.toLowerCase()}
+                  </div>
+                  
+                  {quote.status === 'SUBMITTED' ? (
+                    <Button variant="primary" style={{ width: '100%' }} onClick={() => handleAcceptQuote(quote._id)} loading={isAccepting}>
+                      Accept This Quote
+                    </Button>
+                  ) : quote.status === 'ACCEPTED' ? (
+                    <Button variant="success" style={{ width: '100%' }} disabled leftIcon={<Check size={18} />}>
+                      Accepted
+                    </Button>
+                  ) : null}
+                </div>
+
+              </div>
             </Card>
-          ) : (
-            sortedAndFilteredMatches.map(match => (
-              <ProviderMatchCard 
-                key={match.provider._id} 
-                match={match} 
-                onRequestQuote={handleRequestQuote}
-                isRequesting={isRequestingQuote && requestingId === match.provider._id}
-              />
-            ))
-          )}
-        </div>
+          );
+        })}
       </div>
     </div>
   );

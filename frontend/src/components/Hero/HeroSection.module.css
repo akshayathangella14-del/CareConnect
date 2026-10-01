@@ -6,11 +6,11 @@
   position: relative;
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
-  gap: var(--space-10);
+  gap: var(--space-6);
   align-items: center;
-  padding: var(--space-8) var(--space-6) var(--space-10);
+  padding: var(--space-4) var(--space-6) var(--space-6);
   overflow: hidden;
-  min-height: calc(100vh - 120px);
+  min-height: auto;
 }
 
 /* ---- Animated background layers ---- */
