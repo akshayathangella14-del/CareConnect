@@ -8,9 +8,9 @@
   grid-template-columns: 1.05fr 0.95fr;
   gap: var(--space-10);
   align-items: center;
-  padding: var(--space-12) var(--space-6) var(--space-16);
+  padding: var(--space-8) var(--space-6) var(--space-10);
   overflow: hidden;
-  min-height: 90vh;
+  min-height: calc(100vh - 120px);
 }
 
 /* ---- Animated background layers ---- */
@@ -96,7 +96,7 @@
   color: var(--color-primary);
   font-size: var(--font-size-caption);
   font-weight: 700;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-4);
   backdrop-filter: blur(8px);
 }
 
@@ -111,7 +111,7 @@
 .title {
   font-size: clamp(2.4rem, 5.5vw, 4.2rem);
   line-height: 1.06;
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-4);
   letter-spacing: -0.02em;
   color: var(--color-text-primary);
 }
@@ -141,7 +141,7 @@
 .desc {
   font-size: var(--font-size-body-lg);
   max-width: 540px;
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-6);
   color: var(--color-text-secondary);
   line-height: 1.7;
 }
@@ -150,7 +150,7 @@
   display: flex;
   gap: var(--space-3);
   flex-wrap: wrap;
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-6);
 }
 
 /* ---- Trust badges row ---- */
@@ -183,7 +183,7 @@
 /* ---- Right visual ---- */
 .visual {
   position: relative;
-  min-height: 440px;
+  min-height: 400px;
   z-index: 1;
 }
 
@@ -283,7 +283,7 @@
 
 .floatStats {
   position: absolute;
-  bottom: -8px;
+  bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 4;
