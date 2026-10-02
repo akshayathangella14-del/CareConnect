@@ -1,124 +1,81 @@
-# CareConnect Backend
+# CareConnect - Backend Service
 
-Backend foundation for CareConnect, an AI-powered home services booking and operations platform. This backend is a single Node.js, Express.js, MongoDB, and Mongoose application with REST APIs versioned under `/api/v1`.
+![CareConnect Backend](https://via.placeholder.com/1200x200/7C3AED/FFFFFF?text=CareConnect+-+Backend+Architecture)
 
-No business-domain features are implemented in this phase.
+The **CareConnect Backend** is a robust, highly scalable Node.js and Express API powering the CareConnect home services ecosystem. Built on MongoDB, it provides comprehensive data modeling, stringent role-based access control, and seamless AI integration for intelligent service matching.
 
-## Prerequisites
+## 🚀 Technical Architecture
 
-- Node.js 20 or newer
-- npm
-- Local MongoDB server for development
+- **Core Framework**: Node.js & Express.js
+- **Database**: MongoDB (via Mongoose ODM)
+- **Security**: JWT-based Authentication, Bcrypt password hashing
+- **AI Integration**: Google Gemini API (Natural Language Processing for matching & quoting)
+- **Role-Based Access Control (RBAC)**: Strict middleware enforcement for 5 distinct roles: `CUSTOMER`, `SERVICE_PROVIDER`, `OPERATIONS_MANAGER`, `SUPPORT_AGENT`, and `ADMIN`.
 
-## Installation
+## 🌟 Core Domain Features
 
+- **ServiceRequest & Matching Engine**: Parses natural language requests, extracts structured parameters, and assigns a confidence score to intelligently route leads to verified Service Providers.
+- **ScopeGuard API**: Manages the strict state-machine workflow for mid-service scope changes. Includes multi-party approval tracking.
+- **ServiceTrace & Proof Pack API**: Immutable logging of service timeline events (e.g., En Route, Arrived, Work Started) and encrypted storage endpoints for photographic evidence.
+- **Aggregated Analytics Engine**: Advanced MongoDB aggregation pipelines powering real-time dashboards for Admin, Support, and Operations.
+
+## 📁 Directory Structure
+
+```
+backend/
+├── src/
+│   ├── controllers/      # Route handlers and request parsing
+│   ├── middleware/       # JWT Auth, Role Enforcement, Error Handlers
+│   ├── models/           # Mongoose schemas (14 core collections)
+│   ├── routes/v1/        # API route definitions
+│   ├── services/         # Business logic (e.g., Gemini AI processing)
+│   ├── utils/            # Helper functions and constants
+│   └── app.js            # Express application setup
+├── scripts/              # Database seeders and maintenance tools
+├── tests/                # Test suites
+└── package.json
+```
+
+## 🛠️ Getting Started
+
+### 1. Prerequisites
+- Node.js 18+
+- Local MongoDB Server OR MongoDB Atlas connection URI
+
+### 2. Installation
 ```bash
 npm install
 ```
 
-## Environment Setup
-
-Create a local `.env` file from the example:
-
-```bash
-cp .env.example .env
-```
-
-On Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Update `.env` with local values. Never commit `.env` or real credentials.
-
-Important variables:
-
-- `NODE_ENV`
-- `PORT`
-- `MONGODB_URI`
-- `CLIENT_ORIGINS`
-- `CORS_CREDENTIALS`
-- `JWT_SECRET`
-- `JWT_EXPIRES_IN`
-
-For local development, use a local MongoDB database named `careconnect`:
-
+### 3. Environment Variables
+Create a `.env` file in the `backend` root:
 ```env
+NODE_ENV=development
+PORT=5000
 MONGODB_URI=mongodb://127.0.0.1:27017/careconnect
+CLIENT_ORIGINS=http://localhost:3000
+JWT_SECRET=your_super_secret_jwt_key
+JWT_EXPIRES_IN=1d
+GEMINI_API_KEY=your_google_gemini_api_key
 ```
 
-MongoDB Compass can be used to inspect the local database, but the local MongoDB server must be running for live database connectivity.
-
-JWT authentication uses bearer tokens. Set `JWT_SECRET` to a long random value in `.env`; never commit real secrets.
-
-## Development Server
-
+### 4. Run Development Server
 ```bash
 npm run dev
 ```
+The API will start at `http://localhost:5000/api/v1`.
 
-The default local port is `5000` when `PORT` is not set.
-
-## Production Start
-
+### 5. Database Seeding (Optional)
+To populate the database with realistic test data (Providers, Customers, Categories):
 ```bash
-npm start
+node scripts/seedCategories.js
+node scripts/seedProviders.js
+node scripts/seedUsers.js
 ```
 
-In production, `MONGODB_URI` and `CLIENT_ORIGINS` must be configured.
+## 🔐 Security & Access Control
 
-## Tests
+All protected routes require a valid `Bearer` token in the `Authorization` header. Access is strictly governed by the `requireRole` middleware. Attempting to access an unauthorized endpoint will result in a `403 Forbidden` response.
 
-```bash
-npm test
-```
-
-Syntax checks:
-
-```bash
-npm run check
-```
-
-## Health Endpoint
-
-```http
-GET /api/v1/health
-```
-
-The health response confirms that the API process is running and returns only safe operational status. It does not expose credentials or connection strings.
-
-## Authentication Endpoints
-
-```http
-POST /api/v1/auth/register
-POST /api/v1/auth/login
-GET /api/v1/auth/me
-POST /api/v1/auth/logout
-```
-
-Logout is stateless for this JWT foundation. The client removes its stored bearer token; the server does not store or blacklist tokens in Phase 2.
-
-## MongoDB Configuration
-
-The application reads the database connection from `MONGODB_URI`. Use local MongoDB for normal development:
-
-```env
-MONGODB_URI=mongodb://127.0.0.1:27017/careconnect
-```
-
-For deployment or remote testing later, a MongoDB Atlas URI can replace the local URI through the same `MONGODB_URI` variable. Do not hardcode database credentials in source files.
-
-## Render Deployment Notes
-
-- Set the root directory to `backend` when deploying this service from the monorepo.
-- Use `npm install` as the build/install command.
-- Use `npm start` as the start command.
-- Configure `NODE_ENV=production`.
-- Set `MONGODB_URI` to the deployment MongoDB connection string.
-- Set `CLIENT_ORIGINS` to the deployed frontend origin.
-- Keep secrets in Render environment variables.
-
-## Security Reminder
-
-Secrets, database credentials, and API keys must never be committed. Use `.env` locally and platform environment variables in deployment.
+---
+*Built for the CareConnect ecosystem. Ensure all new models are properly indexed for performance.*
