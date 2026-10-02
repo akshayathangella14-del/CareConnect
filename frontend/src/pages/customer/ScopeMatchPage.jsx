@@ -7,7 +7,6 @@ import {
 import { useAcceptQuoteMutation } from '@/features/quotes';
 import { Card, Button, Alert, Badge } from '@/components';
 import { ArrowLeft, Check, Star, Clock } from 'lucide-react';
-import styles from './ScopeMatchPage.module.css';
 
 export default function ScopeMatchPage() {
   const { id } = useParams();
