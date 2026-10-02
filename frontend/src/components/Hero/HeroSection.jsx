@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Sparkles, Star, MapPin, Zap, Users } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Sparkles, Star, Users } from 'lucide-react';
 import { Button } from '@/components';
 import SafeImage from '@/components/media/SafeImage';
 import { useListFeaturedProvidersQuery } from '@/features/providers';

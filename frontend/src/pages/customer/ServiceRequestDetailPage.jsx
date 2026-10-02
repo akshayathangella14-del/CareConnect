@@ -7,7 +7,6 @@ import {
   useCorrectAiUnderstandingMutation,
   useUpdateServiceRequestMutation
 } from '@/features/serviceRequests';
-import { useAcceptQuoteMutation } from '@/features/quotes';
 import { Card, Button, StatusBadge, Alert, Badge, Input } from '@/components';
 import { DatePicker } from '@/components/ui/DatePicker/DatePicker';
 import { TimePicker } from '@/components/ui/TimePicker/TimePicker';
@@ -23,7 +22,6 @@ export default function ServiceRequestDetailPage() {
   });
   
   const [submitRequest, { isLoading: isSubmitting }] = useSubmitServiceRequestMutation();
-  const [acceptQuote, { isLoading: isAccepting }] = useAcceptQuoteMutation();
   const [correctAi, { isLoading: isConfirming }] = useCorrectAiUnderstandingMutation();
   const [updateRequest] = useUpdateServiceRequestMutation();
 
@@ -39,8 +37,6 @@ export default function ServiceRequestDetailPage() {
   const [showScheduleForm, setShowScheduleForm] = useState(false);
   const [scheduleError, setScheduleError] = useState('');
   const [scheduleSuccess, setScheduleSuccess] = useState('');
-  const [quoteError, setQuoteError] = useState('');
-  const [quoteSuccess, setQuoteSuccess] = useState('');
 
   if (isLoading) return <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading request details...</div>;
   
@@ -66,26 +62,7 @@ export default function ServiceRequestDetailPage() {
     }
   };
 
-  const handleAcceptQuote = async (quoteId) => {
-    if (!request.preferredSchedule?.startAt || !request.preferredSchedule?.endAt) {
-      setShowScheduleForm(true);
-      setQuoteError('Please save your preferred schedule before accepting a quote.');
-      return;
-    }
 
-    if (window.confirm('Are you sure you want to accept this quote? This will create a binding booking.')) {
-      try {
-        setQuoteError('');
-        setQuoteSuccess('');
-        await acceptQuote(quoteId).unwrap();
-        await refetch();
-        setQuoteSuccess('Quote accepted successfully. Your booking is now waiting for provider confirmation.');
-      } catch (err) {
-        console.error('Failed to accept quote:', err);
-        setQuoteError(err?.data?.error?.message || err?.data?.message || 'Failed to accept quote. Please try again.');
-      }
-    }
-  };
 
   const handleScheduleSubmit = async () => {
     setScheduleError('');
