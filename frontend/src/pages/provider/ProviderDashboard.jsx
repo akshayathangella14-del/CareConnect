@@ -1,28 +1,56 @@
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { ArrowRight, BriefcaseBusiness, CalendarRange, CheckCircle2, Star, TrendingUp } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, CalendarRange, Star, TrendingUp } from 'lucide-react';
 import { Card, Badge } from '@/components';
 import { selectCurrentUser } from '@/features/auth';
 import { useGetPlatformStatsQuery } from '@/features/stats';
+import { useListBookingsQuery } from '@/features/bookings/bookingApi';
+import { useListQuotesQuery } from '@/features/quotes/quoteApi';
 
 export default function ProviderDashboard() {
   const user = useSelector(selectCurrentUser);
   const { data: stats } = useGetPlatformStatsQuery();
+  const { data: bookings = [] } = useListBookingsQuery();
+  const { data: quotes = [] } = useListQuotesQuery();
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'PR';
 
+  // Metrics
+  const pendingJobs = bookings.filter(b => !['COMPLETED', 'CANCELLED'].includes(b.status)).length;
+  const quotesSent = quotes.filter(q => q.status !== 'DRAFT').length;
+  const quotesAccepted = quotes.filter(q => q.status === 'ACCEPTED').length;
+  const quoteAcceptanceRate = quotesSent > 0 ? Math.round((quotesAccepted / quotesSent) * 100) : 0;
+  
+  // Real schedule
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const todaysBookings = bookings
+    .filter(b => !['COMPLETED', 'CANCELLED'].includes(b.status))
+    .filter(b => {
+      const start = new Date(b.scheduledStartAt);
+      return start >= today && start < tomorrow;
+    })
+    .sort((a, b) => new Date(a.scheduledStartAt) - new Date(b.scheduledStartAt));
+
+  const scheduleItems = todaysBookings.length > 0 
+    ? todaysBookings.map(b => `${b.status.replace(/_/g, ' ')} at ${new Date(b.scheduledStartAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} for booking #${b._id.slice(-6)}`)
+    : ['No services scheduled for today.'];
+
   const metricCards = [
-    { label: 'Pending jobs', value: stats?.activeBookings ?? 9, tone: 'primary' },
-    { label: 'Quotes sent', value: stats?.totalRequests ?? 18, tone: 'warning' },
-    { label: 'Completion rate', value: `${Math.min(98, Number(stats?.averageRating || 4.8) * 20)}%`, tone: 'success' },
+    { label: 'Pending jobs', value: pendingJobs, tone: 'primary' },
+    { label: 'Quotes sent', value: quotesSent, tone: 'warning' },
+    { label: 'Quote acceptance', value: `${quoteAcceptanceRate}%`, tone: 'success' },
     { label: 'Avg rating', value: `${Number(stats?.averageRating || 4.8).toFixed(1)}/5`, tone: 'violet' },
   ];
 
   const actions = [
     { label: 'Browse matched requests', desc: 'Find requests aligned to your current skills and service area.', path: '/provider/matches' },
-    { label: 'Submit a quote', desc: 'Respond with pricing, time, and detailed scope recommendations.', path: '/provider/quotes/new' },
+    { label: 'Submit a quote', desc: 'Respond with pricing, time, and detailed scope recommendations.', path: '/provider/quotes' },
     { label: 'Manage bookings', desc: 'Track scheduled work, progress, and customer confirmations.', path: '/provider/bookings' },
     { label: 'Update availability', desc: 'Publish your working hours and service windows.', path: '/provider/availability' },
   ];
@@ -65,12 +93,8 @@ export default function ProviderDashboard() {
             <h3 style={{ margin: 0 }}>Today’s schedule</h3>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            {[
-              'Residential AC maintenance request is awaiting your confirmation.',
-              'Customer scope review is pending approval for service adjustments.',
-              'Installation window is confirmed for this evening and visible to the customer.',
-            ].map((item, index) => (
-              <div key={item} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+            {scheduleItems.map((item, index) => (
+              <div key={index} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                 <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--color-primary-soft)', display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700, color: 'var(--color-primary)' }}>{index + 1}</div>
                 <div style={{ color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{item}</div>
               </div>
@@ -115,7 +139,7 @@ export default function ProviderDashboard() {
           </div>
           <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
             <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Quote acceptance</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>{Math.min(91, 72 + (Number(stats?.averageRating || 4.8) * 4))}%</div>
+            <div style={{ marginTop: 8, fontWeight: 700 }}>{quoteAcceptanceRate}%</div>
           </div>
         </div>
       </Card>

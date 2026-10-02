@@ -1,24 +1,19 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Star, Quote } from 'lucide-react';
-import { useListTestimonialsQuery } from '@/features/testimonials';
+import { useListReviewsQuery } from '@/features/reviews/reviewApi';
 import styles from './Testimonials.module.css';
 
-const FALLBACK_TESTIMONIALS = [
-  { _id: 'ft-1', comment: 'CareConnect found me a verified electrician within minutes. The quote was transparent, work was excellent, and the photo proof gave me total peace of mind.', rating: 5, customer: { name: 'Priya Menon' }, city: 'Mumbai' },
-  { _id: 'ft-2', comment: 'I was skeptical at first, but the ScopeGuard pricing meant zero surprises. The plumber arrived on time and fixed everything perfectly. Highly recommend!', rating: 5, customer: { name: 'Arjun Reddy' }, city: 'Hyderabad' },
-  { _id: 'ft-3', comment: 'Best home service app in India! The AI matching is incredibly accurate. Got my AC repaired same day with a verified technician. Five stars!', rating: 5, customer: { name: 'Sneha Gupta' }, city: 'Delhi' },
-];
-
 export default function Testimonials() {
-  const { data: apiTestimonials = [], isLoading, isError } = useListTestimonialsQuery();
-  const testimonials = apiTestimonials.length > 0 ? apiTestimonials : FALLBACK_TESTIMONIALS;
+  const { data: reviews = [], isLoading } = useListReviewsQuery();
   const [index, setIndex] = useState(0);
+  
+  const publishedReviews = reviews.filter(r => r.status === 'PUBLISHED' && r.comment && r.comment.length > 10).slice(0, 5);
 
   useEffect(() => {
-    if (!testimonials.length) return;
-    const id = setInterval(() => setIndex((i) => (i + 1) % testimonials.length), 7000);
+    if (!publishedReviews.length) return;
+    const id = setInterval(() => setIndex((i) => (i + 1) % publishedReviews.length), 7000);
     return () => clearInterval(id);
-  }, [testimonials.length]);
+  }, [publishedReviews.length]);
 
   if (isLoading) {
     return (
@@ -29,8 +24,13 @@ export default function Testimonials() {
     );
   }
 
-  const story = testimonials[index % testimonials.length];
-  const initials = (story.customer?.name || 'C').split(' ').map(w => w[0]).join('').toUpperCase();
+  if (publishedReviews.length === 0) {
+    return null; // Don't show the section if there are no real published reviews
+  }
+
+  const story = publishedReviews[index % publishedReviews.length];
+  const customerName = story.customer?.name || 'Verified customer';
+  const initials = customerName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
   return (
     <section id="stories" className={styles.section}>
@@ -44,14 +44,14 @@ export default function Testimonials() {
             <Quote size={24} />
           </div>
           <blockquote>
-            "{story.comment || 'Great experience with CareConnect.'}"
+            "{story.comment}"
             <footer>
               <div className={styles.avatar}>
                 {initials}
               </div>
               <div>
-                <strong>{story.customer?.name || 'Verified customer'}</strong>
-                <span>{story.city || story.customer?.city || 'Verified customer'} · Completed service</span>
+                <strong>{customerName}</strong>
+                <span>{story.customer?.address?.city || 'Verified Customer'} · Completed service</span>
                 <span className={styles.stars} aria-label={`${story.rating || 5} star rating`}>
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} size={14} fill={i < (story.rating || 5) ? 'currentColor' : 'none'} />
@@ -61,18 +61,19 @@ export default function Testimonials() {
             </footer>
           </blockquote>
           <div className={styles.controls}>
-            <button type="button" aria-label="Previous story" onClick={() => setIndex((i) => (i - 1 + testimonials.length) % testimonials.length)}>
+            <button type="button" aria-label="Previous story" onClick={() => setIndex((i) => (i - 1 + publishedReviews.length) % publishedReviews.length)}>
               <ChevronLeft size={20} />
             </button>
-            <span className={styles.counter}>{index + 1} / {testimonials.length}</span>
-            <button type="button" aria-label="Next story" onClick={() => setIndex((i) => (i + 1) % testimonials.length)}>
+            <span className={styles.counter}>{index + 1} / {publishedReviews.length}</span>
+            <button type="button" aria-label="Next story" onClick={() => setIndex((i) => (i + 1) % publishedReviews.length)}>
               <ChevronRight size={20} />
             </button>
           </div>
         </article>
         <div className={styles.grid}>
-          {testimonials.map((item, i) => {
-            const itemInitials = (item.customer?.name || 'C').split(' ').map(w => w[0]).join('').toUpperCase();
+          {publishedReviews.map((item, i) => {
+            const itemName = item.customer?.name || 'Verified customer';
+            const itemInitials = itemName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
             return (
               <button
                 key={item._id || i}
@@ -82,8 +83,8 @@ export default function Testimonials() {
               >
                 <div className={styles.miniAvatar}>{itemInitials}</div>
                 <div>
-                  <strong>{item.customer?.name || 'Verified customer'}</strong>
-                  <p>{item.comment || 'Great experience with CareConnect.'}</p>
+                  <strong>{itemName}</strong>
+                  <p>{item.comment.length > 60 ? item.comment.substring(0, 60) + '...' : item.comment}</p>
                 </div>
               </button>
             );

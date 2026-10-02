@@ -1,15 +1,18 @@
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CalendarClock, Clock3, Sparkles, Wallet } from 'lucide-react';
+import { ArrowRight, CalendarClock, Sparkles, Wallet } from 'lucide-react';
 import { Card, Badge } from '@/components';
 import { selectCurrentUser } from '@/features/auth';
 import { useGetPlatformStatsQuery } from '@/features/stats';
 import { useListNotificationsQuery } from '@/features/notifications';
+import { useListBookingsQuery } from '@/features/bookings/bookingApi';
 
 export default function CustomerDashboard() {
   const user = useSelector(selectCurrentUser);
   const { data: stats } = useGetPlatformStatsQuery();
   const { data: notifications = [] } = useListNotificationsQuery(undefined, { pollingInterval: 5000 });
+  const { data: bookings = [] } = useListBookingsQuery();
+  
   const pendingQuoteCount = notifications.filter((notification) => notification.type === 'QUOTE' && !notification.isRead).length;
 
   const initials = user?.name
@@ -29,6 +32,13 @@ export default function CustomerDashboard() {
     { label: 'Track active bookings', desc: 'Follow progress, ETA updates, and evidence snapshots for live jobs.', path: '/bookings' },
     { label: 'Leave feedback', desc: 'Rate completed work and help other customers choose confidently.', path: '/reviews/new' },
   ];
+
+  const nextBooking = bookings
+    .filter(b => !['COMPLETED', 'CANCELLED'].includes(b.status))
+    .sort((a, b) => new Date(a.scheduledStartAt) - new Date(b.scheduledStartAt))[0];
+    
+  const completedCount = bookings.filter(b => b.status === 'COMPLETED').length;
+  const activeCount = bookings.filter(b => !['COMPLETED', 'CANCELLED'].includes(b.status)).length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
@@ -110,18 +120,22 @@ export default function CustomerDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-3)' }}>
           <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
             <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Next scheduled service</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>Kitchen appliance check</div>
-            <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>Today · 4:30 PM</div>
+            <div style={{ marginTop: 8, fontWeight: 700 }}>
+              {nextBooking ? (nextBooking.serviceRequest?.title || 'Upcoming Service') : 'No upcoming services'}
+            </div>
+            <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>
+              {nextBooking ? new Date(nextBooking.scheduledStartAt).toLocaleString() : 'Book a service now'}
+            </div>
           </div>
           <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
-            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Saved providers</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>3 trusted professionals</div>
-            <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>Ready for repeat jobs</div>
+            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Total bookings</div>
+            <div style={{ marginTop: 8, fontWeight: 700 }}>{completedCount + activeCount} total jobs</div>
+            <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>{completedCount} completed, {activeCount} active</div>
           </div>
           <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
-            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Response time</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>Under 2 hours</div>
-            <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>For most recent quote requests</div>
+            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Pending quotes</div>
+            <div style={{ marginTop: 8, fontWeight: 700 }}>{pendingQuoteCount} quotes</div>
+            <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>Awaiting your review</div>
           </div>
         </div>
       </Card>

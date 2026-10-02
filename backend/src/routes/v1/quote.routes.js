@@ -5,6 +5,7 @@ const { quoteController } = require('../../controllers/business.controller');
 const router = express.Router();
 
 router.use(authenticate);
+router.get('/', quoteController.list);
 router.post('/requests/:id', quoteController.createForRequest);
 router.get('/:id', quoteController.get);
 router.patch('/:id', quoteController.update);

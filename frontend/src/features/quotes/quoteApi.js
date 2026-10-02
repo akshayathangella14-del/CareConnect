@@ -4,6 +4,7 @@ import { apiSlice } from '@/api/apiSlice';
  * Quote API — RTK Query endpoints.
  *
  * Backend contract:
+ *   GET    /quotes                        → list
  *   GET    /quotes/:id                    → get
  *   PATCH  /quotes/:id                    → update draft
  *   POST   /quotes/:id/submit             → submit to customer
@@ -13,6 +14,24 @@ import { apiSlice } from '@/api/apiSlice';
  */
 export const quoteApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    listQuotes: builder.query({
+      query: (params) => ({
+        url: '/quotes',
+        params,
+      }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        return response?.data?.quotes || response?.quotes || [];
+      },
+      providesTags: (result) =>
+        Array.isArray(result)
+          ? [
+              ...result.map(({ _id }) => ({ type: 'Quote', id: _id })),
+              { type: 'Quote', id: 'LIST' },
+            ]
+          : [{ type: 'Quote', id: 'LIST' }],
+    }),
+
     getQuote: builder.query({
       query: (id) => `/quotes/${id}`,
       transformResponse: (response) => response?.data?.quote || response?.quote || response,
@@ -84,6 +103,7 @@ export const quoteApi = apiSlice.injectEndpoints({
 });
 
 export const {
+  useListQuotesQuery,
   useGetQuoteQuery,
   useUpdateQuoteMutation,
   useSubmitQuoteMutation,

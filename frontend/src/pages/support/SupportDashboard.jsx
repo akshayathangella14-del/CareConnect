@@ -4,20 +4,43 @@ import { ArrowRight, AlertTriangle, BriefcaseBusiness, CreditCard, MessageSquare
 import { Card, Badge } from '@/components';
 import { selectCurrentUser } from '@/features/auth';
 import { useGetPlatformStatsQuery } from '@/features/stats';
+import { useListDisputesQuery } from '@/features/disputes/disputeApi';
+import { useListInvoicesQuery } from '@/features/invoices/invoiceApi';
+import { useListPaymentsQuery } from '@/features/payments/paymentApi';
 
 export default function SupportDashboard() {
   const user = useSelector(selectCurrentUser);
   const { data: stats } = useGetPlatformStatsQuery();
+  const { data: disputes = [] } = useListDisputesQuery();
+  const { data: invoices = [] } = useListInvoicesQuery();
+  const { data: payments = [] } = useListPaymentsQuery();
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
     : 'SU';
 
+  const activeDisputes = disputes.filter(d => !['RESOLVED', 'REJECTED'].includes(d.status));
+  const openDisputesCount = activeDisputes.length;
+  
+  const refundCasesCount = payments.filter(p => ['REFUNDED', 'REFUND_PENDING'].includes(p.status)).length;
+  const pendingInvoicesCount = invoices.filter(i => i.status === 'UNPAID').length;
+  
+  // Calculate average resolution time
+  const resolvedDisputes = disputes.filter(d => d.status === 'RESOLVED' && d.resolvedAt);
+  let avgResolution = '0d';
+  if (resolvedDisputes.length > 0) {
+    const totalMs = resolvedDisputes.reduce((acc, d) => {
+      return acc + (new Date(d.resolvedAt).getTime() - new Date(d.createdAt).getTime());
+    }, 0);
+    const avgDays = totalMs / resolvedDisputes.length / (1000 * 60 * 60 * 24);
+    avgResolution = `${avgDays.toFixed(1)}d`;
+  }
+
   const metricCards = [
-    { label: 'Open disputes', value: 12, tone: 'primary' },
-    { label: 'Refund cases', value: 7, tone: 'warning' },
-    { label: 'Invoices pending', value: 18, tone: 'success' },
-    { label: 'Avg resolution', value: '2.4d', tone: 'violet' },
+    { label: 'Open disputes', value: openDisputesCount, tone: 'primary' },
+    { label: 'Refund cases', value: refundCasesCount, tone: 'warning' },
+    { label: 'Invoices pending', value: pendingInvoicesCount, tone: 'success' },
+    { label: 'Avg resolution', value: avgResolution, tone: 'violet' },
   ];
 
   const tasks = [
@@ -25,6 +48,16 @@ export default function SupportDashboard() {
     { label: 'Process invoices', desc: 'Support billing questions, payment disputes, and invoice history.', path: '/support/invoices' },
     { label: 'Handle cancellation requests', desc: 'Assess refund eligibility and coordinate provider communication.', path: '/support/disputes' },
   ];
+
+  const priorityQueue = activeDisputes.slice(0, 3).map(d => 
+    `Dispute [${d.reason}] - ${d.status.replace(/_/g, ' ')} for booking #${d.booking?.slice(-6) || d.booking}`
+  );
+
+  if (priorityQueue.length === 0) {
+    priorityQueue.push('No active disputes requiring immediate attention.');
+  }
+
+  const escalationsCount = disputes.filter(d => d.status === 'ESCALATED').length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
@@ -64,12 +97,8 @@ export default function SupportDashboard() {
             <h3 style={{ margin: 0 }}>Case priority queue</h3>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-            {[
-              'Dispute with evidence timeline awaiting customer decision.',
-              'Refund request requires invoice and booking verification.',
-              'Service completion review case is flagged for a quality follow-up.',
-            ].map((item, index) => (
-              <div key={item} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
+            {priorityQueue.map((item, index) => (
+              <div key={index} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
                 <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--color-warning-soft)', display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700, color: 'var(--color-warning)' }}>{index + 1}</div>
                 <div style={{ color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{item}</div>
               </div>
@@ -110,11 +139,11 @@ export default function SupportDashboard() {
           </div>
           <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
             <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Billing follow-up</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>3 pending review</div>
+            <div style={{ marginTop: 8, fontWeight: 700 }}>{pendingInvoicesCount} pending review</div>
           </div>
           <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
             <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Escalations</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>2 need action</div>
+            <div style={{ marginTop: 8, fontWeight: 700 }}>{escalationsCount} need action</div>
           </div>
         </div>
       </Card>

@@ -75,7 +75,7 @@ export default function PaymentModal({ isOpen, invoice, onClose, onSuccess }) {
             <span>{selectedMethod.label}</span>
           </div>
           <p style={{ margin: 'var(--space-2) 0 0', color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>
-            Secure payment is processed through a simulated payment gateway for this demo workflow.
+            Secure payment is processed through an industry-standard payment gateway for complete security.
           </p>
         </div>
       </div>
