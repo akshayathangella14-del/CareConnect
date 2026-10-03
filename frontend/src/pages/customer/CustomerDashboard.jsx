@@ -6,6 +6,7 @@ import { selectCurrentUser } from '@/features/auth';
 import { useGetPlatformStatsQuery } from '@/features/stats';
 import { useListNotificationsQuery } from '@/features/notifications';
 import { useListBookingsQuery } from '@/features/bookings/bookingApi';
+import SmartRequestFlow from '@/components/SmartRequestFlow/SmartRequestFlow';
 import styles from './CustomerDashboard.module.css';
 
 export default function CustomerDashboard() {
@@ -74,6 +75,10 @@ export default function CustomerDashboard() {
             <div className={styles.metricValue}>{card.value}</div>
           </Card>
         ))}
+      </div>
+      
+      <div style={{ marginTop: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
+        <SmartRequestFlow />
       </div>
 
       <div className={styles.twoColumnGrid}>

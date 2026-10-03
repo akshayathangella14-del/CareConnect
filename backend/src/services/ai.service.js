@@ -329,4 +329,86 @@ Output strictly valid JSON with this exact schema:
   }
 };
 
-module.exports = { analyzeServiceRequest, reanalyzeAfterCorrection, summarizeDispute: () => ({}) };
+const aiConcierge = async (conversationHistory) => {
+  const [categories] = await Promise.all([
+    ServiceCategory.find({ isActive: true }).lean()
+  ]);
+
+  const categoryNames = categories.map((c) => c.name);
+  
+  if (!env.gemini?.apiKey || env.gemini.apiKey === 'your_gemini_api_key_here') {
+    return {
+      needsClarification: false,
+      title: "Service Request",
+      categoryName: categoryNames[0] || "General",
+      problemType: "General Repair",
+      estimatedPriceMin: 400,
+      estimatedPriceMax: 1500,
+      technicalBrief: "Customer needs help with a home service issue. Please diagnose and fix.",
+      urgency: "NORMAL"
+    };
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey: env.gemini.apiKey });
+    const modelName = env.gemini.model || 'gemini-2.5-flash';
+
+    const systemPrompt = `You are CareConnect AI, an intelligent service concierge. 
+The user wants to book a home service (like appliance repair, plumbing, electrical).
+You need to analyze their request.
+If their request is too vague to know the exact appliance or the general issue, you must ask a quick clarifying question.
+If their request has enough detail to form a technical brief and estimate, you should output the details.
+
+Available Categories: ${JSON.stringify(categoryNames)}
+
+Output strictly valid JSON with this exact schema:
+{
+  "needsClarification": boolean, // true if you need to ask a question, false if you have enough detail
+  "question": "The question to ask the user (if needsClarification is true)",
+  "title": "Short title of the service request (if needsClarification is false)",
+  "categoryName": "One matching category from available list (if needsClarification is false)",
+  "problemType": "Specific technical problem title (if needsClarification is false)",
+  "estimatedPriceMin": number (e.g. 500, if needsClarification is false),
+  "estimatedPriceMax": number (e.g. 1200, if needsClarification is false),
+  "technicalBrief": "Highly technical brief for the provider explaining what needs to be checked or replaced (if needsClarification is false)",
+  "urgency": "LOW|NORMAL|HIGH|EMERGENCY (if needsClarification is false)"
+}
+
+Do not ask more than 2 questions overall in a flow. Make your questions very simple, like a multiple-choice hint.`;
+
+    const contents = [
+      { role: 'user', parts: [{ text: systemPrompt }] },
+      { role: 'model', parts: [{ text: 'Understood. I will respond with strictly valid JSON.' }] }
+    ];
+
+    // Format conversation history for Gemini (roles: 'user' and 'model')
+    conversationHistory.forEach(msg => {
+      contents.push({
+        role: msg.role === 'ai' ? 'model' : 'user',
+        parts: [{ text: msg.text }]
+      });
+    });
+
+    const response = await ai.models.generateContent({
+      model: modelName,
+      contents,
+      config: { responseMimeType: 'application/json' },
+    });
+
+    return JSON.parse(response.text?.trim() || '{}');
+  } catch (error) {
+    console.error('AI Concierge error:', error.message);
+    return {
+      needsClarification: false,
+      title: "Service Request",
+      categoryName: categoryNames[0] || "General",
+      problemType: "General Repair",
+      estimatedPriceMin: 200,
+      estimatedPriceMax: 800,
+      technicalBrief: "Fallback technical brief due to AI error.",
+      urgency: "NORMAL"
+    };
+  }
+};
+
+module.exports = { analyzeServiceRequest, reanalyzeAfterCorrection, summarizeDispute: () => ({}), aiConcierge };

@@ -1,0 +1,203 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  margin-bottom: var(--space-4);
+  position: relative;
+}
+
+.header {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  padding: var(--space-4);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-h3);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: var(--font-size-small);
+  opacity: 0.9;
+}
+
+.chatBox {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: 400px;
+  overflow-y: auto;
+  background-color: var(--color-background);
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-body);
+  line-height: 1.5;
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.messageUser {
+  align-self: flex-end;
+  background-color: var(--color-primary);
+  color: white;
+  border-bottom-right-radius: 0;
+}
+
+.messageAi {
+  align-self: flex-start;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-bottom-left-radius: 0;
+}
+
+.inputArea {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+.inputField {
+  flex: 1;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-body);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.inputField:focus {
+  border-color: var(--color-primary);
+}
+
+.sendButton {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-full);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.sendButton:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+}
+
+.sendButton:disabled {
+  background-color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.sendButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.estimateCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.estimateHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding-bottom: var(--space-2);
+}
+
+.estimateTitle {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.estimatePrice {
+  font-size: var(--font-size-h4);
+  font-weight: 700;
+  color: var(--color-success);
+}
+
+.estimateBody {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+}
+
+.bookButton {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-align: center;
+}
+
+.bookButton:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.typingIndicator {
+  display: flex;
+  gap: 4px;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-full);
+  align-self: flex-start;
+  border: 1px solid var(--color-border);
+  margin-top: var(--space-2);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-text-muted);
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
