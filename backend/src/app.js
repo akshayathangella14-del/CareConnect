@@ -6,6 +6,7 @@ const apiRoutes = require('./routes');
 const notFoundHandler = require('./middleware/notFound.middleware');
 const errorHandler = require('./middleware/error.middleware');
 const AppError = require('./utils/AppError');
+const { realtimeChangeFeed } = require('./realtime/realtime.middleware');
 
 const createCorsOptions = () => ({
   origin(origin, callback) {
@@ -41,6 +42,8 @@ const createApp = () => {
     });
   });
 
+  // Broadcast cache-invalidation signals for every successful mutation (real-time UI).
+  app.use(`/api/${env.app.apiVersion}`, realtimeChangeFeed);
   app.use(`/api/${env.app.apiVersion}`, apiRoutes);
 
   app.use(notFoundHandler);

@@ -6,6 +6,7 @@ import { selectCurrentUser } from '@/features/auth';
 import { useGetPlatformStatsQuery } from '@/features/stats';
 import { useListNotificationsQuery } from '@/features/notifications';
 import { useListBookingsQuery } from '@/features/bookings/bookingApi';
+import styles from './CustomerDashboard.module.css';
 
 export default function CustomerDashboard() {
   const user = useSelector(selectCurrentUser);
@@ -41,68 +42,74 @@ export default function CustomerDashboard() {
   const activeCount = bookings.filter(b => !['COMPLETED', 'CANCELLED'].includes(b.status)).length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+    <div className={styles.dashboard}>
       <Card padding="lg">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-            <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', display: 'grid', placeItems: 'center', background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))', color: '#fff', fontWeight: 700 }}>
-              {user?.profileImage ? <img src={user.profileImage} alt={user.name || 'Customer'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
+        <div className={styles.welcomeCard}>
+          <div className={styles.welcomeProfile}>
+            <div className={styles.welcomeAvatar}>
+              {user?.profileImage ? (
+                <img src={user.profileImage} alt={user.name || 'Customer'} />
+              ) : (
+                initials
+              )}
             </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 8 }}>
-                <h1 style={{ margin: 0, fontSize: 'var(--font-size-h2)' }}>Welcome back, {user?.name || 'Customer'}!</h1>
+            <div className={styles.welcomeText}>
+              <div className={styles.welcomeHeader}>
+                <h1 className={styles.welcomeTitle}>Welcome back, {user?.name || 'Customer'}!</h1>
                 <Badge variant="primary">Customer</Badge>
               </div>
-              <div style={{ color: 'var(--color-text-secondary)' }}>Book trusted home care, compare quotes, and track each job from start to finish.</div>
+              <div className={styles.welcomeDesc}>Book trusted home care, compare quotes, and track each job from start to finish.</div>
             </div>
           </div>
           <Link to="/service-requests/new" style={{ textDecoration: 'none' }}>
-            <button style={{ border: 'none', background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))', color: '#fff', borderRadius: 12, padding: '10px 16px', fontWeight: 700, cursor: 'pointer' }}>Request service</button>
+            <button className={styles.requestButton}>Request service</button>
           </Link>
         </div>
       </Card>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-4)' }}>
+      <div className={styles.metricsGrid}>
         {metricCards.map((card) => (
-          <Card key={card.label} padding="md" style={{ minHeight: 120 }}>
-            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)', marginBottom: 10 }}>{card.label}</div>
-            <div style={{ fontSize: 'var(--font-size-h3)', fontWeight: 800 }}>{card.value}</div>
+          <Card key={card.label} padding="md" className={styles.metricCard}>
+            <div className={styles.metricLabel}>{card.label}</div>
+            <div className={styles.metricValue}>{card.value}</div>
           </Card>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: 'var(--space-6)' }}>
+      <div className={styles.twoColumnGrid}>
         <Card padding="lg">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+          <div className={styles.cardHeader}>
             <CalendarClock size={18} color="var(--color-primary)" />
-            <h3 style={{ margin: 0 }}>Your service timeline</h3>
+            <h3 className={styles.cardTitle}>Your service timeline</h3>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div className={styles.timelineList}>
             {[
               'Request submitted and AI matching is reviewing the job details.',
               'Provider quotes are waiting for your review and comparison.',
               'A matched provider is being confirmed for your preferred schedule.',
             ].map((item, index) => (
-              <div key={item} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: index === 0 ? 'var(--color-primary-soft)' : 'var(--color-surface-muted)', display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700, color: 'var(--color-primary)' }}>{index + 1}</div>
-                <div style={{ color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{item}</div>
+              <div key={item} className={styles.timelineItem}>
+                <div className={`${styles.timelineNumber} ${index === 0 ? styles.timelineNumberActive : styles.timelineNumberInactive}`}>
+                  {index + 1}
+                </div>
+                <div className={styles.timelineText}>{item}</div>
               </div>
             ))}
           </div>
         </Card>
 
         <Card padding="lg">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+          <div className={styles.cardHeader}>
             <Sparkles size={18} color="var(--color-secondary)" />
-            <h3 style={{ margin: 0 }}>Quick actions</h3>
+            <h3 className={styles.cardTitle}>Quick actions</h3>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div className={styles.actionList}>
             {actionItems.map((item) => (
-              <Link key={item.label} to={item.path} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
+              <Link key={item.label} to={item.path} className={styles.actionLink}>
+                <div className={styles.actionItem}>
                   <div>
-                    <div style={{ fontWeight: 600 }}>{item.label}</div>
-                    <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)' }}>{item.desc}</div>
+                    <div className={styles.actionLabel}>{item.label}</div>
+                    <div className={styles.actionDesc}>{item.desc}</div>
                   </div>
                   <ArrowRight size={16} />
                 </div>
@@ -113,29 +120,29 @@ export default function CustomerDashboard() {
       </div>
 
       <Card padding="lg">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+        <div className={styles.cardHeader}>
           <Wallet size={18} color="var(--color-success)" />
-          <h3 style={{ margin: 0 }}>Recent activity</h3>
+          <h3 className={styles.cardTitle}>Recent activity</h3>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-3)' }}>
-          <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
-            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Next scheduled service</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>
+        <div className={styles.recentActivityGrid}>
+          <div className={styles.activityCard}>
+            <div className={styles.activityLabel}>Next scheduled service</div>
+            <div className={styles.activityValue}>
               {nextBooking ? (nextBooking.serviceRequest?.title || 'Upcoming Service') : 'No upcoming services'}
             </div>
-            <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>
+            <div className={styles.activityDesc}>
               {nextBooking ? new Date(nextBooking.scheduledStartAt).toLocaleString() : 'Book a service now'}
             </div>
           </div>
-          <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
-            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Total bookings</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>{completedCount + activeCount} total jobs</div>
-            <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>{completedCount} completed, {activeCount} active</div>
+          <div className={styles.activityCard}>
+            <div className={styles.activityLabel}>Total bookings</div>
+            <div className={styles.activityValue}>{completedCount + activeCount} total jobs</div>
+            <div className={styles.activityDesc}>{completedCount} completed, {activeCount} active</div>
           </div>
-          <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
-            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Pending quotes</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>{pendingQuoteCount} quotes</div>
-            <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>Awaiting your review</div>
+          <div className={styles.activityCard}>
+            <div className={styles.activityLabel}>Pending quotes</div>
+            <div className={styles.activityValue}>{pendingQuoteCount} quotes</div>
+            <div className={styles.activityDesc}>Awaiting your review</div>
           </div>
         </div>
       </Card>

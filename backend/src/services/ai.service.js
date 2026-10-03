@@ -6,22 +6,36 @@ const Skill = require('../models/Skill');
 const keywordMap = [
   { keyword: 'ac', problemType: 'Air Conditioner Servicing & Gas Top-up', urgency: 'HIGH' },
   { keyword: 'refrigerator', problemType: 'Refrigerator Cooling & Gasket Repair', urgency: 'HIGH' },
+  { keyword: 'fridge', problemType: 'Refrigerator Cooling & Gasket Repair', urgency: 'HIGH' },
   { keyword: 'mixer', problemType: 'Mixer Grinder Motor Repair or Blade Replacement', urgency: 'NORMAL' },
+  { keyword: 'mixie', problemType: 'Mixer Grinder Repair', urgency: 'NORMAL' },
   { keyword: 'grinder', problemType: 'Wet Grinder Service & Repair', urgency: 'NORMAL' },
   { keyword: 'geyser', problemType: 'Water Geyser Heating Element or Thermostat Repair', urgency: 'HIGH' },
+  { keyword: 'water heater', problemType: 'Water Geyser Repair', urgency: 'HIGH' },
   { keyword: 'water purifier', problemType: 'RO Water Purifier Filter Change or Service', urgency: 'HIGH' },
+  { keyword: 'ro', problemType: 'RO Water Purifier Service', urgency: 'HIGH' },
+  { keyword: 'aquaguard', problemType: 'Water Purifier Repair', urgency: 'HIGH' },
   { keyword: 'chimney', problemType: 'Kitchen Chimney Motor Cleaning or Repair', urgency: 'NORMAL' },
   { keyword: 'inverter', problemType: 'Home Inverter Battery Charging Issue', urgency: 'HIGH' },
+  { keyword: 'ups', problemType: 'Inverter/UPS Repair', urgency: 'HIGH' },
   { keyword: 'fan', problemType: 'Ceiling Fan Motor or Capacitor Repair', urgency: 'NORMAL' },
   { keyword: 'switch', problemType: 'Electrical Switchboard or Wiring Repair', urgency: 'HIGH' },
+  { keyword: 'mcb', problemType: 'MCB Tripping or Electrical Fault', urgency: 'EMERGENCY' },
   { keyword: 'tap', problemType: 'Water Tap Leakage or Replacement', urgency: 'HIGH' },
+  { keyword: 'leak', problemType: 'Water Leakage or Pipe Repair', urgency: 'HIGH' },
   { keyword: 'sink', problemType: 'Kitchen Sink Drain Blockage or Leak Repair', urgency: 'NORMAL' },
+  { keyword: 'flush', problemType: 'Toilet Flush Tank Repair', urgency: 'HIGH' },
   { keyword: 'door', problemType: 'Door Hinge, Lock or Handle Repair', urgency: 'NORMAL' },
   { keyword: 'window', problemType: 'Window Glass or Frame Repair', urgency: 'NORMAL' },
+  { keyword: 'mesh', problemType: 'Mosquito Mesh Installation or Repair', urgency: 'NORMAL' },
   { keyword: 'paint', problemType: 'Wall Painting or Touch-up Work', urgency: 'NORMAL' },
   { keyword: 'carpenter', problemType: 'Furniture Assembly or Repair', urgency: 'NORMAL' },
   { keyword: 'plumber', problemType: 'General Plumbing Repair or Installation', urgency: 'HIGH' },
   { keyword: 'electrician', problemType: 'General Electrical Repair or Installation', urgency: 'HIGH' },
+  { keyword: 'cleaning', problemType: 'Deep House Cleaning or Bathroom Cleaning', urgency: 'NORMAL' },
+  { keyword: 'sofa', problemType: 'Sofa Cleaning or Shampooing', urgency: 'NORMAL' },
+  { keyword: 'pest', problemType: 'Pest Control Service', urgency: 'HIGH' },
+  { keyword: 'termite', problemType: 'Anti-Termite Treatment', urgency: 'NORMAL' }
 ];
 
 const includes = (value, query) => String(value || '').toLowerCase().includes(query);
@@ -48,7 +62,13 @@ const calculateConfidenceScore = (serviceRequest, parsed, matchedCategory, match
   if (serviceRequest.urgency && serviceRequest.urgency !== 'NORMAL') score += 0.1;
   else if (parsed.urgency && parsed.urgency !== 'NORMAL') score += 0.1;
 
-  return Math.min(Math.max(score, 0), 1);
+  // Visual Context Bonus (0-0.15)
+  if (serviceRequest.attachments && serviceRequest.attachments.length > 0) {
+    score += 0.15;
+  }
+
+  // Cap at 0.98 unless customer explicitly confirms
+  return Math.min(score, 0.98);
 };
 
 const detectMissingInformation = (serviceRequest, parsed) => {
@@ -150,14 +170,14 @@ Output strictly valid JSON with this exact schema:
   "categoryName": "<One matching category from available list>",
   "matchedSkills": ["<Array of matching skill names>"],
   "problemType": "<Specific technical problem title, e.g. 'Refrigerator Cooling Loss & Door Gasket Seal Failure'>",
-  "diagnosticNotes": "<Detailed explanation for the user of why this problem occurs and what needs attention>",
+  "diagnosticNotes": "<Detailed explanation for the user of why this problem occurs, potential root causes based on symptoms, what needs attention, and any immediate safety precautions. Keep it professional and empathetic.>",
   "suggestedTasks": [
-    "<Specific action item 1>",
-    "<Specific action item 2>",
-    "<Specific action item 3>"
+    "<Specific actionable repair/service step 1>",
+    "<Specific actionable repair/service step 2>",
+    "<Specific actionable repair/service step 3>"
   ],
   "urgency": "<LOW|NORMAL|HIGH|EMERGENCY>",
-  "missingInformation": ["<Details user should clarify if any>"]
+  "missingInformation": ["<Details user should clarify if any, e.g., brand/model, exact error codes, or age of appliance>"]
 }`;
 
     const contents = [];
@@ -257,14 +277,14 @@ Output strictly valid JSON with this exact schema:
   "categoryName": "<One matching category from available list>",
   "matchedSkills": ["<Array of matching skill names>"],
   "problemType": "<Specific technical problem title, e.g. 'Refrigerator Cooling Loss & Door Gasket Seal Failure'>",
-  "diagnosticNotes": "<Detailed explanation for the user of why this problem occurs and what needs attention>",
+  "diagnosticNotes": "<Detailed explanation for the user of why this problem occurs, potential root causes based on symptoms, what needs attention, and any immediate safety precautions. Keep it professional and empathetic.>",
   "suggestedTasks": [
-    "<Specific action item 1>",
-    "<Specific action item 2>",
-    "<Specific action item 3>"
+    "<Specific actionable repair/service step 1>",
+    "<Specific actionable repair/service step 2>",
+    "<Specific actionable repair/service step 3>"
   ],
   "urgency": "<LOW|NORMAL|HIGH|EMERGENCY>",
-  "missingInformation": ["<Details user should clarify if any>"]
+  "missingInformation": ["<Details user should clarify if any, e.g., brand/model, exact error codes, or age of appliance>"]
 }`;
 
     const response = await ai.models.generateContent({

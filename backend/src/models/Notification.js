@@ -82,6 +82,52 @@ const notificationSchema = new Schema(
 
 notificationSchema.index({ recipient: 1, isRead: 1, createdAt: -1 });
 
+/* ------------------------------------------------------------------
+ * Realtime delivery — push every newly created notification to the
+ * recipient's open SSE streams the instant it is persisted.
+ * The hub is required lazily to avoid circular imports at boot.
+ * ------------------------------------------------------------------ */
+const RESOURCE_TAGS = {
+  ServiceRequest: ['ServiceRequest', 'Quote'],
+  Quote: ['Quote', 'ServiceRequest', 'Booking'],
+  Booking: ['Booking', 'ServiceRequest', 'Invoice'],
+  ScopeChange: ['Booking'],
+  Invoice: ['Invoice', 'Payment', 'Booking'],
+  Dispute: ['Dispute', 'Booking'],
+  Review: ['Review', 'Provider'],
+  User: ['User'],
+  ProviderProfile: ['Provider', 'User'],
+};
+
+const pushNotification = (doc) => {
+  try {
+    // eslint-disable-next-line global-require
+    const realtimeHub = require('../realtime/realtime.hub');
+    const notification = typeof doc.toObject === 'function' ? doc.toObject() : doc;
+    const resourceType = notification?.relatedResource?.resourceType;
+
+    realtimeHub.emitToUser(notification.recipient, 'notification', {
+      notification,
+      tags: ['Notification', ...(RESOURCE_TAGS[resourceType] || [])],
+    });
+  } catch {
+    // Realtime delivery is best-effort; persistence already succeeded.
+  }
+};
+
+notificationSchema.pre('save', function markNew(next) {
+  this.$locals.wasNew = this.isNew;
+  next();
+});
+
+notificationSchema.post('save', function emitCreated(doc) {
+  if (this.$locals?.wasNew) pushNotification(doc);
+});
+
+notificationSchema.post('insertMany', (docs) => {
+  (Array.isArray(docs) ? docs : [docs]).forEach(pushNotification);
+});
+
 module.exports = mongoose.model('Notification', notificationSchema);
 module.exports.NOTIFICATION_TYPES = NOTIFICATION_TYPES;
 module.exports.RELATED_RESOURCE_TYPES = RELATED_RESOURCE_TYPES;

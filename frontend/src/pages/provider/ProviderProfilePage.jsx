@@ -21,7 +21,8 @@ export default function ProviderProfilePage() {
     baseHourlyRate: '',
     minimumVisitCharge: '',
     selectedSkills: [],
-    serviceAreas: []
+    serviceAreas: [],
+    documents: []
   });
 
   const [newArea, setNewArea] = useState({ label: '', city: '', state: '', postalCode: '' });
@@ -35,7 +36,8 @@ export default function ProviderProfilePage() {
         baseHourlyRate: profile.pricing?.baseHourlyRate || '',
         minimumVisitCharge: profile.pricing?.minimumVisitCharge || '',
         selectedSkills: profile.skills?.map(s => typeof s === 'object' ? s._id : s) || [],
-        serviceAreas: profile.serviceAreas || []
+        serviceAreas: profile.serviceAreas || [],
+        documents: profile.documents || []
       });
     }
   }, [profile]);
@@ -79,6 +81,7 @@ export default function ProviderProfilePage() {
         experienceYears: Number(formData.experienceYears),
         skills: formData.selectedSkills,
         serviceAreas: formData.serviceAreas,
+        documents: formData.documents,
         pricing: {
           currency: 'INR',
           baseHourlyRate: Number(formData.baseHourlyRate),
@@ -255,6 +258,62 @@ export default function ProviderProfilePage() {
               />
               <Button type="button" onClick={handleAddArea} disabled={!newArea.city || !newArea.state} style={{ height: 40 }}>
                 <Plus size={16} /> Add Area
+              </Button>
+            </div>
+          </div>
+
+          <hr style={{ border: 0, borderBottom: '1px solid var(--color-border-subtle)' }} />
+
+          {/* Documents Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+            <h3 style={{ fontSize: 'var(--font-size-h4)', display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              <Briefcase size={18} color="var(--color-primary)" /> Verification Documents
+            </h3>
+            <p style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)', margin: 0 }}>
+              Upload your ID, licenses, or certifications. Provide a link to your hosted document or drive.
+            </p>
+            
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)' }}>
+              {formData.documents.map((doc, idx) => (
+                <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)', padding: 'var(--space-3)', backgroundColor: 'var(--color-surface-muted)', borderRadius: 'var(--radius-md)', minWidth: 200 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 600, fontSize: 'var(--font-size-small)' }}>{doc.type}</span>
+                    <button type="button" onClick={() => setFormData(prev => ({ ...prev, documents: prev.documents.filter((_, i) => i !== idx) }))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}>
+                      <X size={14} />
+                    </button>
+                  </div>
+                  <span style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)' }}>{doc.name}</span>
+                  <a href={doc.reference} target="_blank" rel="noreferrer" style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-primary)' }}>View Document</a>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr auto', gap: 'var(--space-2)', alignItems: 'end' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                <label style={{ fontSize: 'var(--font-size-small)', fontWeight: 600 }}>Document Type</label>
+                <select 
+                  style={{ height: 40, borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', padding: '0 var(--space-2)', backgroundColor: 'var(--color-surface)', color: 'var(--color-text)' }}
+                  id="docType"
+                >
+                  <option value="GOVERNMENT_ID">Government ID</option>
+                  <option value="TRADE_LICENSE">Trade License</option>
+                  <option value="CERTIFICATION">Certification</option>
+                  <option value="INSURANCE">Insurance Proof</option>
+                </select>
+              </div>
+              <Input label="Document Name" id="docName" placeholder="e.g. Aadhar Card" />
+              <Input label="Document URL" id="docUrl" placeholder="https://drive.google.com/..." />
+              <Button type="button" onClick={() => {
+                const type = document.getElementById('docType').value;
+                const name = document.getElementById('docName').value;
+                const reference = document.getElementById('docUrl').value;
+                if (name && reference) {
+                  setFormData(prev => ({ ...prev, documents: [...prev.documents, { type, name, reference }] }));
+                  document.getElementById('docName').value = '';
+                  document.getElementById('docUrl').value = '';
+                }
+              }} style={{ height: 40 }}>
+                <Plus size={16} /> Add
               </Button>
             </div>
           </div>

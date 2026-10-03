@@ -18,6 +18,7 @@ const disputeRoutes = require('./v1/dispute.routes');
 const notificationRoutes = require('./v1/notification.routes');
 const auditRoutes = require('./v1/audit.routes');
 const analyticsRoutes = require('./v1/analytics.routes');
+const realtimeRoutes = require('./v1/realtime.routes');
 
 const router = express.Router();
 
@@ -53,5 +54,6 @@ router.use('/disputes', disputeRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/audit-logs', auditRoutes);
 router.use('/analytics', analyticsRoutes);
+router.use('/realtime', realtimeRoutes);
 
 module.exports = router;

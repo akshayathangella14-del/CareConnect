@@ -2,6 +2,7 @@ const createApp = require('./app');
 const env = require('./config/env');
 const { connectDatabase, disconnectDatabase } = require('./config/database');
 const logger = require('./utils/logger');
+const realtimeHub = require('./realtime/realtime.hub');
 
 let server;
 
@@ -38,6 +39,7 @@ const shutdown = async (signal) => {
   logger.info(`${signal} received. Shutting down gracefully.`);
 
   if (server) {
+    realtimeHub.closeAll();
     server.close(async () => {
       await disconnectDatabase();
       process.exit(0);

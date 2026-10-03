@@ -7,6 +7,7 @@ import { useGetPlatformStatsQuery } from '@/features/stats';
 import { useListDisputesQuery } from '@/features/disputes/disputeApi';
 import { useListInvoicesQuery } from '@/features/invoices/invoiceApi';
 import { useListPaymentsQuery } from '@/features/payments/paymentApi';
+import styles from './SupportDashboard.module.css';
 
 export default function SupportDashboard() {
   const user = useSelector(selectCurrentUser);
@@ -60,64 +61,68 @@ export default function SupportDashboard() {
   const escalationsCount = disputes.filter(d => d.status === 'ESCALATED').length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+    <div className={styles.dashboard}>
       <Card padding="lg">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)', flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-            <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', display: 'grid', placeItems: 'center', background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))', color: '#fff', fontWeight: 700 }}>
-              {user?.profileImage ? <img src={user.profileImage} alt={user.name || 'Support agent'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : initials}
+        <div className={styles.welcomeCard}>
+          <div className={styles.welcomeProfile}>
+            <div className={styles.welcomeAvatar}>
+              {user?.profileImage ? (
+                <img src={user.profileImage} alt={user.name || 'Support agent'} />
+              ) : (
+                initials
+              )}
             </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 8 }}>
-                <h1 style={{ margin: 0, fontSize: 'var(--font-size-h2)' }}>Support desk</h1>
+            <div className={styles.welcomeText}>
+              <div className={styles.welcomeHeader}>
+                <h1 className={styles.welcomeTitle}>Support desk</h1>
                 <Badge variant="warning">Support</Badge>
               </div>
-              <div style={{ color: 'var(--color-text-secondary)' }}>Resolve disputes, billing issues, and customer escalations with full case context.</div>
+              <div className={styles.welcomeDesc}>Resolve disputes, billing issues, and customer escalations with full case context.</div>
             </div>
           </div>
-          <Link to="/support/disputes" style={{ textDecoration: 'none' }}>
-            <button style={{ border: 'none', background: 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))', color: '#fff', borderRadius: 12, padding: '10px 16px', fontWeight: 700, cursor: 'pointer' }}>Open cases</button>
+          <Link to="/support/disputes" className={styles.actionLink}>
+            <button className={styles.primaryButton}>Open cases</button>
           </Link>
         </div>
       </Card>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-4)' }}>
+      <div className={styles.metricsGrid}>
         {metricCards.map((card) => (
-          <Card key={card.label} padding="md" style={{ minHeight: 120 }}>
-            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)', marginBottom: 10 }}>{card.label}</div>
-            <div style={{ fontSize: 'var(--font-size-h3)', fontWeight: 800 }}>{card.value}</div>
+          <Card key={card.label} padding="md" className={styles.metricCard}>
+            <div className={styles.metricLabel}>{card.label}</div>
+            <div className={styles.metricValue}>{card.value}</div>
           </Card>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 0.85fr', gap: 'var(--space-6)' }}>
+      <div className={styles.twoColumnGrid}>
         <Card padding="lg">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+          <div className={styles.cardHeader}>
             <AlertTriangle size={18} color="var(--color-warning)" />
-            <h3 style={{ margin: 0 }}>Case priority queue</h3>
+            <h3 className={styles.cardTitle}>Case priority queue</h3>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div className={styles.timelineList}>
             {priorityQueue.map((item, index) => (
-              <div key={index} style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'flex-start' }}>
-                <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--color-warning-soft)', display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 700, color: 'var(--color-warning)' }}>{index + 1}</div>
-                <div style={{ color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>{item}</div>
+              <div key={index} className={styles.timelineItem}>
+                <div className={styles.timelineNumber}>{index + 1}</div>
+                <div className={styles.timelineText}>{item}</div>
               </div>
             ))}
           </div>
         </Card>
 
         <Card padding="lg">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-4)' }}>
+          <div className={styles.cardHeader}>
             <MessageSquareText size={18} color="var(--color-primary)" />
-            <h3 style={{ margin: 0 }}>Service tools</h3>
+            <h3 className={styles.cardTitle}>Service tools</h3>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div className={styles.actionList}>
             {tasks.map((item) => (
-              <Link key={item.label} to={item.path} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
+              <Link key={item.label} to={item.path} className={styles.actionLink}>
+                <div className={styles.actionItem}>
                   <div>
-                    <div style={{ fontWeight: 600 }}>{item.label}</div>
-                    <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)' }}>{item.desc}</div>
+                    <div className={styles.actionLabel}>{item.label}</div>
+                    <div className={styles.actionDesc}>{item.desc}</div>
                   </div>
                   <ArrowRight size={16} />
                 </div>
@@ -128,22 +133,22 @@ export default function SupportDashboard() {
       </div>
 
       <Card padding="lg">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
+        <div className={styles.cardHeader}>
           <CreditCard size={18} color="var(--color-success)" />
-          <h3 style={{ margin: 0 }}>Customer support snapshot</h3>
+          <h3 className={styles.cardTitle}>Customer support snapshot</h3>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-3)' }}>
-          <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
-            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Satisfaction</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>{Number(stats?.averageRating || 4.8).toFixed(1)}/5</div>
+        <div className={styles.recentActivityGrid}>
+          <div className={styles.activityCard}>
+            <div className={styles.activityLabel}>Satisfaction</div>
+            <div className={styles.activityValue}>{Number(stats?.averageRating || 4.8).toFixed(1)}/5</div>
           </div>
-          <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
-            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Billing follow-up</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>{pendingInvoicesCount} pending review</div>
+          <div className={styles.activityCard}>
+            <div className={styles.activityLabel}>Billing follow-up</div>
+            <div className={styles.activityValue}>{pendingInvoicesCount} pending review</div>
           </div>
-          <div style={{ padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
-            <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-muted)' }}>Escalations</div>
-            <div style={{ marginTop: 8, fontWeight: 700 }}>{escalationsCount} need action</div>
+          <div className={styles.activityCard}>
+            <div className={styles.activityLabel}>Escalations</div>
+            <div className={styles.activityValue}>{escalationsCount} need action</div>
           </div>
         </div>
       </Card>
