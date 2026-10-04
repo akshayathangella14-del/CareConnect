@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, CheckCircle2, Navigation } from 'lucide-react';
 import styles from './SmartRequestFlow.module.css';
-import { useAskConciergeMutation } from '../../features/ai/aiApi';
-import { useCreateServiceRequestMutation } from '../../features/serviceRequests/serviceRequestApi';
+import { useAskConciergeMutation } from '@/features/ai/aiApi';
+import { useCreateServiceRequestMutation } from '@/features/serviceRequests/serviceRequestApi';
 import { useNavigate } from 'react-router-dom';
 
 const SmartRequestFlow = () => {
@@ -57,13 +57,15 @@ const SmartRequestFlow = () => {
     try {
       const payload = {
         title: estimate.title,
+        category: estimate.categoryId,
         description: estimate.technicalBrief,
         urgency: estimate.urgency || 'NORMAL',
         location: {
           addressLine1: 'To be provided',
           city: 'To be provided',
           state: 'To be provided',
-          postalCode: 'To be provided'
+          postalCode: '000000',
+          serviceArea: 'General'
         },
         preferredSchedule: {
           startAt: new Date(Date.now() + 86400000).toISOString(),
@@ -72,7 +74,7 @@ const SmartRequestFlow = () => {
       };
       
       const res = await createRequest(payload).unwrap();
-      navigate(`/dashboard/service-requests/${res.serviceRequest._id}`);
+      navigate(`/service-requests/${res.serviceRequest._id}`);
     } catch (error) {
       console.error('Failed to create request:', error);
       alert('Failed to submit request automatically. Please use the standard form.');

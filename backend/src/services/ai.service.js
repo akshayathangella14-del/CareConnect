@@ -395,7 +395,16 @@ Do not ask more than 2 questions overall in a flow. Make your questions very sim
       config: { responseMimeType: 'application/json' },
     });
 
-    return JSON.parse(response.text?.trim() || '{}');
+    const parsed = JSON.parse(response.text?.trim() || '{}');
+    if (!parsed.needsClarification && parsed.categoryName) {
+      const category = categories.find(c => c.name.toLowerCase() === parsed.categoryName.toLowerCase());
+      if (category) {
+        parsed.categoryId = category._id;
+      } else {
+        parsed.categoryId = categories[0]?._id; // fallback
+      }
+    }
+    return parsed;
   } catch (error) {
     console.error('AI Concierge error:', error.message);
     return {

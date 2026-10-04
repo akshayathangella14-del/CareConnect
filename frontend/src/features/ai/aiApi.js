@@ -1,6 +1,6 @@
-import { baseApi } from '../../api/baseApi';
+import { apiSlice } from '@/api/apiSlice';
 
-export const aiApi = baseApi.injectEndpoints({
+export const aiApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     askConcierge: builder.mutation({
       query: (data) => ({
