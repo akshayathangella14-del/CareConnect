@@ -6,7 +6,7 @@ import { Card, Input, Textarea, Select, Button, Alert } from '@/components';
 import { DatePicker } from '@/components/ui/DatePicker/DatePicker';
 import { TimePicker } from '@/components/ui/TimePicker/TimePicker';
 import { ArrowRight, Wand2, Camera, X, Image as ImageIcon } from 'lucide-react';
-
+import SmartRequestFlow from '@/components/SmartRequestFlow/SmartRequestFlow';
 export default function CreateServiceRequestPage() {
   const navigate = useNavigate();
   const [createRequest, { isLoading, error }] = useCreateServiceRequestMutation();
@@ -113,6 +113,12 @@ export default function CreateServiceRequestPage() {
           Describe your problem in plain language and attach photos. CareConnect AI will analyze your issue, diagnose the root cause, and match you with verified technicians.
         </p>
       </div>
+
+      <div style={{ marginTop: 'var(--space-2)', marginBottom: 'var(--space-6)' }}>
+        <SmartRequestFlow />
+      </div>
+
+      <h3 style={{ fontSize: 'var(--font-size-h4)', marginBottom: 'var(--space-4)', marginTop: 'var(--space-6)' }}>Or fill out the standard request form:</h3>
 
       <Card padding="lg">
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
