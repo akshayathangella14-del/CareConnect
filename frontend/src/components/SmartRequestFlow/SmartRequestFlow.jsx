@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, CheckCircle2, Navigation } from 'lucide-react';
 import styles from './SmartRequestFlow.module.css';
 import { useAskConciergeMutation } from '@/features/ai/aiApi';
-import { useCreateServiceRequestMutation, useSubmitServiceRequestMutation } from '@/features/serviceRequests/serviceRequestApi';
+import { useCreateServiceRequestMutation, useSubmitServiceRequestMutation, useCorrectAiUnderstandingMutation } from '@/features/serviceRequests/serviceRequestApi';
 import { useNavigate } from 'react-router-dom';
 
 const SmartRequestFlow = () => {
@@ -22,6 +22,7 @@ const SmartRequestFlow = () => {
   const [askConcierge, { isLoading }] = useAskConciergeMutation();
   const [createRequest, { isLoading: isCreating }] = useCreateServiceRequestMutation();
   const [submitRequest] = useSubmitServiceRequestMutation();
+  const [correctUnderstanding] = useCorrectAiUnderstandingMutation();
   const navigate = useNavigate();
   const chatEndRef = useRef(null);
 
@@ -90,7 +91,10 @@ const SmartRequestFlow = () => {
       
       if (newRequestId) {
         try {
+          // Submits the draft for AI review
           await submitRequest(newRequestId).unwrap();
+          // Bypasses the manual review step since the concierge already evaluated it
+          await correctUnderstanding({ id: newRequestId, notes: 'Auto-confirmed via AI Concierge.' }).unwrap();
         } catch (e) {
           console.warn('Failed to auto-submit', e);
         }
