@@ -37,11 +37,30 @@ const canAccessServiceRequest = (user, serviceRequest) => (
   (user.role === 'SERVICE_PROVIDER' && ['MATCHING', 'QUOTING'].includes(serviceRequest.status))
 );
 
-const scopedServiceRequestQuery = (user, query = {}) => {
+const scopedServiceRequestQuery = async (user, query = {}) => {
   if (user.role === 'CUSTOMER') {
     query.customer = user._id;
   } else if (user.role === 'SERVICE_PROVIDER') {
     query.status = { $in: ['MATCHING', 'QUOTING'] };
+    
+    try {
+      const provider = await getOwnProviderProfile(user);
+      if (provider && provider.skills && provider.skills.length > 0) {
+        await provider.populate('skills');
+        const categoryIds = provider.skills.map(skill => skill.category).filter(Boolean);
+        const uniqueCategoryIds = [...new Set(categoryIds.map(id => id.toString()))];
+        
+        if (uniqueCategoryIds.length > 0) {
+          query.category = { $in: uniqueCategoryIds };
+        }
+      } else if (provider) {
+         // If provider has no skills, they shouldn't see any jobs
+         query._id = null;
+      }
+    } catch (err) {
+      // If profile not found, they see no jobs
+      query._id = null;
+    }
   }
   return query;
 };
@@ -210,7 +229,7 @@ const serviceRequestController = {
   }),
 
   list: asyncHandler(async (req, res) => {
-    const query = scopedServiceRequestQuery(req.user, {});
+    const query = await scopedServiceRequestQuery(req.user, {});
     if (req.query.status) query.status = req.query.status;
     if (req.query.category) query.category = req.query.category;
     if (req.query.urgency) query.urgency = req.query.urgency;
@@ -323,11 +342,11 @@ const pricingController = {
 };
 
 // --- PROVIDER CONTROLLER ---
-const getOwnProviderProfile = async (user) => {
+async function getOwnProviderProfile(user) {
   const profile = await ProviderProfile.findOne({ user: user._id });
   if (!profile) throw AppError.notFound('Provider profile not found.');
   return profile;
-};
+}
 
 const ensureProviderOwnership = async (user, providerId) => {
   if (hasRole(user, ['ADMIN', 'OPERATIONS_MANAGER'])) return;
