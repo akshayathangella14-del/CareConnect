@@ -33,7 +33,7 @@ function HomePage() {
   const [whyRef, whyInView] = useInView();
 
   const ratingText = stats?.averageRating != null ? Number(stats.averageRating).toFixed(1) : '4.9';
-  const completedJobs = stats?.completedBookings ?? 0;
+  const completedJobs = stats?.completedBookings || 0;
 
   return (
     <div className={styles.home}>

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, CheckCircle2, Navigation } from 'lucide-react';
 import styles from './SmartRequestFlow.module.css';
 import { useAskConciergeMutation } from '@/features/ai/aiApi';
-import { useCreateServiceRequestMutation } from '@/features/serviceRequests/serviceRequestApi';
+import { useCreateServiceRequestMutation, useSubmitServiceRequestMutation } from '@/features/serviceRequests/serviceRequestApi';
 import { useNavigate } from 'react-router-dom';
 
 const SmartRequestFlow = () => {
@@ -14,6 +14,7 @@ const SmartRequestFlow = () => {
   
   const [askConcierge, { isLoading }] = useAskConciergeMutation();
   const [createRequest, { isLoading: isCreating }] = useCreateServiceRequestMutation();
+  const [submitRequest] = useSubmitServiceRequestMutation();
   const navigate = useNavigate();
   const chatEndRef = useRef(null);
 
@@ -74,7 +75,16 @@ const SmartRequestFlow = () => {
       };
       
       const res = await createRequest(payload).unwrap();
-      navigate(`/service-requests/${res.serviceRequest._id}`);
+      const newRequestId = res?.data?.serviceRequest?._id || res?.serviceRequest?._id || res?._id;
+      
+      if (newRequestId) {
+        try {
+          await submitRequest(newRequestId).unwrap();
+        } catch (e) {
+          console.warn('Failed to auto-submit', e);
+        }
+        navigate(`/service-requests/${newRequestId}`);
+      }
     } catch (error) {
       console.error('Failed to create request:', error);
       alert('Failed to submit request automatically. Please use the standard form.');

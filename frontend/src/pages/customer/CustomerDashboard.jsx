@@ -22,9 +22,9 @@ export default function CustomerDashboard() {
     : 'CU';
 
   const metricCards = [
-    { label: 'Active requests', value: stats?.totalRequests ?? 18, tone: 'primary' },
+    { label: 'Active requests', value: stats?.totalRequests || 0, tone: 'primary' },
     { label: 'Quotes pending', value: pendingQuoteCount, tone: 'warning' },
-    { label: 'Upcoming bookings', value: stats?.completedBookings ?? 9, tone: 'success' },
+    { label: 'Upcoming bookings', value: stats?.completedBookings || 0, tone: 'success' },
     { label: 'Avg rating', value: `${Number(stats?.averageRating || 4.8).toFixed(1)}/5`, tone: 'violet' },
   ];
 
