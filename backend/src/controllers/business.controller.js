@@ -487,6 +487,37 @@ const quoteController = {
     const provider = await getOwnProviderProfile(req.user);
     const existing = await Quote.findOne({ serviceRequest: serviceRequest._id, provider: provider._id });
     if (existing) throw AppError.conflict('You have already submitted a quote for this request.');
+    
+    // Prevent creating a quote for the same time as another submitted quote
+    if (serviceRequest.preferredSchedule?.startAt && serviceRequest.preferredSchedule?.endAt) {
+      const { assertNoBookingConflict } = require('../services/availability.service');
+      // Validate against existing bookings
+      await assertNoBookingConflict({
+        provider: provider._id,
+        startAt: serviceRequest.preferredSchedule.startAt,
+        endAt: serviceRequest.preferredSchedule.endAt,
+      });
+
+      // Validate against other active quotes for this provider
+      const overlappingQuotes = await Quote.find({
+        provider: provider._id,
+        status: { $in: ['SUBMITTED', 'VIEWED', 'CHANGES_REQUESTED', 'REVISED'] }
+      }).populate('serviceRequest');
+
+      const startTime = new Date(serviceRequest.preferredSchedule.startAt).getTime();
+      const endTime = new Date(serviceRequest.preferredSchedule.endAt).getTime();
+
+      for (const q of overlappingQuotes) {
+        if (q.serviceRequest && q.serviceRequest.preferredSchedule?.startAt) {
+          const qStart = new Date(q.serviceRequest.preferredSchedule.startAt).getTime();
+          const qEnd = new Date(q.serviceRequest.preferredSchedule.endAt).getTime();
+          if (startTime < qEnd && endTime > qStart) {
+            throw AppError.conflict('You already have an active quote submitted for this time slot.');
+          }
+        }
+      }
+    }
+
     const quote = await Quote.create({
       serviceRequest: serviceRequest._id,
       provider: provider._id,
@@ -619,8 +650,39 @@ const quoteController = {
     sendSuccess(res, 200, 'Changes requested.', { quote });
   }),
   transition: (newStatus, event) => asyncHandler(async (req, res) => {
-    const quote = await Quote.findById(req.params.id);
+    const quote = await Quote.findById(req.params.id).populate('serviceRequest');
     if (!quote) throw AppError.notFound('Quote not found.');
+    
+    if (newStatus === 'SUBMITTED' && quote.serviceRequest?.preferredSchedule?.startAt && quote.serviceRequest?.preferredSchedule?.endAt) {
+      const { assertNoBookingConflict } = require('../services/availability.service');
+      // Validate against existing bookings
+      await assertNoBookingConflict({
+        provider: quote.provider,
+        startAt: quote.serviceRequest.preferredSchedule.startAt,
+        endAt: quote.serviceRequest.preferredSchedule.endAt,
+      });
+
+      // Validate against other active quotes for this provider
+      const overlappingQuotes = await Quote.find({
+        provider: quote.provider,
+        _id: { $ne: quote._id },
+        status: { $in: ['SUBMITTED', 'VIEWED', 'CHANGES_REQUESTED', 'REVISED'] }
+      }).populate('serviceRequest');
+
+      const startTime = new Date(quote.serviceRequest.preferredSchedule.startAt).getTime();
+      const endTime = new Date(quote.serviceRequest.preferredSchedule.endAt).getTime();
+
+      for (const q of overlappingQuotes) {
+        if (q.serviceRequest && q.serviceRequest.preferredSchedule?.startAt) {
+          const qStart = new Date(q.serviceRequest.preferredSchedule.startAt).getTime();
+          const qEnd = new Date(q.serviceRequest.preferredSchedule.endAt).getTime();
+          if (startTime < qEnd && endTime > qStart) {
+            throw AppError.conflict('You already have an active quote submitted for this time slot.');
+          }
+        }
+      }
+    }
+    
     quote.status = newStatus;
     await quote.save();
     await recordAudit({ actor: req.user, action: event, resourceType: 'Quote', resourceId: quote._id });

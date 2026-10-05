@@ -159,7 +159,7 @@ export default function TopNavigation() {
                   {unreadCount > 0 && <span className={styles.badge}>{unreadCount > 9 ? '9+' : unreadCount}</span>}
                 </Link>
                 <div className={styles.user}>
-                  <Link to={user?.role === 'CUSTOMER' ? '/profile' : '/dashboard'} className={styles.avatarLink} aria-label="Open profile">
+                  <Link to={user?.role === 'CUSTOMER' ? '/profile' : (user?.role === 'SERVICE_PROVIDER' ? '/provider/profile' : '/dashboard')} className={styles.avatarLink} aria-label="Open profile">
                     {user?.profileImage ? (
                       <img src={user.profileImage} alt={user.name || 'User'} className={styles.avatarImage} />
                     ) : (
