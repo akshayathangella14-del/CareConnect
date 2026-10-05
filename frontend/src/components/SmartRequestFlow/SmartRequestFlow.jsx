@@ -12,6 +12,13 @@ const SmartRequestFlow = () => {
   const [input, setInput] = useState('');
   const [estimate, setEstimate] = useState(null);
   
+  // New details state for proper booking
+  const [bookingDetails, setBookingDetails] = useState({
+    address: '',
+    city: '',
+    date: ''
+  });
+
   const [askConcierge, { isLoading }] = useAskConciergeMutation();
   const [createRequest, { isLoading: isCreating }] = useCreateServiceRequestMutation();
   const [submitRequest] = useSubmitServiceRequestMutation();
@@ -62,15 +69,19 @@ const SmartRequestFlow = () => {
         description: estimate.technicalBrief,
         urgency: estimate.urgency || 'NORMAL',
         location: {
-          addressLine1: 'To be provided',
-          city: 'To be provided',
-          state: 'To be provided',
+          addressLine1: bookingDetails.address || 'Address pending',
+          city: bookingDetails.city || 'City pending',
+          state: 'State pending',
           postalCode: '000000',
-          serviceArea: 'General'
+          serviceArea: bookingDetails.city || 'General'
         },
         preferredSchedule: {
-          startAt: new Date(Date.now() + 86400000).toISOString(),
-          endAt: new Date(Date.now() + 86400000 + 7200000).toISOString()
+          startAt: bookingDetails.date 
+            ? new Date(bookingDetails.date).toISOString() 
+            : new Date(Date.now() + 86400000).toISOString(),
+          endAt: bookingDetails.date 
+            ? new Date(new Date(bookingDetails.date).getTime() + 7200000).toISOString()
+            : new Date(Date.now() + 86400000 + 7200000).toISOString()
         }
       };
       
@@ -122,8 +133,42 @@ const SmartRequestFlow = () => {
             <div className={styles.estimateBody}>
               <strong>Diagnosis:</strong> {estimate.technicalBrief}
             </div>
-            <button onClick={handleBook} disabled={isCreating} className={styles.bookButton}>
-              {isCreating ? 'Booking...' : 'Book This Service'}
+            
+            <div className={styles.detailsForm}>
+              <p style={{ margin: 'var(--space-4) 0 var(--space-2) 0', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+                Please provide a few more details to finalize:
+              </p>
+              <input 
+                type="text" 
+                placeholder="Street Address (e.g. 123 Main St)" 
+                className={styles.inputField} 
+                style={{ marginBottom: '8px' }}
+                value={bookingDetails.address}
+                onChange={e => setBookingDetails({...bookingDetails, address: e.target.value})}
+              />
+              <input 
+                type="text" 
+                placeholder="City" 
+                className={styles.inputField} 
+                style={{ marginBottom: '8px' }}
+                value={bookingDetails.city}
+                onChange={e => setBookingDetails({...bookingDetails, city: e.target.value})}
+              />
+              <input 
+                type="date" 
+                className={styles.inputField} 
+                style={{ marginBottom: '16px' }}
+                value={bookingDetails.date}
+                onChange={e => setBookingDetails({...bookingDetails, date: e.target.value})}
+              />
+            </div>
+
+            <button 
+              onClick={handleBook} 
+              disabled={isCreating || !bookingDetails.address || !bookingDetails.city || !bookingDetails.date} 
+              className={styles.bookButton}
+            >
+              {isCreating ? 'Booking...' : 'Confirm & Book Service'}
             </button>
           </div>
         )}
