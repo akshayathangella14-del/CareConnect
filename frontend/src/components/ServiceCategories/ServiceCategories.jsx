@@ -12,7 +12,7 @@ const categoryImageMap = {
   'refrigerator-repair': '/images/categories/refrigerator-repair.jpg',
   electrical: '/images/categories/electrical.jpg',
   cleaning: '/images/categories/cleaning.jpg',
-  painting: '/images/categories/paining.jpg',
+  painting: '/images/categories/painting.jpg',
   carpenter: '/images/categories/carpenter.jpg',
   'pest-control': '/images/categories/pest-control.jpg',
 };

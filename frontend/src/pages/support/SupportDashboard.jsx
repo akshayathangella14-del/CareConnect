@@ -140,7 +140,7 @@ export default function SupportDashboard() {
         <div className={styles.recentActivityGrid}>
           <div className={styles.activityCard}>
             <div className={styles.activityLabel}>Satisfaction</div>
-            <div className={styles.activityValue}>{Number(stats?.averageRating || 4.8).toFixed(1)}/5</div>
+            <div className={styles.activityValue}>{stats?.averageRating ? `${Number(stats.averageRating).toFixed(1)}/5` : 'No ratings yet'}</div>
           </div>
           <div className={styles.activityCard}>
             <div className={styles.activityLabel}>Billing follow-up</div>
