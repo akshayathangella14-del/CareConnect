@@ -29,9 +29,28 @@ const keywordMap = [
   { keyword: 'window', problemType: 'Window Glass or Frame Repair', urgency: 'NORMAL' },
   { keyword: 'mesh', problemType: 'Mosquito Mesh Installation or Repair', urgency: 'NORMAL' },
   { keyword: 'paint', problemType: 'Wall Painting or Touch-up Work', urgency: 'NORMAL' },
+  { keyword: 'painting', problemType: 'Wall Painting or Touch-up Work', urgency: 'NORMAL' },
+  { keyword: 'wall paint', problemType: 'Wall Painting or Touch-up Work', urgency: 'NORMAL' },
+  { keyword: 'interior paint', problemType: 'Interior Wall Painting', urgency: 'NORMAL' },
+  { keyword: 'exterior paint', problemType: 'Exterior Wall Painting', urgency: 'NORMAL' },
+  { keyword: 'touch-up', problemType: 'Wall Touch-up Work', urgency: 'NORMAL' },
+  { keyword: 'color', problemType: 'Wall Painting or Color Change', urgency: 'NORMAL' },
+  { keyword: 'finish', problemType: 'Surface Finishing', urgency: 'NORMAL' },
   { keyword: 'carpenter', problemType: 'Furniture Assembly or Repair', urgency: 'NORMAL' },
   { keyword: 'plumber', problemType: 'General Plumbing Repair or Installation', urgency: 'HIGH' },
   { keyword: 'electrician', problemType: 'General Electrical Repair or Installation', urgency: 'HIGH' },
+  { keyword: 'wire', problemType: 'Electrical Wiring Issue', urgency: 'HIGH' },
+  { keyword: 'socket', problemType: 'Electrical Socket Repair', urgency: 'NORMAL' },
+  { keyword: 'light', problemType: 'Lighting Repair or Installation', urgency: 'NORMAL' },
+  { keyword: 'fuse', problemType: 'Electrical Fuse Replacement', urgency: 'HIGH' },
+  { keyword: 'circuit', problemType: 'Circuit Breaker Repair', urgency: 'EMERGENCY' },
+  { keyword: 'drain', problemType: 'Drain Unblocking', urgency: 'HIGH' },
+  { keyword: 'toilet', problemType: 'Toilet Repair', urgency: 'HIGH' },
+  { keyword: 'compressor', problemType: 'AC Compressor Repair', urgency: 'HIGH' },
+  { keyword: 'thermostat', problemType: 'Thermostat Repair', urgency: 'NORMAL' },
+  { keyword: 'washing machine', problemType: 'Washing Machine Repair', urgency: 'NORMAL' },
+  { keyword: 'deep', problemType: 'Deep Cleaning Service', urgency: 'NORMAL' },
+  { keyword: 'carpet', problemType: 'Carpet Cleaning', urgency: 'NORMAL' },
   { keyword: 'cleaning', problemType: 'Deep House Cleaning or Bathroom Cleaning', urgency: 'NORMAL' },
   { keyword: 'sofa', problemType: 'Sofa Cleaning or Shampooing', urgency: 'NORMAL' },
   { keyword: 'pest', problemType: 'Pest Control Service', urgency: 'HIGH' },
@@ -51,6 +70,12 @@ const calculateConfidenceScore = (serviceRequest, parsed, matchedCategory, match
 
   // Category Match (0-0.3)
   if (matchedCategory) score += 0.3;
+
+  // Category Selection Bonus (0.2)
+  if (serviceRequest.category && matchedCategory && 
+      serviceRequest.category.toString() === matchedCategory._id.toString()) {
+    score += 0.2;
+  }
 
   // Skills Identification (0-0.2)
   if (matchedSkillIds && matchedSkillIds.length > 0) score += 0.2;
@@ -102,8 +127,15 @@ const detectMissingInformation = (serviceRequest, parsed) => {
 const runFallbackAnalysis = async (serviceRequest, categories, skills) => {
   const text = `${serviceRequest.title} ${serviceRequest.description}`.toLowerCase();
 
-  const matchedCategory = categories.find((c) => includes(text, c.name));
-  const matchedSkills = skills.filter((s) => includes(text, s.name)).slice(0, 5);
+  // PRIORITIZE USER'S SELECTED CATEGORY
+  const selectedCategory = categories.find(c => c._id.toString() === serviceRequest.category?.toString());
+  const matchedCategory = selectedCategory || categories.find((c) => includes(text, c.name));
+  
+  // Only match skills within the selected category
+  const categorySkills = skills.filter(s => 
+    !selectedCategory || s.category?.toString() === selectedCategory._id.toString()
+  );
+  const matchedSkills = categorySkills.filter((s) => includes(text, s.name)).slice(0, 5);
   const keyword = keywordMap.find((entry) => includes(text, entry.keyword));
 
   let specificDiagnostic = '';
@@ -153,16 +185,22 @@ const analyzeServiceRequest = async (serviceRequest) => {
     const ai = new GoogleGenAI({ apiKey: env.gemini.apiKey });
     const modelName = env.gemini.model || 'gemini-2.5-flash';
 
+    const selectedCategory = categories.find(c => c._id.toString() === serviceRequest.category?.toString());
+    const selectedCategoryName = selectedCategory?.name || '';
+
     const categoryNames = categories.map((c) => c.name);
     const skillNames = skills.map((s) => s.name);
 
     const promptText = `You are CareConnect AI. Analyze this home service request and generate a structured JSON diagnosis for the customer and service providers.
+
+IMPORTANT: The user has explicitly selected the category: "${selectedCategoryName}". You MUST analyze within this category context. DO NOT change the category.
 
 Categories available: ${JSON.stringify(categoryNames)}
 Skills available: ${JSON.stringify(skillNames)}
 
 User Request Title: ${serviceRequest.title}
 User Description: ${serviceRequest.description}
+User Selected Category: ${selectedCategoryName}
 Attached Images Count: ${serviceRequest.attachments?.length || 0}
 
 Output strictly valid JSON with this exact schema:
@@ -207,9 +245,21 @@ Output strictly valid JSON with this exact schema:
     });
 
     const parsed = JSON.parse(response.text?.trim() || '{}');
-    const matchedCategory = categories.find((c) => c.name.toLowerCase() === String(parsed.categoryName).toLowerCase());
+    
+    let matchedCategory = categories.find((c) => c.name.toLowerCase() === String(parsed.categoryName).toLowerCase());
+    const categoryMismatch = serviceRequest.category && matchedCategory && 
+      serviceRequest.category.toString() !== matchedCategory._id.toString();
 
-    const matchedSkillIds = skills
+    if (categoryMismatch) {
+      console.warn('AI returned different category than user selected');
+      // Force use user's selected category
+      matchedCategory = categories.find(c => c._id.toString() === serviceRequest.category.toString());
+    }
+
+    const categorySkills = skills.filter(s => 
+      !matchedCategory || s.category?.toString() === matchedCategory._id.toString()
+    );
+    const matchedSkillIds = categorySkills
       .filter((s) => (parsed.matchedSkills || []).some((ms) => ms.toLowerCase() === s.name.toLowerCase()))
       .map((s) => s._id);
 
@@ -259,17 +309,23 @@ const reanalyzeAfterCorrection = async (originalUnderstanding, customerCorrectio
     const ai = new GoogleGenAI({ apiKey: env.gemini.apiKey });
     const modelName = env.gemini.model || 'gemini-2.5-flash';
 
+    const selectedCategory = categories.find(c => c._id.toString() === serviceRequest.category?.toString());
+    const selectedCategoryName = selectedCategory?.name || '';
+
     const categoryNames = categories.map((c) => c.name);
     const skillNames = skills.map((s) => s.name);
 
     const promptText = `You are CareConnect AI. You previously analyzed a home service request. The customer has provided corrections/additional information.
 Re-analyze and generate a structured JSON diagnosis.
 
+IMPORTANT: The user's selected category is: "${selectedCategoryName}". You MUST analyze within this category context. DO NOT change the category.
+
 Categories available: ${JSON.stringify(categoryNames)}
 Skills available: ${JSON.stringify(skillNames)}
 
 Original Request Title: ${serviceRequest?.title || 'Unknown'}
 Original Description: ${serviceRequest?.description || 'Unknown'}
+User Selected Category: ${selectedCategoryName}
 CUSTOMER CORRECTIONS / ADDITIONAL INFO: ${customerCorrection}
 
 Output strictly valid JSON with this exact schema:
@@ -294,8 +350,19 @@ Output strictly valid JSON with this exact schema:
     });
 
     const parsed = JSON.parse(response.text?.trim() || '{}');
-    const matchedCategory = categories.find((c) => c.name.toLowerCase() === String(parsed.categoryName).toLowerCase());
-    const matchedSkillIds = skills
+    let matchedCategory = categories.find((c) => c.name.toLowerCase() === String(parsed.categoryName).toLowerCase());
+    const categoryMismatch = serviceRequest.category && matchedCategory && 
+      serviceRequest.category.toString() !== matchedCategory._id.toString();
+
+    if (categoryMismatch) {
+      console.warn('AI returned different category than user selected');
+      matchedCategory = categories.find(c => c._id.toString() === serviceRequest.category.toString());
+    }
+
+    const categorySkills = skills.filter(s => 
+      !matchedCategory || s.category?.toString() === matchedCategory._id.toString()
+    );
+    const matchedSkillIds = categorySkills
       .filter((s) => (parsed.matchedSkills || []).some((ms) => ms.toLowerCase() === s.name.toLowerCase()))
       .map((s) => s._id);
 
@@ -357,6 +424,7 @@ const aiConcierge = async (conversationHistory) => {
     const systemPrompt = `You are CareConnect AI, an intelligent service concierge. 
 The user wants to book a home service (like appliance repair, plumbing, electrical).
 You need to analyze their request.
+IMPORTANT: If the user indicates a specific category context, you MUST prioritize that category. DO NOT suggest AC repair for a painting request.
 If their request is too vague to know the exact appliance or the general issue, you must ask a quick clarifying question.
 If their request has enough detail to form a technical brief and estimate, you should output the details.
 
