@@ -106,7 +106,7 @@ export default function AdminDashboard() {
             </div>
             <div className={styles.activityCard}>
               <div className={styles.activityLabel}>Trust score</div>
-              <div className={styles.activityValue}>{Number(stats?.averageRating || 4.8).toFixed(1)}/5</div>
+              <div className={styles.activityValue}>{Number(stats?.averageRating || 0).toFixed(1)}/5</div>
             </div>
           </div>
         </Card>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, CalendarClock, Sparkles, Wallet } from 'lucide-react';
 import { Card, Badge } from '@/components';
 import { selectCurrentUser } from '@/features/auth';
-import { useGetPlatformStatsQuery } from '@/features/stats';
+import { useListServiceRequestsQuery } from '@/features/serviceRequests';
 import { useListNotificationsQuery } from '@/features/notifications';
 import { useListBookingsQuery } from '@/features/bookings/bookingApi';
 import SmartRequestFlow from '@/components/SmartRequestFlow/SmartRequestFlow';
@@ -11,10 +11,11 @@ import styles from './CustomerDashboard.module.css';
 
 export default function CustomerDashboard() {
   const user = useSelector(selectCurrentUser);
-  const { data: stats } = useGetPlatformStatsQuery();
+  const { data: requests = [] } = useListServiceRequestsQuery();
   const { data: notifications = [] } = useListNotificationsQuery(undefined, { pollingInterval: 5000 });
   const { data: bookings = [] } = useListBookingsQuery();
   
+  const activeRequestsCount = requests.filter(r => !['CANCELLED', 'CLOSED', 'COMPLETED'].includes(r.status)).length;
   const pendingQuoteCount = notifications.filter((notification) => notification.type === 'QUOTE' && !notification.isRead).length;
 
   const initials = user?.name
@@ -22,10 +23,10 @@ export default function CustomerDashboard() {
     : 'CU';
 
   const metricCards = [
-    { label: 'Active requests', value: stats?.totalRequests || 0, tone: 'primary' },
+    { label: 'Active requests', value: activeRequestsCount, tone: 'primary' },
     { label: 'Quotes pending', value: pendingQuoteCount, tone: 'warning' },
-    { label: 'Upcoming bookings', value: stats?.completedBookings || 0, tone: 'success' },
-    { label: 'Avg rating', value: `${Number(stats?.averageRating || 4.8).toFixed(1)}/5`, tone: 'violet' },
+    { label: 'Upcoming bookings', value: bookings.filter(b => !['COMPLETED', 'CANCELLED'].includes(b.status)).length, tone: 'success' },
+    { label: 'Completed jobs', value: bookings.filter(b => b.status === 'COMPLETED').length, tone: 'violet' },
   ];
 
   const actionItems = [

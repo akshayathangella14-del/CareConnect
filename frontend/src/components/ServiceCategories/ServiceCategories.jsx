@@ -12,21 +12,23 @@ const categoryImageMap = {
   'refrigerator-repair': '/images/categories/refrigerator-repair.jpg',
   electrical: '/images/categories/electrical.jpg',
   cleaning: '/images/categories/cleaning.jpg',
-  painting: '/images/categories/painting.jpg',
+  painting: '/images/categories/paining.jpg',
   carpenter: '/images/categories/carpenter.jpg',
   'pest-control': '/images/categories/pest-control.jpg',
 };
 
-const FALLBACK_CATEGORIES = [
-  { _id: 'fb-1', name: 'AC Repair', slug: 'ac-repair', description: 'Expert air conditioning service & maintenance', basePrice: 499 },
-  { _id: 'fb-2', name: 'Cleaning', slug: 'cleaning', description: 'Deep home & office cleaning by experts', basePrice: 999 },
-  { _id: 'fb-3', name: 'Electrical', slug: 'electrical', description: 'Wiring, switches, and electrical repairs', basePrice: 199 },
-  { _id: 'fb-4', name: 'Plumbing', slug: 'plumbing', description: 'Leak fixing, pipe fitting & water works', basePrice: 299 },
-  { _id: 'fb-5', name: 'Painting', slug: 'painting', description: 'Wall painting, texture & home touchups', basePrice: 1499 },
-  { _id: 'fb-6', name: 'Carpenter', slug: 'carpenter', description: 'Furniture repair, fitting & wood works', basePrice: 349 },
-  { _id: 'fb-7', name: 'Pest Control', slug: 'pest-control', description: 'Termite, cockroach & complete pest treatment', basePrice: 799 },
-  { _id: 'fb-8', name: 'Refrigerator', slug: 'refrigerator-repair', description: 'Fridge repair, gas refill & compressor fix', basePrice: 399 },
+const DEFAULT_CATEGORIES = [
+  { _id: 'cat-1', name: 'Cleaning', slug: 'cleaning', description: 'Deep home & office cleaning by experts', basePrice: 999 },
+  { _id: 'cat-2', name: 'Electrical', slug: 'electrical', description: 'Wiring, switches, and electrical repairs', basePrice: 199 },
+  { _id: 'cat-3', name: 'Plumbing', slug: 'plumbing', description: 'Leak fixing, pipe fitting & water works', basePrice: 299 },
+  { _id: 'cat-4', name: 'Painting', slug: 'painting', description: 'Wall painting, texture & home touchups', basePrice: 1499 },
+  { _id: 'cat-5', name: 'Carpenter', slug: 'carpenter', description: 'Furniture repair, fitting & wood works', basePrice: 349 },
+  { _id: 'cat-6', name: 'AC Repair', slug: 'ac-repair', description: 'Expert air conditioning service & maintenance', basePrice: 499 },
+  { _id: 'cat-7', name: 'Pest Control', slug: 'pest-control', description: 'Termite, cockroach & complete pest treatment', basePrice: 799 },
+  { _id: 'cat-8', name: 'Refrigerator', slug: 'refrigerator-repair', description: 'Fridge repair, gas refill & compressor fix', basePrice: 399 },
 ];
+
+
 
 export default function ServiceCategories() {
   const scroller = useRef(null);
@@ -34,7 +36,7 @@ export default function ServiceCategories() {
   const query = new URLSearchParams(location.search).get('q')?.toLowerCase() || '';
   const { data: apiCategories = [], isLoading } = useListCategoriesQuery();
 
-  const categories = apiCategories.length >= 8 ? apiCategories : FALLBACK_CATEGORIES;
+  const categories = apiCategories.length > 0 ? apiCategories : DEFAULT_CATEGORIES;
 
   useEffect(() => {
     if (!query || !scroller.current || categories.length === 0) return;
@@ -66,6 +68,12 @@ export default function ServiceCategories() {
     );
   }
 
+  const displayCategories = categories.length >= 8 ? categories : [...categories, ...DEFAULT_CATEGORIES.filter(dc => !categories.some(c => c.slug === dc.slug || c.name.toLowerCase() === dc.name.toLowerCase()))].slice(0, 8);
+
+  if (displayCategories.length === 0) {
+    return null;
+  }
+
   return (
     <section id="services" className={styles.section}>
       <div className={styles.head}>
@@ -83,7 +91,7 @@ export default function ServiceCategories() {
         </div>
       </div>
       <div className={styles.track} ref={scroller}>
-        {categories.map((cat, index) => {
+        {displayCategories.map((cat, index) => {
           const slug = cat.slug || cat.name?.toLowerCase().replace(/\s+/g, '-');
           const image = cat.image || categoryImageMap[slug] || '/images/categories/plumbing.jpg';
           const priceText = cat.basePrice ? `From ₹${cat.basePrice}` : 'Flexible pricing';

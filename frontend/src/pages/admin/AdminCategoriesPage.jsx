@@ -9,8 +9,14 @@ export default function AdminCategoriesPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', slug: '', description: '' });
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleCreate = async () => {
+    setErrorMsg('');
+    if (!formData.name) {
+      setErrorMsg('Category name is required.');
+      return;
+    }
     try {
       // Generate slug from name if not provided
       const slug = formData.slug || formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
@@ -19,6 +25,7 @@ export default function AdminCategoriesPage() {
       setFormData({ name: '', slug: '', description: '' });
     } catch (err) {
       console.error('Failed to create category:', err);
+      setErrorMsg(err?.data?.error?.message || err?.data?.message || 'Failed to create category');
     }
   };
 
@@ -84,6 +91,7 @@ export default function AdminCategoriesPage() {
         }
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+          {errorMsg && <Alert variant="error" title="Creation Failed">{errorMsg}</Alert>}
           <Input
             label="Category Name"
             value={formData.name}

@@ -1,13 +1,40 @@
 import { Card, Badge } from '@/components';
 import { ShieldCheck, Star, BriefcaseBusiness } from 'lucide-react';
-
-const providers = [
-  { name: 'CareCraft Home Services', rating: '4.9', verification: 'Verified', jobs: '132' },
-  { name: 'PrimeFix Solutions', rating: '4.7', verification: 'Under review', jobs: '81' },
-  { name: 'UrbanCare Maintenance', rating: '4.8', verification: 'Verified', jobs: '93' },
-];
+import { useListProvidersQuery } from '@/features/providers';
+import { DataTable, EmptyState } from '@/components';
 
 export default function AdminProvidersPage() {
+  const { data: providers = [], isLoading } = useListProvidersQuery();
+  
+  const verifiedCount = providers.filter(p => p.verificationStatus === 'VERIFIED').length;
+  const pendingCount = providers.filter(p => p.verificationStatus === 'PENDING').length;
+  
+  const avgRatingRaw = providers.reduce((acc, p) => acc + (p.ratingSummary?.averageRating || 0), 0) / (providers.length || 1);
+  const avgRating = providers.length ? avgRatingRaw.toFixed(1) : 'N/A';
+
+  const columns = [
+    {
+      header: 'Provider Name',
+      key: 'name',
+      render: (p) => <div style={{ fontWeight: 700 }}>{p.displayName}</div>,
+    },
+    {
+      header: 'Rating',
+      key: 'rating',
+      render: (p) => <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}><Star size={14} color="var(--color-warning)" /> {p.ratingSummary?.averageRating || 0}</div>,
+    },
+    {
+      header: 'Status',
+      key: 'verification',
+      render: (p) => <Badge variant={p.verificationStatus === 'VERIFIED' ? 'success' : 'warning'}>{p.verificationStatus}</Badge>,
+    },
+    {
+      header: 'Experience',
+      key: 'jobs',
+      render: (p) => <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}><ShieldCheck size={14} color="var(--color-success)" /> {p.experienceYears || 0} yrs</div>,
+    },
+  ];
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
       <div>
@@ -17,10 +44,9 @@ export default function AdminProvidersPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-4)' }}>
         {[
-          { label: 'Verified providers', value: '342' },
-          { label: 'Pending verification', value: '19' },
-          { label: 'Avg rating', value: '4.8/5' },
-          { label: 'Completion rate', value: '92%' },
+          { label: 'Verified providers', value: verifiedCount },
+          { label: 'Pending verification', value: pendingCount },
+          { label: 'Avg rating', value: avgRating },
         ].map((item) => (
           <Card key={item.label} padding="md">
             <div style={{ fontSize: 'var(--font-size-small)', color: 'var(--color-text-secondary)' }}>{item.label}</div>
@@ -34,16 +60,14 @@ export default function AdminProvidersPage() {
           <BriefcaseBusiness size={18} color="var(--color-primary)" />
           <h3 style={{ margin: 0 }}>Provider roster</h3>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          {providers.map((provider) => (
-            <div key={provider.name} style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.8fr 1fr 0.8fr', gap: 'var(--space-3)', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
-              <div style={{ fontWeight: 700 }}>{provider.name}</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}><Star size={14} color="var(--color-warning)" /> {provider.rating}</div>
-              <div><Badge variant={provider.verification === 'Verified' ? 'success' : 'warning'}>{provider.verification}</Badge></div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}><ShieldCheck size={14} color="var(--color-success)" /> {provider.jobs} jobs</div>
-            </div>
-          ))}
-        </div>
+        
+        {isLoading ? (
+          <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading providers...</div>
+        ) : providers.length === 0 ? (
+          <EmptyState title="No providers found" description="There are no providers in the system yet." />
+        ) : (
+          <DataTable columns={columns} data={providers} keyField="_id" />
+        )}
       </Card>
     </div>
   );

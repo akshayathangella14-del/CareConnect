@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '@/features/auth';
 import { useListInvoicesQuery } from '@/features/invoices';
 import { Card, Button, StatusBadge, DataTable, EmptyState, PaymentModal } from '@/components';
 import { Receipt, Download } from 'lucide-react';
 
 export default function InvoicesPage() {
+  const user = useSelector(selectCurrentUser);
   const { data: invoices = [], isLoading, isFetching } = useListInvoicesQuery();
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
@@ -62,7 +65,7 @@ export default function InvoicesPage() {
       key: 'action',
       render: (inv) => (
         <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
-          {inv.status !== 'PAID' && (
+          {inv.status !== 'PAID' && user?.role === 'CUSTOMER' && (
             <Button size="sm" variant="primary" onClick={() => setSelectedInvoice(inv)}>
               Pay Now
             </Button>
@@ -92,9 +95,9 @@ export default function InvoicesPage() {
             gap: 'var(--space-2)',
           }}
         >
-          <Receipt size={28} color="var(--color-primary)" /> My Invoices
+          <Receipt size={28} color="var(--color-primary)" /> {user?.role === 'CUSTOMER' ? 'My Invoices' : 'Invoices'}
         </h1>
-        <p style={{ color: 'var(--color-text-secondary)' }}>View and download your billing history and receipts.</p>
+        <p style={{ color: 'var(--color-text-secondary)' }}>View and download billing history and receipts.</p>
       </div>
 
       {isLoading ? (

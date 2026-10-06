@@ -1179,6 +1179,12 @@ const disputeController = {
     ['status', 'resolution', 'assignedTo'].forEach((f) => {
       if (req.body[f] !== undefined) dispute[f] = req.body[f];
     });
+    
+    if (['RESOLVED', 'REJECTED'].includes(req.body.status) && !dispute.resolvedAt) {
+      dispute.resolvedAt = new Date();
+      dispute.resolvedBy = req.user._id;
+    }
+
     await dispute.save();
     await recordAudit({ actor: req.user, action: 'DISPUTE_UPDATED', resourceType: 'Dispute', resourceId: dispute._id });
     sendSuccess(res, 200, 'Dispute updated.', { dispute });

@@ -3,11 +3,14 @@ import { useParams } from 'react-router-dom';
 import { useGetDisputeQuery, useUpdateDisputeMutation } from '@/features/disputes';
 import { Card, Button, Alert, Tabs, Badge, Select, Input } from '@/components';
 import { Shield, MessageSquare, ShieldAlert } from 'lucide-react';
+import { useGetServiceTraceQuery } from '@/features/bookings';
+import ServiceTraceTimeline from '@/components/booking/ServiceTraceTimeline';
 
 export default function SupportDisputeDetailPage() {
   const { id } = useParams();
   const { data: dispute, isLoading, error } = useGetDisputeQuery(id);
   const [updateDispute, { isLoading: isUpdating }] = useUpdateDisputeMutation();
+  const { data: serviceTraceData, isLoading: isTraceLoading } = useGetServiceTraceQuery(dispute?.booking?._id || dispute?.booking, { skip: !dispute?.booking });
   
   const [resolutionStatus, setResolutionStatus] = useState('UNDER_REVIEW');
   const [resolution, setResolution] = useState('');
@@ -81,10 +84,16 @@ export default function SupportDisputeDetailPage() {
                   <h3 style={{ fontSize: 'var(--font-size-h4)', margin: 0 }}>ServiceTrace Audit</h3>
                 </div>
                 
-                {/* Mocking ServiceTrace items for dispute view since we don't fetch full booking here natively unless we pull it. */}
-                <Alert variant="info" title="ServiceTrace Integration">
-                  In a real scenario, this tab automatically pulls the immutable timeline from the associated Booking ({dispute.booking?._id}).
-                </Alert>
+                {/* Actual ServiceTrace implementation */}
+                {isTraceLoading ? (
+                  <div>Loading trace...</div>
+                ) : serviceTraceData ? (
+                  <ServiceTraceTimeline serviceTraceData={serviceTraceData} />
+                ) : (
+                  <Alert variant="warning" title="No ServiceTrace Available">
+                    Unable to load the ServiceTrace for this booking.
+                  </Alert>
+                )}
               </Card>
             </Tabs.Content>
 

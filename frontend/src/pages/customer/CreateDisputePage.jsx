@@ -15,14 +15,17 @@ export default function CreateDisputePage() {
     reason: 'SERVICE_QUALITY',
     description: ''
   });
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     try {
       await createDispute(formData).unwrap();
       navigate('/bookings');
     } catch (err) {
       console.error('Failed to create dispute:', err);
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to create dispute');
     }
   };
 
@@ -42,6 +45,8 @@ export default function CreateDisputePage() {
           <Alert variant="warning" title="Before opening a dispute">
             Please ensure you have attempted to resolve the issue directly with the provider first.
           </Alert>
+
+          {error && <Alert variant="error" title="Submission failed">{error}</Alert>}
 
           <Input
             label="Booking ID"

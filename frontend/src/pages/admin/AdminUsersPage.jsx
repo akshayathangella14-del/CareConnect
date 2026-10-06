@@ -1,12 +1,7 @@
 import { Card, Badge } from '@/components';
 import { UserRound, ShieldCheck, Activity, Search } from 'lucide-react';
 
-const users = [
-  { name: 'Aisha Rahman', role: 'Customer', status: 'Active', activity: '2h ago' },
-  { name: 'Ravi Mehta', role: 'Service Provider', status: 'Verified', activity: '14m ago' },
-  { name: 'Samira Khan', role: 'Support Agent', status: 'Active', activity: '1d ago' },
-  { name: 'Daniel Jones', role: 'Operations Manager', status: 'Active', activity: '2d ago' },
-];
+import { EmptyState } from '@/components';
 
 export default function AdminUsersPage() {
   return (
@@ -41,16 +36,7 @@ export default function AdminUsersPage() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          {users.map((user) => (
-            <div key={user.name} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 0.8fr 0.8fr', gap: 'var(--space-3)', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
-              <div style={{ fontWeight: 700 }}>{user.name}</div>
-              <div>{user.role}</div>
-              <div><Badge variant={user.status === 'Verified' ? 'success' : 'primary'}>{user.status}</Badge></div>
-              <div style={{ color: 'var(--color-text-secondary)' }}>{user.activity}</div>
-            </div>
-          ))}
-        </div>
+        <EmptyState title="User Management Not Implemented" description="The backend API for platform-wide user management is not yet available." />
       </Card>
     </div>
   );

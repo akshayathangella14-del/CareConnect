@@ -293,8 +293,6 @@ export default function ServiceRequestDetailPage() {
                 </Link>
               </div>
 
-              {quoteError && <Alert variant="error" title="Quote could not be accepted" style={{ marginTop: 'var(--space-4)' }}>{quoteError}</Alert>}
-              {quoteSuccess && <Alert variant="success" title="Booking created" style={{ marginTop: 'var(--space-4)' }}>{quoteSuccess}</Alert>}
               {scheduleSuccess && <Alert variant="success" title="Schedule saved" style={{ marginTop: 'var(--space-4)' }}>{scheduleSuccess}</Alert>}
 
               {!request.preferredSchedule?.startAt && (

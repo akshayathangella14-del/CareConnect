@@ -1,14 +1,38 @@
 import { Card, Badge } from '@/components';
 import { Tags, Pencil, Plus } from 'lucide-react';
 
-const pricingRules = [
-  { category: 'Plumbing', pricing: 'Base + emergency multiplier', status: 'Live' },
-  { category: 'Electrical', pricing: 'Time-and-material', status: 'Live' },
-  { category: 'Cleaning', pricing: 'Flat-rate visit pricing', status: 'Draft' },
-  { category: 'Appliance repair', pricing: 'Skill-based surcharge', status: 'Live' },
-];
+import { useListPricingRulesQuery } from '@/features/pricing';
+import { DataTable, EmptyState } from '@/components';
 
 export default function AdminPricingPage() {
+  const { data: pricingRules = [], isLoading } = useListPricingRulesQuery();
+
+  const columns = [
+    {
+      header: 'Category',
+      key: 'category',
+      render: (rule) => <div style={{ fontWeight: 700 }}>{rule.category?.name || 'Unknown'}</div>,
+    },
+    {
+      header: 'Pricing Logic',
+      key: 'pricing',
+      render: (rule) => <div>Base: ₹{rule.basePrice || 0} / hr</div>,
+    },
+    {
+      header: 'Status',
+      key: 'status',
+      render: (rule) => <Badge variant={rule.isActive ? 'success' : 'warning'}>{rule.isActive ? 'Live' : 'Draft'}</Badge>,
+    },
+    {
+      header: 'Actions',
+      key: 'actions',
+      render: () => (
+        <button type="button" style={{ border: 'none', background: 'transparent', color: 'var(--color-primary)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          <Pencil size={14} /> Edit
+        </button>
+      )
+    },
+  ];
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
       <div>
@@ -27,18 +51,13 @@ export default function AdminPricingPage() {
           </button>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-          {pricingRules.map((rule) => (
-            <div key={rule.category} style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.4fr 0.7fr auto', gap: 'var(--space-3)', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)', background: 'var(--color-surface-muted)' }}>
-              <div style={{ fontWeight: 700 }}>{rule.category}</div>
-              <div>{rule.pricing}</div>
-              <div><Badge variant={rule.status === 'Live' ? 'success' : 'warning'}>{rule.status}</Badge></div>
-              <button type="button" style={{ border: 'none', background: 'transparent', color: 'var(--color-primary)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-                <Pencil size={14} /> Edit
-              </button>
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading pricing rules...</div>
+        ) : pricingRules.length === 0 ? (
+          <EmptyState title="No pricing rules" description="Create a pricing rule to govern category rates." />
+        ) : (
+          <DataTable columns={columns} data={pricingRules} keyField="_id" />
+        )}
       </Card>
     </div>
   );

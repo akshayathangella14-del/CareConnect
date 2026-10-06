@@ -15,9 +15,11 @@ export default function CreateReviewPage() {
     rating: 5,
     comment: ''
   });
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     if (!bookingId) return;
 
     try {
@@ -25,6 +27,7 @@ export default function CreateReviewPage() {
       navigate('/bookings');
     } catch (err) {
       console.error('Failed to submit review:', err);
+      setError(err?.data?.error?.message || err?.data?.message || 'Failed to submit review');
     }
   };
 
@@ -43,7 +46,12 @@ export default function CreateReviewPage() {
             Open this review form from a completed booking so the booking can be attached.
           </Alert>
         )}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+        {error && (
+          <Alert variant="error" title="Could not submit review">
+            {error}
+          </Alert>
+        )}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', marginTop: error || !bookingId ? 'var(--space-4)' : 0 }}>
           <div>
             <label style={{ display: 'block', fontSize: 'var(--font-size-small)', fontWeight: 500, marginBottom: 'var(--space-2)' }}>
               Rating

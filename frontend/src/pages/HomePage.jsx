@@ -32,7 +32,7 @@ function HomePage() {
   const [prosRef, prosInView] = useInView();
   const [whyRef, whyInView] = useInView();
 
-  const ratingText = stats?.averageRating != null ? Number(stats.averageRating).toFixed(1) : '4.9';
+  const ratingText = stats?.averageRating ? Number(stats.averageRating).toFixed(1) : '0.0';
   const completedJobs = stats?.completedBookings || 0;
 
   return (
@@ -78,7 +78,7 @@ function HomePage() {
             <img src="/images/categories/electrical.jpg" alt="Verified electrician at work" className={styles.prosImg1} loading="lazy" />
             <img src="/images/categories/plumbing.jpg" alt="Verified plumber at work" className={styles.prosImg2} loading="lazy" />
             <div className={styles.prosStatChip}>
-              <strong>4.9★</strong>
+              <strong>{ratingText}★</strong>
               <span>avg. rating</span>
             </div>
           </div>
