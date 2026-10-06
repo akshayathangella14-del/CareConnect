@@ -1,18 +1,18 @@
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BriefcaseBusiness, CalendarRange, Star, TrendingUp } from 'lucide-react';
-import { Card, Badge } from '@/components';
+import { Card, Badge, Alert } from '@/components';
 import { selectCurrentUser } from '@/features/auth';
-import { useGetPlatformStatsQuery } from '@/features/stats';
 import { useListBookingsQuery } from '@/features/bookings/bookingApi';
 import { useListQuotesQuery } from '@/features/quotes/quoteApi';
+import { useGetMeProviderQuery } from '@/features/providers/providerApi';
 import styles from './ProviderDashboard.module.css';
 
 export default function ProviderDashboard() {
   const user = useSelector(selectCurrentUser);
-  const { data: stats } = useGetPlatformStatsQuery();
   const { data: bookings = [] } = useListBookingsQuery();
   const { data: quotes = [] } = useListQuotesQuery();
+  const { data: providerProfile } = useGetMeProviderQuery();
 
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -46,7 +46,7 @@ export default function ProviderDashboard() {
     { label: 'Pending jobs', value: pendingJobs, tone: 'primary' },
     { label: 'Quotes sent', value: quotesSent, tone: 'warning' },
     { label: 'Quote acceptance', value: `${quoteAcceptanceRate}%`, tone: 'success' },
-    { label: 'Avg rating', value: `${Number(stats?.averageRating || 4.8).toFixed(1)}/5`, tone: 'violet' },
+    { label: 'Avg rating', value: providerProfile?.ratingSummary?.averageRating ? `${providerProfile.ratingSummary.averageRating.toFixed(1)}/5` : 'N/A', tone: 'violet' },
   ];
 
   const actions = [
@@ -58,6 +58,12 @@ export default function ProviderDashboard() {
 
   return (
     <div className={styles.dashboard}>
+      {providerProfile && providerProfile.verificationStatus !== 'VERIFIED' && (
+        <Alert variant="warning" title="Profile Not Verified">
+          Your profile is currently {providerProfile.verificationStatus}. You will not receive any matched service requests until your profile is verified. Please ensure all your details, skills, and service areas are complete.
+        </Alert>
+      )}
+
       <Card padding="lg">
         <div className={styles.welcomeCard}>
           <div className={styles.welcomeProfile}>
@@ -136,11 +142,11 @@ export default function ProviderDashboard() {
         <div className={styles.recentActivityGrid}>
           <div className={styles.activityCard}>
             <div className={styles.activityLabel}>Verified status</div>
-            <div className={styles.activityValue}>Background check active</div>
+            <div className={styles.activityValue}>{providerProfile?.verificationStatus === 'VERIFIED' ? 'Background check active' : (providerProfile?.verificationStatus || 'Pending')}</div>
           </div>
           <div className={styles.activityCard}>
             <div className={styles.activityLabel}>Customer trust</div>
-            <div className={styles.activityValue}>{Number(stats?.averageRating || 4.8).toFixed(1)}/5 average</div>
+            <div className={styles.activityValue}>{providerProfile?.ratingSummary?.averageRating ? `${providerProfile.ratingSummary.averageRating.toFixed(1)}/5 average` : 'No ratings yet'}</div>
           </div>
           <div className={styles.activityCard}>
             <div className={styles.activityLabel}>Quote acceptance</div>

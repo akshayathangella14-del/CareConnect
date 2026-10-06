@@ -1,17 +1,22 @@
 const Notification = require('../models/Notification');
+const realtimeHub = require('../realtime/realtime.hub');
 
 const createNotification = async ({ recipient, type, title, message, resourceType, resourceId }) => {
   if (!recipient) {
     return null;
   }
 
-  return Notification.create({
+  const notification = await Notification.create({
     recipient,
     type,
     title,
     message,
     relatedResource: resourceType && resourceId ? { resourceType, resourceId } : undefined,
   });
+  
+  realtimeHub.emitToUser(recipient, 'notification', notification);
+  
+  return notification;
 };
 
 const notifyMany = async (notifications) => {

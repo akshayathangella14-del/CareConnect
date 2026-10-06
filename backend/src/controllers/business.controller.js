@@ -25,6 +25,7 @@ const { createNotification } = require('../services/notification.service');
 const { analyzeServiceRequest, summarizeDispute, reanalyzeAfterCorrection } = require('../services/ai.service');
 const { getProviderMatches } = require('../services/matching.service');
 const { assertNoAvailabilityOverlap, assertNoBookingConflict } = require('../services/availability.service');
+const realtimeHub = require('../realtime/realtime.hub');
 
 const customerRoles = ['CUSTOMER'];
 const elevatedRoles = ['ADMIN', 'OPERATIONS_MANAGER', 'SUPPORT_AGENT'];
@@ -45,7 +46,7 @@ const scopedServiceRequestQuery = async (user, query = {}) => {
     
     try {
       const provider = await getOwnProviderProfile(user);
-      if (provider && provider.skills && provider.skills.length > 0) {
+      if (provider && provider.verificationStatus === 'VERIFIED' && provider.skills && provider.skills.length > 0) {
         await provider.populate('skills');
         const categoryIds = provider.skills.map(skill => skill.category).filter(Boolean);
         const uniqueCategoryIds = [...new Set(categoryIds.map(id => id.toString()))];
@@ -53,8 +54,8 @@ const scopedServiceRequestQuery = async (user, query = {}) => {
         if (uniqueCategoryIds.length > 0) {
           query.category = { $in: uniqueCategoryIds };
         }
-      } else if (provider) {
-         // If provider has no skills, they shouldn't see any jobs
+      } else {
+         // If provider is not verified or has no skills, they shouldn't see any jobs
          query._id = null;
       }
     } catch (err) {
@@ -185,6 +186,8 @@ const serviceRequestController = {
       resourceId: serviceRequest._id,
     });
 
+    realtimeHub.emitToUser(req.user._id, 'invalidate', { tags: ['ServiceRequest'] });
+
     sendSuccess(res, 201, 'Service request created.', { serviceRequest });
   }),
 
@@ -224,6 +227,9 @@ const serviceRequestController = {
       resourceType: 'ServiceRequest',
       resourceId: serviceRequest._id,
     });
+
+    realtimeHub.emitToUser(req.user._id, 'invalidate', { tags: ['ServiceRequest'] });
+    realtimeHub.emitToRoles(['ADMIN', 'OPERATIONS_MANAGER'], 'invalidate', { tags: ['ServiceRequest'] });
 
     sendSuccess(res, 200, 'Service request submitted successfully.', { serviceRequest });
   }),
@@ -270,6 +276,9 @@ const serviceRequestController = {
       if (req.body[field] !== undefined) serviceRequest[field] = req.body[field];
     });
     await serviceRequest.save();
+    
+    realtimeHub.emitToUser(req.user._id, 'invalidate', { tags: ['ServiceRequest'] });
+    
     sendSuccess(res, 200, 'Service request updated.', { serviceRequest });
   }),
 
@@ -305,6 +314,10 @@ const serviceRequestController = {
     serviceRequest.status = ['MANUAL_REVIEW', 'AI_REVIEW'].includes(serviceRequest.status) ? 'MATCHING' : serviceRequest.status;
     await serviceRequest.save();
     await recordAudit({ actor: req.user, action: 'SERVICE_REQUEST_UNDERSTANDING_CONFIRMED', resourceType: 'ServiceRequest', resourceId: serviceRequest._id });
+    
+    realtimeHub.emitToUser(req.user._id, 'invalidate', { tags: ['ServiceRequest'] });
+    realtimeHub.emitToRoles('SERVICE_PROVIDER', 'invalidate', { tags: ['ServiceRequest'] });
+
     sendSuccess(res, 200, 'Service request understanding updated.', { serviceRequest });
   }),
 };
@@ -558,6 +571,10 @@ const quoteController = {
       });
     }
     await recordAudit({ actor: req.user, action: 'QUOTE_CREATED', resourceType: 'Quote', resourceId: quote._id });
+
+    realtimeHub.emitToUser(serviceRequest.customer, 'invalidate', { tags: ['Quote', 'ServiceRequest'] });
+    realtimeHub.emitToUser(req.user._id, 'invalidate', { tags: ['Quote'] });
+
     sendSuccess(res, 201, 'Quote created.', { quote });
   }),
   listForRequest: asyncHandler(async (req, res) => {
@@ -658,6 +675,10 @@ const quoteController = {
     });
 
     await recordAudit({ actor: req.user, action: 'QUOTE_ACCEPTED_BOOKING_CREATED', resourceType: 'Quote', resourceId: quote._id });
+    
+    realtimeHub.emitToUser(req.user._id, 'invalidate', { tags: ['Quote', 'Booking', 'ServiceRequest'] });
+    realtimeHub.emitToUser(provider.user._id, 'invalidate', { tags: ['Quote', 'Booking'] });
+    
     sendSuccess(res, 200, 'Quote accepted. Booking created.', { quote, booking });
   }),
   requestChanges: asyncHandler(async (req, res) => {
@@ -760,6 +781,14 @@ const bookingController = {
     if (!transition.from.includes(booking.status)) {
       throw AppError.conflict(`Cannot transition from ${booking.status} to ${transition.to}.`);
     }
+
+    if (transitionName === 'requestCompletion') {
+      const completionEvidence = booking.evidence?.find(e => e.type === 'COMPLETION');
+      if (!completionEvidence) {
+        throw AppError.conflict('Completion evidence is required before requesting completion.');
+      }
+    }
+
     booking.status = transition.to;
     booking.statusEvents.push({
       type: transition.event,
@@ -778,6 +807,10 @@ const bookingController = {
       resourceType: 'Booking',
       resourceId: booking._id,
     });
+    
+    realtimeHub.emitToUser(booking.customer, 'invalidate', { tags: ['Booking'] });
+    realtimeHub.emitToUser(req.user._id, 'invalidate', { tags: ['Booking'] });
+
     sendSuccess(res, 200, `Booking ${transition.to.toLowerCase()}.`, { booking });
   }),
   cancel: asyncHandler(async (req, res) => {
@@ -828,9 +861,19 @@ const bookingController = {
       }
     }
     
+    const evidenceType = req.body.type || 'OTHER_APPROVED_EVIDENCE';
+
+    // Validate evidence timing
+    if (evidenceType === 'COMPLETION' && !['IN_PROGRESS', 'AWAITING_CUSTOMER_CONFIRMATION'].includes(booking.status)) {
+      throw AppError.conflict('Completion evidence can only be uploaded when work is in progress.');
+    }
+    if (evidenceType === 'BEFORE_SERVICE' && !['CONFIRMED', 'PROVIDER_EN_ROUTE', 'ARRIVED'].includes(booking.status)) {
+      throw AppError.conflict('Before-service evidence must be uploaded before work begins.');
+    }
+
     const evidenceItem = {
       uploadedBy: req.user._id,
-      type: req.body.type || 'OTHER_APPROVED_EVIDENCE',
+      type: evidenceType,
       description: req.body.description || '',
       file: fileData,
       relatedScopeChangeId: req.body.relatedScopeChangeId || null,
@@ -845,6 +888,19 @@ const bookingController = {
     if (!['CONFIRMED', 'IN_PROGRESS', 'ARRIVED'].includes(booking.status)) {
       throw AppError.conflict('Scope changes can only be requested during active bookings.');
     }
+    
+    if (booking.scopeChanges.length >= 3) {
+      throw AppError.conflict('Maximum limit of 3 scope changes per booking reached.');
+    }
+    
+    if (!req.body.reason || req.body.reason.trim().length < 10) {
+      throw AppError.badRequest('A detailed justification reason (at least 10 characters) is required.');
+    }
+    
+    if (!req.body.evidenceIds || req.body.evidenceIds.length === 0) {
+      throw AppError.badRequest('You must upload and attach evidence before requesting a scope change.');
+    }
+
     const scopeChange = {
       requestedBy: req.user._id,
       reason: req.body.reason,

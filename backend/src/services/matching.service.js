@@ -27,7 +27,7 @@ const getProviderMatches = async (serviceRequest) => {
     ...(requiredSkills.length ? { skills: { $all: requiredSkills } } : {}),
   })
     .populate('user', 'name email phone status')
-    .populate('skills', 'name slug')
+    .populate('skills', 'name slug category')
     .lean();
 
   const startAt = serviceRequest.preferredSchedule?.startAt;
@@ -41,6 +41,15 @@ const getProviderMatches = async (serviceRequest) => {
 
     const areaMatch = serviceAreaMatches(provider, serviceRequest.location?.serviceArea);
     if (!areaMatch) {
+      continue;
+    }
+
+    // Verify provider has a skill matching the request's category
+    const categoryId = serviceRequest.category?.toString();
+    const hasCategorySkill = provider.skills?.some(skill => 
+      skill.category?.toString() === categoryId || skill._id?.toString() === categoryId
+    );
+    if (!hasCategorySkill) {
       continue;
     }
 
