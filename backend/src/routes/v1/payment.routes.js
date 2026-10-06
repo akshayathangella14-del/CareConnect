@@ -8,5 +8,6 @@ router.use(authenticate);
 router.get('/', paymentController.list);
 router.get('/:id', paymentController.get);
 router.post('/', paymentController.create);
+router.post('/:id/refund', paymentController.refund);
 
 module.exports = router;

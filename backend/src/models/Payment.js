@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const PAYMENT_METHODS = ['CARD', 'UPI', 'NETBANKING', 'WALLET'];
-const PAYMENT_STATUS = ['PENDING', 'SUCCEEDED', 'FAILED', 'REFUNDED'];
+const PAYMENT_STATUS = ['PENDING', 'SUCCEEDED', 'FAILED', 'PARTIALLY_REFUNDED', 'REFUNDED'];
 
 const paymentSchema = new Schema(
   {
@@ -58,6 +58,11 @@ const paymentSchema = new Schema(
     paidAt: {
       type: Date,
       default: null,
+    },
+    refundedAmount: {
+      type: Number,
+      min: 0,
+      default: 0,
     },
     metadata: {
       type: Schema.Types.Mixed,

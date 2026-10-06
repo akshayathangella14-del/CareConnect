@@ -1012,34 +1012,118 @@ const invoiceController = {
       }
     }
     
-    const invoiceText = `
-CARECONNECT INVOICE
-==================
-Invoice ID: ${invoice._id}
-Date: ${new Date(invoice.createdAt).toLocaleDateString()}
-Status: ${invoice.status}
+    const htmlReceipt = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Receipt INV-${invoice._id.toString().slice(0, 8).toUpperCase()}</title>
+  <style>
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; margin: 0; padding: 40px; background: #f9fafb; }
+    .receipt-container { max-width: 800px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px; }
+    .logo { font-size: 28px; font-weight: 800; color: #4f46e5; margin: 0; }
+    .invoice-title { font-size: 24px; color: #111827; text-align: right; margin: 0; }
+    .invoice-meta { color: #6b7280; font-size: 14px; text-align: right; margin-top: 8px; }
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #dcfce7; color: #166534; }
+    .parties { display: flex; justify-content: space-between; margin-bottom: 40px; }
+    .party-col h3 { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .party-col p { margin: 4px 0; font-size: 15px; }
+    .table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    .table th { text-align: left; padding: 12px; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-size: 13px; text-transform: uppercase; }
+    .table td { padding: 16px 12px; border-bottom: 1px solid #f3f4f6; }
+    .amount-col { text-align: right; }
+    .summary { width: 300px; margin-left: auto; }
+    .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; color: #4b5563; }
+    .summary-total { display: flex; justify-content: space-between; padding: 16px 0; font-size: 20px; font-weight: 700; color: #111827; border-top: 2px solid #e5e7eb; margin-top: 8px; }
+    .footer { margin-top: 50px; text-align: center; color: #9ca3af; font-size: 13px; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+    @media print { body { background: #fff; padding: 0; } .receipt-container { box-shadow: none; padding: 0; } }
+  </style>
+</head>
+<body onload="window.print()">
+  <div class="receipt-container">
+    <div class="header">
+      <div>
+        <h1 class="logo">CareConnect</h1>
+        <p style="color: #6b7280; margin-top: 4px; font-size: 14px;">Professional Home Services</p>
+      </div>
+      <div>
+        <h2 class="invoice-title">RECEIPT</h2>
+        <div class="invoice-meta">
+          <p style="margin: 4px 0;"><strong>Invoice Number:</strong> ${invoice.invoiceNumber || 'INV-' + invoice._id.toString().slice(0, 8).toUpperCase()}</p>
+          <p style="margin: 4px 0;"><strong>Date:</strong> ${new Date(invoice.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p style="margin: 4px 0; margin-top: 12px;"><span class="status-badge">${invoice.paymentStatus === 'PAID' ? 'PAID IN FULL' : invoice.paymentStatus}</span></p>
+        </div>
+      </div>
+    </div>
 
-CUSTOMER:
-${invoice.customer.name}
-${invoice.customer.email}
-${invoice.customer.phone || ''}
+    <div class="parties">
+      <div class="party-col">
+        <h3>Billed To</h3>
+        <p><strong>${invoice.customer.name}</strong></p>
+        <p>${invoice.customer.email}</p>
+        <p>${invoice.customer.phone || ''}</p>
+      </div>
+      <div class="party-col" style="text-align: right;">
+        <h3>Service Provided By</h3>
+        <p><strong>${invoice.provider.displayName}</strong></p>
+        <p>${invoice.provider.email}</p>
+        <p>${invoice.provider.phone || ''}</p>
+      </div>
+    </div>
 
-PROVIDER:
-${invoice.provider.displayName}
-${invoice.provider.email}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="amount-col" style="width: 100px;">Qty</th>
+          <th class="amount-col" style="width: 150px;">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${(invoice.lineItems && invoice.lineItems.length > 0 ? invoice.lineItems : [{ description: 'Professional Service Charges', quantity: 1, amount: invoice.total }])
+          .map(item => `
+          <tr>
+            <td><strong>${item.description}</strong></td>
+            <td class="amount-col">${item.quantity || 1}</td>
+            <td class="amount-col">${invoice.currency || 'INR'} ${(item.amount || 0).toFixed(2)}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
 
-BOOKING REF: ${invoice.booking._id}
-AMOUNT: ${invoice.currency || 'INR'} ${invoice.total || invoice.totalAmount || 0}
+    <div class="summary">
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>${invoice.currency || 'INR'} ${(invoice.subtotal || invoice.total).toFixed(2)}</span>
+      </div>
+      ${invoice.tax ? `
+      <div class="summary-row">
+        <span>Tax</span>
+        <span>${invoice.currency || 'INR'} ${invoice.tax.toFixed(2)}</span>
+      </div>` : ''}
+      ${invoice.discount ? `
+      <div class="summary-row">
+        <span>Discount</span>
+        <span>-${invoice.currency || 'INR'} ${invoice.discount.toFixed(2)}</span>
+      </div>` : ''}
+      <div class="summary-total">
+        <span>Total Paid</span>
+        <span>${invoice.currency || 'INR'} ${invoice.total.toFixed(2)}</span>
+      </div>
+    </div>
 
-ITEMS:
-${invoice.items?.map(item => `- ${item.description}: ${item.amount}`).join('\n') || 'Service charges'}
-
-TOTAL: ${invoice.currency || 'INR'} ${invoice.total || invoice.totalAmount || 0}
+    <div class="footer">
+      <p>Thank you for using CareConnect.</p>
+      <p>If you have any questions about this receipt, please contact support@careconnect.com</p>
+    </div>
+  </div>
+</body>
+</html>
     `.trim();
-    
-    res.setHeader('Content-Type', 'text/plain');
-    res.setHeader('Content-Disposition', `attachment; filename="invoice-${invoice._id}.txt"`);
-    res.send(invoiceText);
+
+    res.setHeader('Content-Type', 'text/html');
+    res.send(htmlReceipt);
   }),
   update: asyncHandler(async (req, res) => {
     requireRole(req.user, ['ADMIN', 'OPERATIONS_MANAGER']);
@@ -1136,6 +1220,32 @@ const paymentController = {
     invoice.paidAt = new Date();
     await invoice.save();
 
+    await createNotification({
+      recipient: invoice.customer,
+      type: 'PAYMENT_SUCCESS',
+      title: 'Payment Successful',
+      message: `Your payment of ${invoice.currency} ${invoice.total} was successful. Invoice #${invoice.invoiceNumber} is now paid.`,
+      resourceType: 'Invoice',
+      resourceId: invoice._id,
+    });
+
+    await createNotification({
+      recipient: invoice.provider.user || invoice.provider,
+      type: 'PAYMENT_RECEIVED',
+      title: 'Payment Received',
+      message: `You received a payment of ${invoice.currency} ${invoice.total} for Invoice #${invoice.invoiceNumber}.`,
+      resourceType: 'Invoice',
+      resourceId: invoice._id,
+    });
+
+    realtimeHub.emitToUser(invoice.customer, 'invalidate', { tags: ['Invoice', 'Payment'] });
+    // Assuming provider user ID is stored on the provider profile object locally, or we emit to the provider's user ID.
+    // Let's ensure we get the provider's user ID.
+    const providerProfile = await ProviderProfile.findById(invoice.provider);
+    if (providerProfile) {
+      realtimeHub.emitToUser(providerProfile.user, 'invalidate', { tags: ['Invoice', 'Payment'] });
+    }
+
     await recordAudit({
       actor: req.user,
       action: 'PAYMENT_COMPLETED',
@@ -1144,6 +1254,65 @@ const paymentController = {
     });
 
     sendSuccess(res, 201, 'Payment processed successfully.', { payment });
+  }),
+
+  refund: asyncHandler(async (req, res) => {
+    requireRole(req.user, ['ADMIN', 'SUPPORT_AGENT']);
+    const { amount, reason } = req.body;
+
+    const payment = await Payment.findById(req.params.id);
+    if (!payment) throw AppError.notFound('Payment not found.');
+    if (payment.status !== 'SUCCEEDED') throw AppError.badRequest('Only successful payments can be refunded.');
+
+    const invoice = await Invoice.findById(payment.invoice).populate('customer').populate('provider');
+    if (!invoice) throw AppError.notFound('Associated invoice not found.');
+
+    const refundAmount = typeof amount === 'number' ? amount : payment.amount;
+    if (refundAmount > payment.amount) {
+      throw AppError.badRequest('Refund amount cannot exceed the original payment amount.');
+    }
+
+    const isFullRefund = refundAmount === payment.amount;
+
+    payment.status = isFullRefund ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
+    payment.refundedAmount = (payment.refundedAmount || 0) + refundAmount;
+    await payment.save();
+
+    invoice.paymentStatus = isFullRefund ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
+    await invoice.save();
+
+    // Notify Customer
+    await createNotification({
+      recipient: invoice.customer._id || invoice.customer,
+      type: 'REFUND_PROCESSED',
+      title: 'Refund Processed',
+      message: `A refund of ${invoice.currency} ${refundAmount.toFixed(2)} has been processed for Invoice #${invoice.invoiceNumber}. Reason: ${reason || 'Customer Support Dispute Resolution'}.`,
+      resourceType: 'Payment',
+      resourceId: payment._id,
+    });
+
+    // Notify Provider
+    const providerUserId = invoice.provider.user || invoice.provider;
+    await createNotification({
+      recipient: providerUserId,
+      type: 'PAYMENT_REFUNDED',
+      title: 'Payment Refunded',
+      message: `A refund of ${invoice.currency} ${refundAmount.toFixed(2)} was issued to the customer for Invoice #${invoice.invoiceNumber}. Reason: ${reason || 'Customer Support Dispute Resolution'}.`,
+      resourceType: 'Payment',
+      resourceId: payment._id,
+    });
+
+    realtimeHub.emitToUser(invoice.customer._id || invoice.customer, 'invalidate', { tags: ['Invoice', 'Payment'] });
+    realtimeHub.emitToUser(providerUserId, 'invalidate', { tags: ['Invoice', 'Payment'] });
+
+    await recordAudit({
+      actor: req.user,
+      action: 'PAYMENT_REFUNDED',
+      resourceType: 'Payment',
+      resourceId: payment._id,
+    });
+
+    sendSuccess(res, 200, 'Refund processed successfully.', { payment, refundAmount });
   }),
 };
 

@@ -1,20 +1,38 @@
 const Invoice = require('../models/Invoice');
 
 const buildInvoiceFromBooking = (booking) => {
-  const baseTotal = booking.pricingSnapshot.totalAmount || 0;
-  const subtotal = baseTotal;
-  const tax = 0;
-  const discount = 0;
-  const total = subtotal + tax - discount;
+  let subtotal = booking.pricingSnapshot.subtotal || 0;
+  let tax = booking.pricingSnapshot.tax || 0;
+  let discount = booking.pricingSnapshot.discount || 0;
 
   const lineItems = [
     {
-      description: 'Accepted service scope',
+      description: 'Base service quote',
       quantity: 1,
-      unitPrice: baseTotal,
-      amount: baseTotal,
+      unitPrice: subtotal,
+      amount: subtotal,
     },
   ];
+
+  // Add approved scope changes
+  if (booking.scopeChanges && booking.scopeChanges.length > 0) {
+    const approvedChanges = booking.scopeChanges.filter(c => c.status === 'APPROVED');
+    for (const change of approvedChanges) {
+      if (change.costDifference > 0) {
+        lineItems.push({
+          description: `Scope change: ${change.reason.substring(0, 50)}...`,
+          quantity: 1,
+          unitPrice: change.costDifference,
+          amount: change.costDifference,
+        });
+        subtotal += change.costDifference;
+      }
+    }
+  }
+
+  const total = subtotal + tax - discount;
+  const platformFee = Math.round(total * 0.15 * 100) / 100; // 15% commission
+  const providerEarnings = total - platformFee;
 
   return {
     lineItems,
@@ -22,6 +40,8 @@ const buildInvoiceFromBooking = (booking) => {
     tax,
     discount,
     total,
+    platformFee,
+    providerEarnings,
     currency: booking.pricingSnapshot.currency || 'INR',
   };
 };

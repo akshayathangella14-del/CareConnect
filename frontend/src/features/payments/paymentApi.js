@@ -35,6 +35,16 @@ export const paymentApi = apiSlice.injectEndpoints({
       transformResponse: (response) => response?.data?.payment || response?.payment || response,
       invalidatesTags: ['Payment', 'Invoice'],
     }),
+
+    refundPayment: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/payments/${id}/refund`,
+        method: 'POST',
+        body,
+      }),
+      transformResponse: (response) => response?.data?.payment || response?.payment || response,
+      invalidatesTags: ['Payment', 'Invoice'],
+    }),
   }),
 });
 
@@ -42,4 +52,5 @@ export const {
   useListPaymentsQuery,
   useGetPaymentQuery,
   useCreatePaymentMutation,
+  useRefundPaymentMutation,
 } = paymentApi;

@@ -1,9 +1,32 @@
-import { Receipt } from 'lucide-react';
-import { Card, EmptyState, StatusBadge, DataTable } from '@/components';
-import { useListPaymentsQuery } from '@/features/payments';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '@/features/auth';
+import { Receipt, RefreshCcw } from 'lucide-react';
+import { Card, EmptyState, StatusBadge, DataTable, Button } from '@/components';
+import { useListPaymentsQuery, useRefundPaymentMutation } from '@/features/payments';
 
 export default function PaymentsPage() {
+  const user = useSelector(selectCurrentUser);
   const { data: payments = [], isLoading, isFetching } = useListPaymentsQuery();
+  const [refundPayment] = useRefundPaymentMutation();
+
+  const handleRefund = async (payment) => {
+    const amountStr = window.prompt(`Enter refund amount for ${payment.gatewayTransactionId} (Max: ${payment.amount}):`, payment.amount);
+    if (!amountStr) return;
+    const amount = Number(amountStr);
+    if (isNaN(amount) || amount <= 0 || amount > payment.amount) {
+      alert('Invalid refund amount');
+      return;
+    }
+    const reason = window.prompt('Enter reason for refund:');
+    if (!reason) return;
+
+    try {
+      await refundPayment({ id: payment._id, amount, reason }).unwrap();
+      alert('Refund processed successfully');
+    } catch (error) {
+      alert(error.data?.error?.message || 'Failed to process refund');
+    }
+  };
 
   const columns = [
     {
@@ -37,6 +60,25 @@ export default function PaymentsPage() {
       render: (payment) => <StatusBadge status={payment.status} size="sm" />,
     },
   ];
+
+  if (['SUPPORT_AGENT', 'ADMIN'].includes(user?.role)) {
+    columns.push({
+      header: 'Actions',
+      key: 'actions',
+      render: (payment) => (
+        payment.status === 'SUCCEEDED' || payment.status === 'PARTIALLY_REFUNDED' ? (
+          <Button 
+            size="sm" 
+            variant="outline" 
+            leftIcon={<RefreshCcw size={14} />} 
+            onClick={() => handleRefund(payment)}
+          >
+            Refund
+          </Button>
+        ) : null
+      ),
+    });
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
