@@ -7,6 +7,7 @@ import {
   useCorrectAiUnderstandingMutation,
   useUpdateServiceRequestMutation
 } from '@/features/serviceRequests';
+import { useListBookingsQuery } from '@/features/bookings/bookingApi';
 import { Card, Button, StatusBadge, Alert, Badge, Input } from '@/components';
 import { DatePicker } from '@/components/ui/DatePicker/DatePicker';
 import { TimePicker } from '@/components/ui/TimePicker/TimePicker';
@@ -20,6 +21,12 @@ export default function ServiceRequestDetailPage() {
     pollingInterval: 5000,
     refetchOnFocus: true,
   });
+
+  const { data: bookings = [] } = useListBookingsQuery(undefined, {
+    skip: !request || request.status === 'DRAFT',
+    pollingInterval: 5000,
+  });
+  const booking = bookings.find(b => b.serviceRequest?._id === id || b.serviceRequest === id);
   
   const [submitRequest, { isLoading: isSubmitting }] = useSubmitServiceRequestMutation();
   const [correctAi, { isLoading: isConfirming }] = useCorrectAiUnderstandingMutation();
@@ -111,12 +118,18 @@ export default function ServiceRequestDetailPage() {
     { key: 'MATCHING', label: 'Provider Found & Notified', icon: '✅', tone: 'success' },
     { key: 'QUOTING', label: 'Provider Reviewing Your Request', icon: '⏳', tone: 'warning' },
     { key: 'PROVIDER_SELECTED', label: 'Provider Confirmed', icon: '🏁', tone: 'success' },
-    { key: 'BOOKED', label: 'Provider En Route', icon: '🚗', tone: 'info' },
+    { key: 'PROVIDER_EN_ROUTE', label: 'Provider En Route', icon: '🚗', tone: 'info' },
     { key: 'IN_PROGRESS', label: 'Service In Progress', icon: '🔧', tone: 'primary' },
     { key: 'COMPLETED', label: 'Service Completed', icon: '✓', tone: 'success' },
   ];
 
-  const requestedStatus = request.status === 'BOOKED' ? 'BOOKED' : request.status;
+  let requestedStatus = request.status;
+  if (booking) {
+    if (booking.status === 'PROVIDER_EN_ROUTE') requestedStatus = 'PROVIDER_EN_ROUTE';
+    else if (booking.status === 'IN_PROGRESS' || booking.status === 'ARRIVED' || booking.status === 'AWAITING_CUSTOMER_CONFIRMATION') requestedStatus = 'IN_PROGRESS';
+    else if (booking.status === 'COMPLETED') requestedStatus = 'COMPLETED';
+    else requestedStatus = 'PROVIDER_SELECTED';
+  }
   const currentStepIndex = Math.max(0, statusSteps.findIndex((step) => step.key === requestedStatus));
   const requestState = statusSteps[currentStepIndex] || statusSteps[0];
   const needsAiConfirmation = request.status === 'AI_REVIEW' && hasAiUnderstanding && !isConfirmed;
