@@ -81,8 +81,8 @@ const scopedServiceRequestQuery = async (user, query = {}) => {
       if (uniqueCategoryIds.length > 0) {
         query.category = { $in: uniqueCategoryIds };
       } else {
-        console.log('Provider query - No valid categories');
-        query._id = null; // No valid categories
+        console.log('Provider query - Warning: Provider skills have no categories attached. Allowing all categories as fallback.');
+        // Do not force query._id = null here, just let them see requests since they do have skills.
       }
     } catch (err) {
       console.error('Provider query error:', err);
@@ -446,7 +446,7 @@ const providerController = {
     await provider.save();
     
     // Emit SSE for real-time updates
-    realtimeHub.emitToUser(req.user._id, 'invalidate', { tags: ['Provider'] });
+    realtimeHub.emitToUser(req.user._id, 'invalidate', { tags: ['Provider', 'ServiceRequest', 'LIST'] });
     
     await recordAudit({ actor: req.user, action: 'PROVIDER_PROFILE_UPDATED', resourceType: 'ProviderProfile', resourceId: provider._id });
     sendSuccess(res, 200, 'Provider profile updated.', { provider });
