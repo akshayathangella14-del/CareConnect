@@ -7,7 +7,10 @@ import { MapPin, Search } from 'lucide-react';
 export default function MatchedRequestsPage() {
   const navigate = useNavigate();
   // Provider sees requests in MATCHING or QUOTING state (filtered by backend)
-  const { data: requests = [], isLoading, isFetching } = useListServiceRequestsQuery();
+  const { data: requests = [], isLoading, isFetching } = useListServiceRequestsQuery(undefined, { 
+    pollingInterval: 10000, // Poll every 10 seconds
+    refetchOnMountOrArgChange: true,
+  });
 
   const columns = [
     {

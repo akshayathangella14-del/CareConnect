@@ -46,21 +46,31 @@ const scopedServiceRequestQuery = async (user, query = {}) => {
     
     try {
       const provider = await getOwnProviderProfile(user);
-      if (provider && provider.verificationStatus === 'VERIFIED' && provider.skills && provider.skills.length > 0) {
-        await provider.populate('skills');
-        const categoryIds = provider.skills.map(skill => skill.category).filter(Boolean);
-        const uniqueCategoryIds = [...new Set(categoryIds.map(id => id.toString()))];
-        
-        if (uniqueCategoryIds.length > 0) {
-          query.category = { $in: uniqueCategoryIds };
-        }
+      
+      // Strict verification check
+      if (!provider || provider.verificationStatus !== 'VERIFIED') {
+        query._id = null; // No requests for unverified providers
+        return query;
+      }
+      
+      // Check if provider has skills
+      if (!provider.skills || provider.skills.length === 0) {
+        query._id = null; // No requests for providers without skills
+        return query;
+      }
+      
+      await provider.populate('skills');
+      const categoryIds = provider.skills.map(skill => skill.category).filter(Boolean);
+      const uniqueCategoryIds = [...new Set(categoryIds.map(id => id.toString()))];
+      
+      if (uniqueCategoryIds.length > 0) {
+        query.category = { $in: uniqueCategoryIds };
       } else {
-         // If provider is not verified or has no skills, they shouldn't see any jobs
-         query._id = null;
+        query._id = null; // No valid categories
       }
     } catch (err) {
-      // If profile not found, they see no jobs
-      query._id = null;
+      console.error('Provider query error:', err);
+      query._id = null; // Fail safely
     }
   }
   return query;

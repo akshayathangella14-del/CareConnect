@@ -9,10 +9,20 @@ import { User, MapPin, IndianRupee, Briefcase, Plus, X, Wrench, Camera } from 'l
 export default function ProviderProfilePage() {
   const dispatch = useDispatch();
   const currentUser = useSelector(selectCurrentUser);
-  const { data: profile, isLoading } = useGetMeProviderQuery();
+  const { data: profile, isLoading, refetch } = useGetMeProviderQuery();
   const [updateProfile, { isLoading: isUpdating, error: updateError, isSuccess }] = useUpdateMeProviderMutation();
   const [uploadProfileImage, { isLoading: isUploading, error: uploadError }] = useUpdateProfileImageMutation();
   const { data: availableSkills = [], isLoading: isLoadingSkills } = useListSkillsQuery();
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    if (isSuccess) {
+      refetch();
+      setShowSuccess(true);
+      const timer = setTimeout(() => setShowSuccess(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSuccess, refetch]);
 
   const [formData, setFormData] = useState({
     displayName: '',
@@ -117,7 +127,7 @@ export default function ProviderProfilePage() {
         <p style={{ color: 'var(--color-text-secondary)' }}>Manage your public profile and pricing information.</p>
       </div>
 
-      {isSuccess && (
+      {showSuccess && (
         <Alert variant="success" title="Profile Updated">Your profile has been successfully saved.</Alert>
       )}
 
