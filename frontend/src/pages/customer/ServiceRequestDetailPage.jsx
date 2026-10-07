@@ -105,7 +105,7 @@ export default function ServiceRequestDetailPage() {
   const hasAiUnderstanding = !!request.aiUnderstanding;
   const isConfirmed = !!request.confirmedUnderstanding;
   const isDraft = request.status === 'DRAFT';
-  const providerQuote = quotes.find((quote) => quote.status === 'ACCEPTED') || quotes[0];
+  const providerQuote = quotes.find((quote) => quote.status === 'ACCEPTED' || quote.status === 'COMPLETED');
 
   const statusSteps = [
     { key: 'MATCHING', label: 'Provider Found & Notified', icon: '✅', tone: 'success' },

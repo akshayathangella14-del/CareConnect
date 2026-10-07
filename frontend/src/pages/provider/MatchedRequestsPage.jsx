@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useListServiceRequestsQuery } from '@/features/serviceRequests';
+import { useListQuotesQuery } from '@/features/quotes/quoteApi';
 import { Card, Button, StatusBadge, DataTable, EmptyState, Badge } from '@/components';
 import { MapPin, Search } from 'lucide-react';
 
@@ -11,6 +12,12 @@ export default function MatchedRequestsPage() {
     pollingInterval: 10000, // Poll every 10 seconds
     refetchOnMountOrArgChange: true,
   });
+
+  const { data: quotes = [] } = useListQuotesQuery(undefined, {
+    pollingInterval: 10000,
+  });
+  
+  const quotedRequestIds = new Set(quotes.map(q => q.serviceRequest?._id || q.serviceRequest));
 
   const columns = [
     {
@@ -46,11 +53,16 @@ export default function MatchedRequestsPage() {
     {
       header: 'Action',
       key: 'action',
-      render: (req) => (
-        <Link to={`/provider/quotes/new?requestId=${req._id}`} onClick={e => e.stopPropagation()}>
-          <Button size="sm" variant="primary">Create Quote</Button>
-        </Link>
-      ),
+      render: (req) => {
+        const hasQuoted = quotedRequestIds.has(req._id);
+        return hasQuoted ? (
+          <Button size="sm" variant="secondary" disabled>Quote Submitted</Button>
+        ) : (
+          <Link to={`/provider/quotes/new?requestId=${req._id}`} onClick={e => e.stopPropagation()}>
+            <Button size="sm" variant="primary">Create Quote</Button>
+          </Link>
+        );
+      },
     },
   ];
 
