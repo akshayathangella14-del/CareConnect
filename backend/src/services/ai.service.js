@@ -4,57 +4,63 @@ const ServiceCategory = require('../models/ServiceCategory');
 const Skill = require('../models/Skill');
 
 const keywordMap = [
-  { keyword: 'ac', problemType: 'Air Conditioner Servicing & Gas Top-up', urgency: 'HIGH' },
-  { keyword: 'refrigerator', problemType: 'Refrigerator Cooling & Gasket Repair', urgency: 'HIGH' },
-  { keyword: 'fridge', problemType: 'Refrigerator Cooling & Gasket Repair', urgency: 'HIGH' },
-  { keyword: 'mixer', problemType: 'Mixer Grinder Motor Repair or Blade Replacement', urgency: 'NORMAL' },
-  { keyword: 'mixie', problemType: 'Mixer Grinder Repair', urgency: 'NORMAL' },
-  { keyword: 'grinder', problemType: 'Wet Grinder Service & Repair', urgency: 'NORMAL' },
-  { keyword: 'geyser', problemType: 'Water Geyser Heating Element or Thermostat Repair', urgency: 'HIGH' },
-  { keyword: 'water heater', problemType: 'Water Geyser Repair', urgency: 'HIGH' },
-  { keyword: 'water purifier', problemType: 'RO Water Purifier Filter Change or Service', urgency: 'HIGH' },
-  { keyword: 'ro', problemType: 'RO Water Purifier Service', urgency: 'HIGH' },
-  { keyword: 'aquaguard', problemType: 'Water Purifier Repair', urgency: 'HIGH' },
-  { keyword: 'chimney', problemType: 'Kitchen Chimney Motor Cleaning or Repair', urgency: 'NORMAL' },
-  { keyword: 'inverter', problemType: 'Home Inverter Battery Charging Issue', urgency: 'HIGH' },
-  { keyword: 'ups', problemType: 'Inverter/UPS Repair', urgency: 'HIGH' },
-  { keyword: 'fan', problemType: 'Ceiling Fan Motor or Capacitor Repair', urgency: 'NORMAL' },
-  { keyword: 'switch', problemType: 'Electrical Switchboard or Wiring Repair', urgency: 'HIGH' },
-  { keyword: 'mcb', problemType: 'MCB Tripping or Electrical Fault', urgency: 'EMERGENCY' },
-  { keyword: 'tap', problemType: 'Water Tap Leakage or Replacement', urgency: 'HIGH' },
-  { keyword: 'leak', problemType: 'Water Leakage or Pipe Repair', urgency: 'HIGH' },
-  { keyword: 'sink', problemType: 'Kitchen Sink Drain Blockage or Leak Repair', urgency: 'NORMAL' },
-  { keyword: 'flush', problemType: 'Toilet Flush Tank Repair', urgency: 'HIGH' },
-  { keyword: 'door', problemType: 'Door Hinge, Lock or Handle Repair', urgency: 'NORMAL' },
-  { keyword: 'window', problemType: 'Window Glass or Frame Repair', urgency: 'NORMAL' },
-  { keyword: 'mesh', problemType: 'Mosquito Mesh Installation or Repair', urgency: 'NORMAL' },
-  { keyword: 'paint', problemType: 'Wall Painting or Touch-up Work', urgency: 'NORMAL' },
-  { keyword: 'painting', problemType: 'Wall Painting or Touch-up Work', urgency: 'NORMAL' },
-  { keyword: 'wall paint', problemType: 'Wall Painting or Touch-up Work', urgency: 'NORMAL' },
-  { keyword: 'interior paint', problemType: 'Interior Wall Painting', urgency: 'NORMAL' },
-  { keyword: 'exterior paint', problemType: 'Exterior Wall Painting', urgency: 'NORMAL' },
-  { keyword: 'touch-up', problemType: 'Wall Touch-up Work', urgency: 'NORMAL' },
-  { keyword: 'color', problemType: 'Wall Painting or Color Change', urgency: 'NORMAL' },
-  { keyword: 'finish', problemType: 'Surface Finishing', urgency: 'NORMAL' },
-  { keyword: 'carpenter', problemType: 'Furniture Assembly or Repair', urgency: 'NORMAL' },
-  { keyword: 'plumber', problemType: 'General Plumbing Repair or Installation', urgency: 'HIGH' },
-  { keyword: 'electrician', problemType: 'General Electrical Repair or Installation', urgency: 'HIGH' },
-  { keyword: 'wire', problemType: 'Electrical Wiring Issue', urgency: 'HIGH' },
-  { keyword: 'socket', problemType: 'Electrical Socket Repair', urgency: 'NORMAL' },
-  { keyword: 'light', problemType: 'Lighting Repair or Installation', urgency: 'NORMAL' },
-  { keyword: 'fuse', problemType: 'Electrical Fuse Replacement', urgency: 'HIGH' },
-  { keyword: 'circuit', problemType: 'Circuit Breaker Repair', urgency: 'EMERGENCY' },
-  { keyword: 'drain', problemType: 'Drain Unblocking', urgency: 'HIGH' },
-  { keyword: 'toilet', problemType: 'Toilet Repair', urgency: 'HIGH' },
-  { keyword: 'compressor', problemType: 'AC Compressor Repair', urgency: 'HIGH' },
-  { keyword: 'thermostat', problemType: 'Thermostat Repair', urgency: 'NORMAL' },
-  { keyword: 'washing machine', problemType: 'Washing Machine Repair', urgency: 'NORMAL' },
-  { keyword: 'deep', problemType: 'Deep Cleaning Service', urgency: 'NORMAL' },
-  { keyword: 'carpet', problemType: 'Carpet Cleaning', urgency: 'NORMAL' },
-  { keyword: 'cleaning', problemType: 'Deep House Cleaning or Bathroom Cleaning', urgency: 'NORMAL' },
-  { keyword: 'sofa', problemType: 'Sofa Cleaning or Shampooing', urgency: 'NORMAL' },
-  { keyword: 'pest', problemType: 'Pest Control Service', urgency: 'HIGH' },
-  { keyword: 'termite', problemType: 'Anti-Termite Treatment', urgency: 'NORMAL' }
+  // AC Keywords
+  { keyword: 'ac', problemType: 'Air Conditioner Servicing & Gas Top-up', urgency: 'HIGH', category: 'AC Servicing' },
+  { keyword: 'air conditioner', problemType: 'Air Conditioner Servicing & Gas Top-up', urgency: 'HIGH', category: 'AC Servicing' },
+  { keyword: 'ac cooling', problemType: 'Air Conditioner Not Cooling', urgency: 'HIGH', category: 'AC Servicing' },
+  
+  // Painting Keywords
+  { keyword: 'paint', problemType: 'Wall Painting or Touch-up Work', urgency: 'NORMAL', category: 'Painting' },
+  { keyword: 'painting', problemType: 'Wall Painting or Touch-up Work', urgency: 'NORMAL', category: 'Painting' },
+  { keyword: 'wall paint', problemType: 'Wall Painting or Touch-up Work', urgency: 'NORMAL', category: 'Painting' },
+  { keyword: 'interior paint', problemType: 'Interior Wall Painting', urgency: 'NORMAL', category: 'Painting' },
+  { keyword: 'exterior paint', problemType: 'Exterior Wall Painting', urgency: 'NORMAL', category: 'Painting' },
+  { keyword: 'touch-up', problemType: 'Wall Touch-up Work', urgency: 'NORMAL', category: 'Painting' },
+  { keyword: 'color', problemType: 'Wall Painting or Color Change', urgency: 'NORMAL', category: 'Painting' },
+  { keyword: 'putty', problemType: 'Wall Preparation and Putty Work', urgency: 'NORMAL', category: 'Painting' },
+  { keyword: 'primer', problemType: 'Wall Preparation and Primer Application', urgency: 'NORMAL', category: 'Painting' },
+  { keyword: 'crack', problemType: 'Wall Crack Repair and Painting', urgency: 'NORMAL', category: 'Painting' },
+  
+  // Plumbing Keywords
+  { keyword: 'tap', problemType: 'Water Tap Leakage or Replacement', urgency: 'HIGH', category: 'Plumbing' },
+  { keyword: 'leak', problemType: 'Water Leakage or Pipe Repair', urgency: 'HIGH', category: 'Plumbing' },
+  { keyword: 'sink', problemType: 'Kitchen Sink Drain Blockage or Leak Repair', urgency: 'NORMAL', category: 'Plumbing' },
+  { keyword: 'flush', problemType: 'Toilet Flush Tank Repair', urgency: 'HIGH', category: 'Plumbing' },
+  { keyword: 'pipe', problemType: 'Pipe Leakage or Repair', urgency: 'HIGH', category: 'Plumbing' },
+  
+  // Electrical Keywords
+  { keyword: 'switch', problemType: 'Electrical Switchboard or Wiring Repair', urgency: 'HIGH', category: 'Electrical' },
+  { keyword: 'mcb', problemType: 'MCB Tripping or Electrical Fault', urgency: 'EMERGENCY', category: 'Electrical' },
+  { keyword: 'fan', problemType: 'Ceiling Fan Motor or Capacitor Repair', urgency: 'NORMAL', category: 'Electrical' },
+  { keyword: 'light', problemType: 'Light Fixture or Wiring Repair', urgency: 'NORMAL', category: 'Electrical' },
+  { keyword: 'wire', problemType: 'Electrical Wiring Repair', urgency: 'HIGH', category: 'Electrical' },
+  
+  // Appliance Keywords
+  { keyword: 'refrigerator', problemType: 'Refrigerator Cooling & Gasket Repair', urgency: 'HIGH', category: 'Appliances' },
+  { keyword: 'fridge', problemType: 'Refrigerator Cooling & Gasket Repair', urgency: 'HIGH', category: 'Appliances' },
+  { keyword: 'mixer', problemType: 'Mixer Grinder Motor Repair or Blade Replacement', urgency: 'NORMAL', category: 'Appliances' },
+  { keyword: 'mixie', problemType: 'Mixer Grinder Repair', urgency: 'NORMAL', category: 'Appliances' },
+  { keyword: 'grinder', problemType: 'Wet Grinder Service & Repair', urgency: 'NORMAL', category: 'Appliances' },
+  { keyword: 'geyser', problemType: 'Water Geyser Heating Element or Thermostat Repair', urgency: 'HIGH', category: 'Appliances' },
+  { keyword: 'water heater', problemType: 'Water Geyser Repair', urgency: 'HIGH', category: 'Appliances' },
+  { keyword: 'water purifier', problemType: 'RO Water Purifier Filter Change or Service', urgency: 'HIGH', category: 'Appliances' },
+  { keyword: 'ro', problemType: 'RO Water Purifier Service', urgency: 'HIGH', category: 'Appliances' },
+  { keyword: 'aquaguard', problemType: 'Water Purifier Repair', urgency: 'HIGH', category: 'Appliances' },
+  { keyword: 'chimney', problemType: 'Kitchen Chimney Motor Cleaning or Repair', urgency: 'NORMAL', category: 'Appliances' },
+  { keyword: 'inverter', problemType: 'Home Inverter Battery Charging Issue', urgency: 'HIGH', category: 'Appliances' },
+  { keyword: 'ups', problemType: 'Inverter/UPS Repair', urgency: 'HIGH', category: 'Appliances' },
+  
+  // Other Keywords
+  { keyword: 'door', problemType: 'Door Hinge, Lock or Handle Repair', urgency: 'NORMAL', category: 'Carpentry' },
+  { keyword: 'window', problemType: 'Window Glass or Frame Repair', urgency: 'NORMAL', category: 'Carpentry' },
+  { keyword: 'mesh', problemType: 'Mosquito Mesh Installation or Repair', urgency: 'NORMAL', category: 'Carpentry' },
+  { keyword: 'carpenter', problemType: 'Furniture Assembly or Repair', urgency: 'NORMAL', category: 'Carpentry' },
+  { keyword: 'plumber', problemType: 'General Plumbing Repair or Installation', urgency: 'HIGH', category: 'Plumbing' },
+  { keyword: 'electrician', problemType: 'General Electrical Repair or Installation', urgency: 'HIGH', category: 'Electrical' },
+  { keyword: 'cleaning', problemType: 'Deep House Cleaning or Bathroom Cleaning', urgency: 'NORMAL', category: 'Cleaning' },
+  { keyword: 'sofa', problemType: 'Sofa Cleaning or Shampooing', urgency: 'NORMAL', category: 'Cleaning' },
+  { keyword: 'pest', problemType: 'Pest Control Service', urgency: 'HIGH', category: 'Cleaning' },
+  { keyword: 'termite', problemType: 'Anti-Termite Treatment', urgency: 'NORMAL', category: 'Cleaning' }
 ];
 
 const includes = (value, query) => String(value || '').toLowerCase().includes(query);
@@ -68,13 +74,15 @@ const calculateConfidenceScore = (serviceRequest, parsed, matchedCategory, match
   else if (descLength > 40) score += 0.2;
   else if (descLength > 10) score += 0.1;
 
-  // Category Match (0-0.3)
-  if (matchedCategory) score += 0.3;
-
-  // Category Selection Bonus (0.2)
-  if (serviceRequest.category && matchedCategory && 
-      serviceRequest.category.toString() === matchedCategory._id.toString()) {
-    score += 0.2;
+  // Category Match (0-0.4) - INCREASED WEIGHT
+  if (matchedCategory) {
+    // Extra bonus if category matches user's selection
+    if (serviceRequest.category && 
+        serviceRequest.category.toString() === matchedCategory._id.toString()) {
+      score += 0.4;
+    } else {
+      score += 0.2; // Reduced penalty for mismatch
+    }
   }
 
   // Skills Identification (0-0.2)
@@ -126,21 +134,32 @@ const detectMissingInformation = (serviceRequest, parsed) => {
 
 const runFallbackAnalysis = async (serviceRequest, categories, skills) => {
   const text = `${serviceRequest.title} ${serviceRequest.description}`.toLowerCase();
-
-  // PRIORITIZE USER'S SELECTED CATEGORY
+  
+  // FIRST PRIORITY: User's selected category
   const selectedCategory = categories.find(c => c._id.toString() === serviceRequest.category?.toString());
   const matchedCategory = selectedCategory || categories.find((c) => includes(text, c.name));
   
-  // Only match skills within the selected category
-  const categorySkills = skills.filter(s => 
-    !selectedCategory || s.category?.toString() === selectedCategory._id.toString()
-  );
+  // SECOND PRIORITY: Filter skills by selected category
+  const categorySkills = matchedCategory 
+    ? skills.filter(s => s.category?.toString() === matchedCategory._id.toString())
+    : skills;
   const matchedSkills = categorySkills.filter((s) => includes(text, s.name)).slice(0, 5);
-  const keyword = keywordMap.find((entry) => includes(text, entry.keyword));
-
+  
+  // THIRD PRIORITY: Keyword matching with category awareness
+  const keyword = keywordMap.find((entry) => {
+    // Only match keywords if they're relevant to the selected category
+    if (selectedCategory && selectedCategory.name.toLowerCase().includes('paint') && 
+        entry.keyword === 'ac') {
+      return false; // Don't match AC if user selected painting
+    }
+    return includes(text, entry.keyword);
+  });
+  
   let specificDiagnostic = '';
   if (keyword) {
     specificDiagnostic = `Based on your description mentioning "${keyword.keyword}", this appears to be a ${keyword.problemType}. Common causes include wear and tear, lack of maintenance, or component failure. A verified technician can diagnose the exact issue and provide an accurate quote.`;
+  } else if (selectedCategory) {
+    specificDiagnostic = `Your request for ${selectedCategory.name} has been analyzed. A qualified technician will inspect the issue, identify the root cause, and provide an accurate estimate for service.`;
   } else {
     specificDiagnostic = `Your request has been analyzed. A qualified technician will inspect the issue, identify the root cause, and provide an accurate estimate for repair or replacement.`;
   }
@@ -155,14 +174,14 @@ const runFallbackAnalysis = async (serviceRequest, categories, skills) => {
     category: matchedCategory?._id || serviceRequest.category,
     subcategory: serviceRequest.service || null,
     requiredSkills: matchedSkills.map((s) => s._id),
-    problemType: keyword?.problemType || 'Home Service Repair',
+    problemType: keyword?.problemType || `${selectedCategory?.name || 'Home'} Service`,
     urgency: keyword?.urgency || serviceRequest.urgency || 'NORMAL',
     diagnosticNotes: specificDiagnostic,
     suggestedTasks: [
-      `Inspect the ${keyword?.keyword || 'appliance/area'} thoroughly`,
-      `Identify broken or failing components`,
-      `Provide cost estimate for replacement parts if needed`,
-      `Complete repair with proper testing`
+      `Inspect the ${selectedCategory?.name?.toLowerCase() || 'area'} thoroughly`,
+      `Identify specific issues or requirements`,
+      `Provide cost estimate for materials if needed`,
+      `Complete service with proper testing`
     ],
     missingInformation,
     confidence: 0.75,
@@ -193,26 +212,29 @@ const analyzeServiceRequest = async (serviceRequest) => {
 
     const promptText = `You are CareConnect AI. Analyze this home service request and generate a structured JSON diagnosis for the customer and service providers.
 
-IMPORTANT: The user has explicitly selected the category: "${selectedCategoryName}". You MUST analyze within this category context. DO NOT change the category.
+CRITICAL CONSTRAINT: The user has explicitly selected the category "${selectedCategoryName}". 
+YOU MUST return this category. DO NOT change the category under any circumstances.
+If the user's description seems to match a different category, assume the user knows what they are doing and keep their selected category.
 
 Categories available: ${JSON.stringify(categoryNames)}
 Skills available: ${JSON.stringify(skillNames)}
 
+USER SELECTED CATEGORY: ${selectedCategoryName} (THIS IS THE CORRECT CATEGORY - DO NOT CHANGE)
+
 User Request Title: ${serviceRequest.title}
 User Description: ${serviceRequest.description}
-User Selected Category: ${selectedCategoryName}
 Attached Images Count: ${serviceRequest.attachments?.length || 0}
 
 Output strictly valid JSON with this exact schema:
 {
-  "categoryName": "<One matching category from available list>",
-  "matchedSkills": ["<Array of matching skill names>"],
-  "problemType": "<Specific technical problem title, e.g. 'Refrigerator Cooling Loss & Door Gasket Seal Failure'>",
+  "categoryName": "${selectedCategoryName}", // MUST be the user's selected category
+  "matchedSkills": ["<Array of matching skill names from the selected category>"],
+  "problemType": "<Specific technical problem title relevant to ${selectedCategoryName}>",
   "diagnosticNotes": "<Detailed explanation for the user of why this problem occurs, potential root causes based on symptoms, what needs attention, and any immediate safety precautions. Keep it professional and empathetic.>",
   "suggestedTasks": [
-    "<Specific actionable repair/service step 1>",
-    "<Specific actionable repair/service step 2>",
-    "<Specific actionable repair/service step 3>"
+    "<Specific actionable repair/service step 1 relevant to ${selectedCategoryName}>",
+    "<Specific actionable repair/service step 2 relevant to ${selectedCategoryName}>",
+    "<Specific actionable repair/service step 3 relevant to ${selectedCategoryName}>"
   ],
   "urgency": "<LOW|NORMAL|HIGH|EMERGENCY>",
   "missingInformation": ["<Details user should clarify if any, e.g., brand/model, exact error codes, or age of appliance>"]
@@ -245,20 +267,38 @@ Output strictly valid JSON with this exact schema:
     });
 
     const parsed = JSON.parse(response.text?.trim() || '{}');
-    
     let matchedCategory = categories.find((c) => c.name.toLowerCase() === String(parsed.categoryName).toLowerCase());
-    const categoryMismatch = serviceRequest.category && matchedCategory && 
-      serviceRequest.category.toString() !== matchedCategory._id.toString();
-
-    if (categoryMismatch) {
-      console.warn('AI returned different category than user selected');
+    
+    // VALIDATION: If AI returned different category than user selected, force user's category
+    const userSelectedCategory = categories.find(c => c._id.toString() === serviceRequest.category?.toString());
+    if (userSelectedCategory && matchedCategory && 
+        userSelectedCategory._id.toString() !== matchedCategory._id.toString()) {
+      console.warn('AI returned different category than user selected. Forcing user selection.');
       // Force use user's selected category
-      matchedCategory = categories.find(c => c._id.toString() === serviceRequest.category.toString());
+      return {
+        source: 'GEMINI_CORRECTED',
+        category: userSelectedCategory._id,
+        subcategory: serviceRequest.service || null,
+        requiredSkills: [], // Clear skills since they might be wrong
+        problemType: `${userSelectedCategory.name} Service Request`,
+        diagnosticNotes: `Your request for ${userSelectedCategory.name} has been analyzed. A qualified technician will inspect the issue and provide an accurate estimate.`,
+        suggestedTasks: [
+          `Inspect the ${userSelectedCategory.name.toLowerCase()} area`,
+          `Identify specific requirements`,
+          `Provide cost estimate`,
+          `Complete service`
+        ],
+        urgency: serviceRequest.urgency || 'NORMAL',
+        missingInformation: [],
+        confidence: 0.85, // Still high confidence since we're using user's selection
+        manualReviewRecommended: false,
+        generatedAt: new Date(),
+      };
     }
 
-    const categorySkills = skills.filter(s => 
-      !matchedCategory || s.category?.toString() === matchedCategory._id.toString()
-    );
+    const categorySkills = matchedCategory 
+      ? skills.filter(s => s.category?.toString() === matchedCategory._id.toString())
+      : skills;
     const matchedSkillIds = categorySkills
       .filter((s) => (parsed.matchedSkills || []).some((ms) => ms.toLowerCase() === s.name.toLowerCase()))
       .map((s) => s._id);
@@ -318,26 +358,28 @@ const reanalyzeAfterCorrection = async (originalUnderstanding, customerCorrectio
     const promptText = `You are CareConnect AI. You previously analyzed a home service request. The customer has provided corrections/additional information.
 Re-analyze and generate a structured JSON diagnosis.
 
-IMPORTANT: The user's selected category is: "${selectedCategoryName}". You MUST analyze within this category context. DO NOT change the category.
+CRITICAL CONSTRAINT: The user's selected category is "${selectedCategoryName}". 
+YOU MUST return this category. DO NOT change the category under any circumstances.
 
 Categories available: ${JSON.stringify(categoryNames)}
 Skills available: ${JSON.stringify(skillNames)}
 
+USER SELECTED CATEGORY: ${selectedCategoryName} (THIS IS THE CORRECT CATEGORY - DO NOT CHANGE)
+
 Original Request Title: ${serviceRequest?.title || 'Unknown'}
 Original Description: ${serviceRequest?.description || 'Unknown'}
-User Selected Category: ${selectedCategoryName}
 CUSTOMER CORRECTIONS / ADDITIONAL INFO: ${customerCorrection}
 
 Output strictly valid JSON with this exact schema:
 {
-  "categoryName": "<One matching category from available list>",
-  "matchedSkills": ["<Array of matching skill names>"],
-  "problemType": "<Specific technical problem title, e.g. 'Refrigerator Cooling Loss & Door Gasket Seal Failure'>",
+  "categoryName": "${selectedCategoryName}", // MUST be the user's selected category
+  "matchedSkills": ["<Array of matching skill names from the selected category>"],
+  "problemType": "<Specific technical problem title relevant to ${selectedCategoryName}>",
   "diagnosticNotes": "<Detailed explanation for the user of why this problem occurs, potential root causes based on symptoms, what needs attention, and any immediate safety precautions. Keep it professional and empathetic.>",
   "suggestedTasks": [
-    "<Specific actionable repair/service step 1>",
-    "<Specific actionable repair/service step 2>",
-    "<Specific actionable repair/service step 3>"
+    "<Specific actionable repair/service step 1 relevant to ${selectedCategoryName}>",
+    "<Specific actionable repair/service step 2 relevant to ${selectedCategoryName}>",
+    "<Specific actionable repair/service step 3 relevant to ${selectedCategoryName}>"
   ],
   "urgency": "<LOW|NORMAL|HIGH|EMERGENCY>",
   "missingInformation": ["<Details user should clarify if any, e.g., brand/model, exact error codes, or age of appliance>"]
@@ -351,17 +393,18 @@ Output strictly valid JSON with this exact schema:
 
     const parsed = JSON.parse(response.text?.trim() || '{}');
     let matchedCategory = categories.find((c) => c.name.toLowerCase() === String(parsed.categoryName).toLowerCase());
-    const categoryMismatch = serviceRequest.category && matchedCategory && 
-      serviceRequest.category.toString() !== matchedCategory._id.toString();
-
-    if (categoryMismatch) {
-      console.warn('AI returned different category than user selected');
-      matchedCategory = categories.find(c => c._id.toString() === serviceRequest.category.toString());
+    
+    // VALIDATION: If AI returned different category than user selected, force user's category
+    const userSelectedCategory = categories.find(c => c._id.toString() === serviceRequest.category?.toString());
+    if (userSelectedCategory && matchedCategory && 
+        userSelectedCategory._id.toString() !== matchedCategory._id.toString()) {
+      console.warn('AI returned different category than user selected during re-analysis. Forcing user selection.');
+      matchedCategory = userSelectedCategory;
     }
 
-    const categorySkills = skills.filter(s => 
-      !matchedCategory || s.category?.toString() === matchedCategory._id.toString()
-    );
+    const categorySkills = matchedCategory 
+      ? skills.filter(s => s.category?.toString() === matchedCategory._id.toString())
+      : skills;
     const matchedSkillIds = categorySkills
       .filter((s) => (parsed.matchedSkills || []).some((ms) => ms.toLowerCase() === s.name.toLowerCase()))
       .map((s) => s._id);
