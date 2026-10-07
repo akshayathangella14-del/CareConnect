@@ -7,7 +7,7 @@ import { MapPin, Search } from 'lucide-react';
 export default function MatchedRequestsPage() {
   const navigate = useNavigate();
   // Provider sees requests in MATCHING or QUOTING state (filtered by backend)
-  const { data: requests = [], isLoading, isFetching } = useListServiceRequestsQuery(undefined, { 
+  const { data: requests = [], isLoading, isFetching, refetch } = useListServiceRequestsQuery(undefined, { 
     pollingInterval: 10000, // Poll every 10 seconds
     refetchOnMountOrArgChange: true,
   });
@@ -56,11 +56,14 @@ export default function MatchedRequestsPage() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-      <div>
-        <h1 style={{ fontSize: 'var(--font-size-h2)', marginBottom: 'var(--space-2)' }}>Matched Opportunities</h1>
-        <p style={{ color: 'var(--color-text-secondary)' }}>
-          Service requests matching your skills and service area. Submit quotes to win these jobs.
-        </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ fontSize: 'var(--font-size-h2)', marginBottom: 'var(--space-2)' }}>Matched Opportunities</h1>
+          <p style={{ color: 'var(--color-text-secondary)' }}>
+            Service requests matching your skills and service area. Submit quotes to win these jobs.
+          </p>
+        </div>
+        <Button onClick={() => refetch()} variant="secondary" size="sm">Refresh</Button>
       </div>
 
       {isLoading ? (

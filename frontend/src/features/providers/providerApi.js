@@ -48,7 +48,7 @@ export const providerApi = apiSlice.injectEndpoints({
         body: data,
       }),
       transformResponse: (response) => response?.data?.provider || response?.provider || response,
-      invalidatesTags: ['Provider', 'ServiceRequest'],
+      invalidatesTags: ['Provider', 'ServiceRequest', 'LIST'],
     }),
 
     getProvider: builder.query({

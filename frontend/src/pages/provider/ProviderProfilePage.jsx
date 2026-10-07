@@ -38,6 +38,7 @@ export default function ProviderProfilePage() {
   const [newArea, setNewArea] = useState({ label: '', city: '', state: '', postalCode: '' });
 
   useEffect(() => {
+    console.log('Profile data loaded:', profile);
     if (profile) {
       setFormData({
         displayName: profile.displayName || '',
@@ -48,6 +49,11 @@ export default function ProviderProfilePage() {
         selectedSkills: profile.skills?.map(s => typeof s === 'object' ? s._id : s) || [],
         serviceAreas: profile.serviceAreas || [],
         documents: profile.documents || []
+      });
+      console.log('Form data set:', {
+        displayName: profile.displayName,
+        skillsCount: profile.skills?.length,
+        areasCount: profile.serviceAreas?.length
       });
     }
   }, [profile]);

@@ -47,14 +47,27 @@ const scopedServiceRequestQuery = async (user, query = {}) => {
     try {
       const provider = await getOwnProviderProfile(user);
       
+      // Debug logging
+      console.log('Provider query - Provider found:', !!provider);
+      console.log('Provider query - Verification status:', provider?.verificationStatus);
+      console.log('Provider query - Skills count:', provider?.skills?.length);
+      
       // Strict verification check
-      if (!provider || provider.verificationStatus !== 'VERIFIED') {
+      if (!provider) {
+        console.log('Provider query - No provider profile found');
+        query._id = null;
+        return query;
+      }
+      
+      if (provider.verificationStatus !== 'VERIFIED') {
+        console.log('Provider query - Provider not verified');
         query._id = null; // No requests for unverified providers
         return query;
       }
       
       // Check if provider has skills
       if (!provider.skills || provider.skills.length === 0) {
+        console.log('Provider query - Provider has no skills');
         query._id = null; // No requests for providers without skills
         return query;
       }
@@ -63,9 +76,12 @@ const scopedServiceRequestQuery = async (user, query = {}) => {
       const categoryIds = provider.skills.map(skill => skill.category).filter(Boolean);
       const uniqueCategoryIds = [...new Set(categoryIds.map(id => id.toString()))];
       
+      console.log('Provider query - Category IDs:', uniqueCategoryIds);
+      
       if (uniqueCategoryIds.length > 0) {
         query.category = { $in: uniqueCategoryIds };
       } else {
+        console.log('Provider query - No valid categories');
         query._id = null; // No valid categories
       }
     } catch (err) {
@@ -428,6 +444,10 @@ const providerController = {
     }
 
     await provider.save();
+    
+    // Emit SSE for real-time updates
+    realtimeHub.emitToUser(req.user._id, 'invalidate', { tags: ['Provider'] });
+    
     await recordAudit({ actor: req.user, action: 'PROVIDER_PROFILE_UPDATED', resourceType: 'ProviderProfile', resourceId: provider._id });
     sendSuccess(res, 200, 'Provider profile updated.', { provider });
   }),
