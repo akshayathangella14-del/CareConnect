@@ -143,7 +143,7 @@ export default function TopNavigation() {
           </nav>
 
           <div className={styles.actions}>
-            {currentUser?.role !== 'SERVICE_PROVIDER' && (
+            {user?.role !== 'SERVICE_PROVIDER' && (
               <button
                 type="button"
                 className={styles.iconBtn}
@@ -234,7 +234,7 @@ export default function TopNavigation() {
       </div>
       {drawerOpen && <button type="button" className={styles.backdrop} aria-label="Close menu" onClick={() => setDrawerOpen(false)} />}
 
-      {currentUser?.role !== 'SERVICE_PROVIDER' && (
+      {user?.role !== 'SERVICE_PROVIDER' && (
         <SearchBar open={searchOpen} onClose={() => setSearchOpen(false)} />
       )}
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
