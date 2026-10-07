@@ -30,9 +30,19 @@ export default function ProviderBookingDetailPage() {
 
   const handleStatusTransition = async (action) => {
     try {
+      if (action === 'request-completion') {
+        const hasCompletionEvidence = booking.evidence?.some(e => e.type === 'COMPLETION');
+        if (!hasCompletionEvidence) {
+          alert('Please upload Final Completion Proof (evidence) before requesting completion.');
+          setEvidenceData(prev => ({ ...prev, type: 'COMPLETION' }));
+          setIsEvidenceModalOpen(true);
+          return;
+        }
+      }
       await transitionBooking({ id, action }).unwrap();
     } catch (err) {
       console.error('Failed to transition:', err);
+      alert(err?.data?.error?.message || err?.data?.message || 'Failed to update booking status.');
     }
   };
 
