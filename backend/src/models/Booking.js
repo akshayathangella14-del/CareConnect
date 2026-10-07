@@ -73,7 +73,7 @@ const evidenceSchema = new Schema(
     },
     description: { type: String, trim: true, maxlength: 1000 },
     file: {
-      url: { type: String, trim: true, maxlength: 1000 },
+      url: { type: String, trim: true },
       publicId: { type: String, trim: true, maxlength: 300 },
       name: { type: String, trim: true, maxlength: 200 },
       mimeType: { type: String, trim: true, maxlength: 120 },
