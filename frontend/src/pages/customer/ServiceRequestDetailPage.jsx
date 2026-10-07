@@ -277,13 +277,22 @@ export default function ServiceRequestDetailPage() {
               </div>
 
               {providerQuote && (
-                <div style={{ display: 'grid', gap: 'var(--space-2)', backgroundColor: 'var(--color-surface-muted)', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)' }}>
-                  <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Provider</div>
-                  <div style={{ fontWeight: 700 }}>{providerQuote.provider?.displayName || 'Verified provider'}</div>
-                  <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>
-                    {providerQuote.provider?.ratingSummary?.averageRating > 0 ? `⭐ ${providerQuote.provider.ratingSummary.averageRating.toFixed(1)} rating` : 'New provider added'}
-                    {request.preferredSchedule?.startAt ? ` • ETA: ${new Date(request.preferredSchedule.startAt).toLocaleString()}` : ''}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                  <div style={{ display: 'grid', gap: 'var(--space-2)', backgroundColor: 'var(--color-surface-muted)', padding: 'var(--space-3)', borderRadius: 'var(--radius-md)' }}>
+                    <div style={{ fontSize: 'var(--font-size-caption)', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Provider</div>
+                    <div style={{ fontWeight: 700 }}>{providerQuote.provider?.displayName || 'Verified provider'}</div>
+                    <div style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--font-size-small)' }}>
+                      {providerQuote.provider?.ratingSummary?.averageRating > 0 ? `⭐ ${providerQuote.provider.ratingSummary.averageRating.toFixed(1)} rating` : 'New provider added'}
+                      {request.preferredSchedule?.startAt ? ` • ETA: ${new Date(request.preferredSchedule.startAt).toLocaleString()}` : ''}
+                    </div>
                   </div>
+                  {booking && (
+                    <Link to={`/bookings/${booking._id}`} style={{ textDecoration: 'none' }}>
+                      <Button variant={booking.status === 'AWAITING_CUSTOMER_CONFIRMATION' ? 'success' : 'primary'} style={{ width: '100%' }}>
+                        {booking.status === 'AWAITING_CUSTOMER_CONFIRMATION' ? 'Verify Completion & Pay' : 'View Job Details'}
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               )}
             </Card>
