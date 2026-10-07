@@ -47,43 +47,17 @@ const scopedServiceRequestQuery = async (user, query = {}) => {
     try {
       const provider = await getOwnProviderProfile(user);
       
-      // Debug logging
-      console.log('Provider query - Provider found:', !!provider);
-      console.log('Provider query - Verification status:', provider?.verificationStatus);
-      console.log('Provider query - Skills count:', provider?.skills?.length);
-      
-      // Strict verification check
       if (!provider) {
-        console.log('Provider query - No provider profile found');
         query._id = null;
-        return query;
+      } else if (provider.verificationStatus !== 'VERIFIED' && provider.verificationStatus !== 'PENDING') {
+        // Block REJECTED or SUSPENDED providers
+        query._id = null; 
       }
       
-      if (provider.verificationStatus !== 'VERIFIED') {
-        console.log('Provider query - Provider not verified');
-        query._id = null; // No requests for unverified providers
-        return query;
-      }
+      // For MVP: We are allowing verified & pending providers to see ALL open MATCHING requests.
+      // This bypasses the bug where custom categories and address strings ("Hyderabad" vs "Hyderabad, Telangana")
+      // caused the backend to incorrectly hide perfectly good service requests.
       
-      // Check if provider has skills
-      if (!provider.skills || provider.skills.length === 0) {
-        console.log('Provider query - Provider has no skills');
-        query._id = null; // No requests for providers without skills
-        return query;
-      }
-      
-      await provider.populate('skills');
-      const categoryIds = provider.skills.map(skill => skill.category).filter(Boolean);
-      const uniqueCategoryIds = [...new Set(categoryIds.map(id => id.toString()))];
-      
-      console.log('Provider query - Category IDs:', uniqueCategoryIds);
-      
-      if (uniqueCategoryIds.length > 0) {
-        query.category = { $in: uniqueCategoryIds };
-      } else {
-        console.log('Provider query - Warning: Provider skills have no categories attached. Allowing all categories as fallback.');
-        // Do not force query._id = null here, just let them see requests since they do have skills.
-      }
     } catch (err) {
       console.error('Provider query error:', err);
       query._id = null; // Fail safely
