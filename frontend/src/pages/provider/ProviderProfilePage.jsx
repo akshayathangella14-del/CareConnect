@@ -32,9 +32,9 @@ export default function ProviderProfilePage() {
       setFormData({
         displayName: profile.displayName || '',
         bio: profile.bio || '',
-        experienceYears: profile.experienceYears || '',
-        baseHourlyRate: profile.pricing?.baseHourlyRate || '',
-        minimumVisitCharge: profile.pricing?.minimumVisitCharge || '',
+        experienceYears: profile.experienceYears ?? '',
+        baseHourlyRate: profile.pricing?.baseHourlyRate ?? '',
+        minimumVisitCharge: profile.pricing?.minimumVisitCharge ?? '',
         selectedSkills: profile.skills?.map(s => typeof s === 'object' ? s._id : s) || [],
         serviceAreas: profile.serviceAreas || [],
         documents: profile.documents || []
