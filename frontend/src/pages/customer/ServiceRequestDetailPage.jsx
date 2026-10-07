@@ -126,8 +126,8 @@ export default function ServiceRequestDetailPage() {
   let requestedStatus = request.status;
   if (booking) {
     if (booking.status === 'PROVIDER_EN_ROUTE') requestedStatus = 'PROVIDER_EN_ROUTE';
-    else if (booking.status === 'IN_PROGRESS' || booking.status === 'ARRIVED' || booking.status === 'AWAITING_CUSTOMER_CONFIRMATION') requestedStatus = 'IN_PROGRESS';
-    else if (booking.status === 'COMPLETED') requestedStatus = 'COMPLETED';
+    else if (booking.status === 'IN_PROGRESS' || booking.status === 'ARRIVED') requestedStatus = 'IN_PROGRESS';
+    else if (booking.status === 'AWAITING_CUSTOMER_CONFIRMATION' || booking.status === 'COMPLETED') requestedStatus = 'COMPLETED';
     else requestedStatus = 'PROVIDER_SELECTED';
   }
   const currentStepIndex = Math.max(0, statusSteps.findIndex((step) => step.key === requestedStatus));
