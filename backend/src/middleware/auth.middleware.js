@@ -2,23 +2,27 @@ const authService = require('../services/auth.service');
 const AppError = require('../utils/AppError');
 const sanitizeUser = require('../utils/sanitizeUser');
 
-const extractBearerToken = (authorizationHeader) => {
-  if (!authorizationHeader) {
-    throw AppError.unauthorized('Authentication token is required.');
+const extractBearerToken = (authorizationHeader, queryToken) => {
+  if (authorizationHeader) {
+    const [scheme, token, extra] = authorizationHeader.split(' ');
+
+    if (scheme !== 'Bearer' || !token || extra) {
+      throw AppError.unauthorized('Authorization header must use Bearer token format.');
+    }
+
+    return token;
   }
 
-  const [scheme, token, extra] = authorizationHeader.split(' ');
-
-  if (scheme !== 'Bearer' || !token || extra) {
-    throw AppError.unauthorized('Authorization header must use Bearer token format.');
+  if (queryToken) {
+    return queryToken;
   }
 
-  return token;
+  throw AppError.unauthorized('Authentication token is required.');
 };
 
 const authenticate = async (req, _res, next) => {
   try {
-    const token = extractBearerToken(req.get('authorization'));
+    const token = extractBearerToken(req.get('authorization'), req.query?.token);
     const user = await authService.getAuthenticatedUserByToken(token);
 
     req.user = user;

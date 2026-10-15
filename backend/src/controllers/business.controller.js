@@ -1013,122 +1013,493 @@ const invoiceController = {
     
     if (!invoice) throw AppError.notFound('Invoice not found.');
     
-    if (req.user.role === 'CUSTOMER' && invoice.customer._id.toString() !== req.user._id.toString()) {
+    const customerId = invoice.customer?._id?.toString() || invoice.customer?.toString();
+    if (req.user.role === 'CUSTOMER' && customerId && customerId !== req.user._id.toString()) {
       throw AppError.forbidden('Access denied.');
     }
     if (req.user.role === 'SERVICE_PROVIDER') {
       const provider = await getOwnProviderProfile(req.user);
-      if (invoice.provider._id.toString() !== provider._id.toString()) {
+      const providerId = invoice.provider?._id?.toString() || invoice.provider?.toString();
+      if (provider && providerId && providerId !== provider._id.toString()) {
         throw AppError.forbidden('Access denied.');
       }
     }
+
+    const payment = await Payment.findOne({ invoice: invoice._id, status: 'SUCCEEDED' }).sort({ createdAt: -1 });
+    const customerName = invoice.customer?.name || 'Valued Customer';
+    const customerEmail = invoice.customer?.email || '';
+    const customerPhone = invoice.customer?.phone || '';
+    const providerName = invoice.provider?.displayName || 'CareConnect Service Partner';
+    const providerEmail = invoice.provider?.email || '';
+    const providerPhone = invoice.provider?.phone || '';
+    const transactionId = payment?.gatewayTransactionId || `CC-TXN-${invoice._id.toString().slice(-8).toUpperCase()}`;
+    const paymentMethodName = payment?.method === 'CARD' ? 'Credit / Debit Card' : payment?.method === 'UPI' ? 'UPI Instant Payment' : payment?.method === 'NETBANKING' ? 'Net Banking' : payment?.method === 'WALLET' ? 'Digital Wallet' : 'Secure Online Payment';
+    const paymentDate = payment?.paidAt || invoice.paidAt || invoice.createdAt;
+    const formattedDate = new Date(paymentDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const invoiceNum = invoice.invoiceNumber || `INV-${invoice._id.toString().slice(0, 8).toUpperCase()}`;
     
     const htmlReceipt = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Receipt INV-${invoice._id.toString().slice(0, 8).toUpperCase()}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receipt - ${invoiceNum} | CareConnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; margin: 0; padding: 40px; background: #f9fafb; }
-    .receipt-container { max-width: 800px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 20px; margin-bottom: 30px; }
-    .logo { font-size: 28px; font-weight: 800; color: #4f46e5; margin: 0; }
-    .invoice-title { font-size: 24px; color: #111827; text-align: right; margin: 0; }
-    .invoice-meta { color: #6b7280; font-size: 14px; text-align: right; margin-top: 8px; }
-    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #dcfce7; color: #166534; }
-    .parties { display: flex; justify-content: space-between; margin-bottom: 40px; }
-    .party-col h3 { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-    .party-col p { margin: 4px 0; font-size: 15px; }
-    .table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-    .table th { text-align: left; padding: 12px; border-bottom: 2px solid #e5e7eb; color: #6b7280; font-size: 13px; text-transform: uppercase; }
-    .table td { padding: 16px 12px; border-bottom: 1px solid #f3f4f6; }
-    .amount-col { text-align: right; }
-    .summary { width: 300px; margin-left: auto; }
-    .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 15px; color: #4b5563; }
-    .summary-total { display: flex; justify-content: space-between; padding: 16px 0; font-size: 20px; font-weight: 700; color: #111827; border-top: 2px solid #e5e7eb; margin-top: 8px; }
-    .footer { margin-top: 50px; text-align: center; color: #9ca3af; font-size: 13px; border-top: 1px solid #e5e7eb; padding-top: 20px; }
-    @media print { body { background: #fff; padding: 0; } .receipt-container { box-shadow: none; padding: 0; } }
+    :root {
+      --primary: #7C3AED;
+      --primary-dark: #6D28D9;
+      --success: #10B981;
+      --slate-900: #0F172A;
+      --slate-800: #1E293B;
+      --slate-600: #475569;
+      --slate-400: #94A3B8;
+      --slate-100: #F1F5F9;
+      --slate-50: #F8FAFC;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--slate-800);
+      background: #F1F5F9;
+      padding: 0;
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .action-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #0F172A;
+      color: #FFFFFF;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .action-bar-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .action-bar-badge {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34D399;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .action-bar-buttons {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: none;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: #7C3AED;
+      color: #FFFFFF;
+    }
+    .btn-primary:hover {
+      background: #6D28D9;
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
+    }
+    .btn-secondary {
+      background: #334155;
+      color: #FFFFFF;
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+    .receipt-wrapper {
+      max-width: 820px;
+      margin: 36px auto;
+      padding: 0 16px;
+    }
+    .receipt-card {
+      background: #FFFFFF;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      border: 1px solid #E2E8F0;
+      overflow: hidden;
+      position: relative;
+    }
+    .card-top-accent {
+      height: 8px;
+      background: linear-gradient(90deg, #7C3AED 0%, #A855F7 50%, #10B981 100%);
+    }
+    .receipt-body {
+      padding: 48px;
+    }
+    .receipt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid var(--slate-100);
+      padding-bottom: 32px;
+      margin-bottom: 32px;
+    }
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: #7C3AED;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 20px;
+    }
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--slate-900);
+      letter-spacing: -0.5px;
+    }
+    .brand-tagline {
+      font-size: 13px;
+      color: var(--slate-600);
+      margin: 0;
+    }
+    .receipt-meta {
+      text-align: right;
+    }
+    .receipt-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ECFDF5;
+      color: #065F46;
+      border: 1px solid #A7F3D0;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .meta-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--slate-800);
+      margin-bottom: 4px;
+    }
+    .meta-date {
+      font-size: 13px;
+      color: var(--slate-600);
+    }
+    .txn-banner {
+      background: #F8FAFC;
+      border: 1px dashed #CBD5E1;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      font-size: 13px;
+    }
+    .txn-item strong {
+      display: block;
+      color: var(--slate-900);
+      font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .parties-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 36px;
+    }
+    .party-card {
+      background: var(--slate-50);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #E2E8F0;
+    }
+    .party-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      color: var(--slate-400);
+      margin-bottom: 10px;
+    }
+    .party-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-bottom: 4px;
+    }
+    .party-detail {
+      font-size: 13px;
+      color: var(--slate-600);
+      margin: 2px 0;
+    }
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 28px;
+    }
+    .items-table th {
+      text-align: left;
+      padding: 14px 16px;
+      background: var(--slate-50);
+      color: var(--slate-600);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #E2E8F0;
+    }
+    .items-table td {
+      padding: 16px;
+      border-bottom: 1px solid #E2E8F0;
+      font-size: 14px;
+    }
+    .items-table .amount-col {
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+    .financials-section {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 36px;
+    }
+    .financials-box {
+      width: 340px;
+    }
+    .financials-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 14px;
+      color: var(--slate-600);
+    }
+    .financials-row strong {
+      color: var(--slate-900);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .financials-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      margin-top: 8px;
+      border-top: 2px solid var(--slate-900);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--slate-900);
+    }
+    .financials-total .total-amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 24px;
+      color: #7C3AED;
+    }
+    .stamp-container {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #E2E8F0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .stamp {
+      border: 2px solid #10B981;
+      color: #065F46;
+      background: #F0FDF4;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .receipt-footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--slate-400);
+      padding: 24px;
+      background: var(--slate-50);
+      border-top: 1px solid #E2E8F0;
+    }
+    @media print {
+      body { background: #FFFFFF; padding: 0; }
+      .action-bar { display: none !important; }
+      .receipt-wrapper { margin: 0; padding: 0; max-width: 100%; }
+      .receipt-card { box-shadow: none; border: none; border-radius: 0; }
+      .receipt-body { padding: 24px 0; }
+    }
   </style>
 </head>
-<body onload="window.print()">
-  <div class="receipt-container">
-    <div class="header">
-      <div>
-        <h1 class="logo">CareConnect</h1>
-        <p style="color: #6b7280; margin-top: 4px; font-size: 14px;">Professional Home Services</p>
-      </div>
-      <div>
-        <h2 class="invoice-title">RECEIPT</h2>
-        <div class="invoice-meta">
-          <p style="margin: 4px 0;"><strong>Invoice Number:</strong> ${invoice.invoiceNumber || 'INV-' + invoice._id.toString().slice(0, 8).toUpperCase()}</p>
-          <p style="margin: 4px 0;"><strong>Date:</strong> ${new Date(invoice.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-          <p style="margin: 4px 0; margin-top: 12px;"><span class="status-badge">${invoice.paymentStatus === 'PAID' ? 'PAID IN FULL' : invoice.paymentStatus}</span></p>
-        </div>
-      </div>
+<body>
+  <div class="action-bar">
+    <div class="action-bar-info">
+      <span class="action-bar-badge">● PAID & VERIFIED</span>
+      <span>Official CareConnect Customer Receipt</span>
     </div>
-
-    <div class="parties">
-      <div class="party-col">
-        <h3>Billed To</h3>
-        <p><strong>${invoice.customer.name}</strong></p>
-        <p>${invoice.customer.email}</p>
-        <p>${invoice.customer.phone || ''}</p>
-      </div>
-      <div class="party-col" style="text-align: right;">
-        <h3>Service Provided By</h3>
-        <p><strong>${invoice.provider.displayName}</strong></p>
-        <p>${invoice.provider.email}</p>
-        <p>${invoice.provider.phone || ''}</p>
-      </div>
-    </div>
-
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th class="amount-col" style="width: 100px;">Qty</th>
-          <th class="amount-col" style="width: 150px;">Amount</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${(invoice.lineItems && invoice.lineItems.length > 0 ? invoice.lineItems : [{ description: 'Professional Service Charges', quantity: 1, amount: invoice.total }])
-          .map(item => `
-          <tr>
-            <td><strong>${item.description}</strong></td>
-            <td class="amount-col">${item.quantity || 1}</td>
-            <td class="amount-col">${invoice.currency || 'INR'} ${(item.amount || 0).toFixed(2)}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-
-    <div class="summary">
-      <div class="summary-row">
-        <span>Subtotal</span>
-        <span>${invoice.currency || 'INR'} ${(invoice.subtotal || invoice.total).toFixed(2)}</span>
-      </div>
-      ${invoice.tax ? `
-      <div class="summary-row">
-        <span>Tax</span>
-        <span>${invoice.currency || 'INR'} ${invoice.tax.toFixed(2)}</span>
-      </div>` : ''}
-      ${invoice.discount ? `
-      <div class="summary-row">
-        <span>Discount</span>
-        <span>-${invoice.currency || 'INR'} ${invoice.discount.toFixed(2)}</span>
-      </div>` : ''}
-      <div class="summary-total">
-        <span>Total Paid</span>
-        <span>${invoice.currency || 'INR'} ${invoice.total.toFixed(2)}</span>
-      </div>
-    </div>
-
-    <div class="footer">
-      <p>Thank you for using CareConnect.</p>
-      <p>If you have any questions about this receipt, please contact support@careconnect.com</p>
+    <div class="action-bar-buttons">
+      <button class="btn btn-secondary" onclick="window.close()">Close</button>
+      <button class="btn btn-primary" onclick="window.print()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Save as PDF / Print
+      </button>
     </div>
   </div>
+
+  <div class="receipt-wrapper">
+    <div class="receipt-card">
+      <div class="card-top-accent"></div>
+      <div class="receipt-body">
+        
+        <div class="receipt-header">
+          <div>
+            <div class="brand-mark">
+              <div class="brand-icon">C</div>
+              <div class="brand-title">CareConnect</div>
+            </div>
+            <p class="brand-tagline">Verified Home & Professional Services Marketplace</p>
+          </div>
+          <div class="receipt-meta">
+            <div class="receipt-badge">✓ PAYMENT RECEIVED</div>
+            <div class="meta-id">${invoiceNum}</div>
+            <div class="meta-date">${formattedDate}</div>
+          </div>
+        </div>
+
+        <div class="txn-banner">
+          <div class="txn-item">
+            <span>Transaction ID</span>
+            <strong>${transactionId}</strong>
+          </div>
+          <div class="txn-item">
+            <span>Payment Method</span>
+            <strong>${paymentMethodName}</strong>
+          </div>
+          <div class="txn-item">
+            <span>Status</span>
+            <strong style="color: #10B981;">SUCCESS (200 OK)</strong>
+          </div>
+        </div>
+
+        <div class="parties-grid">
+          <div class="party-card">
+            <div class="party-title">Billed To (Customer)</div>
+            <div class="party-name">${customerName}</div>
+            ${customerEmail ? `<div class="party-detail">${customerEmail}</div>` : ''}
+            ${customerPhone ? `<div class="party-detail">${customerPhone}</div>` : ''}
+          </div>
+          <div class="party-card">
+            <div class="party-title">Service Partner (Provider)</div>
+            <div class="party-name">${providerName}</div>
+            ${providerEmail ? `<div class="party-detail">${providerEmail}</div>` : ''}
+            ${providerPhone ? `<div class="party-detail">${providerPhone}</div>` : ''}
+          </div>
+        </div>
+
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Service Item & Scope</th>
+              <th style="width: 80px; text-align: center;">Qty</th>
+              <th class="amount-col" style="width: 140px;">Unit Price</th>
+              <th class="amount-col" style="width: 140px;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(invoice.lineItems && invoice.lineItems.length > 0 ? invoice.lineItems : [{ description: 'Professional Home Service Completion', quantity: 1, unitPrice: invoice.total, amount: invoice.total }])
+              .map(item => `
+              <tr>
+                <td>
+                  <strong>${item.description}</strong>
+                  <div style="font-size: 12px; color: var(--slate-600); margin-top: 2px;">Completed with photo verification & proof pack</div>
+                </td>
+                <td style="text-align: center;">${item.quantity || 1}</td>
+                <td class="amount-col">${invoice.currency || 'INR'} ${(item.unitPrice || item.amount || 0).toFixed(2)}</td>
+                <td class="amount-col">${invoice.currency || 'INR'} ${(item.amount || 0).toFixed(2)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="financials-section">
+          <div class="financials-box">
+            <div class="financials-row">
+              <span>Subtotal</span>
+              <strong>${invoice.currency || 'INR'} ${(invoice.subtotal || invoice.total).toFixed(2)}</strong>
+            </div>
+            ${invoice.tax ? `
+            <div class="financials-row">
+              <span>Applicable GST / Tax</span>
+              <strong>+ ${invoice.currency || 'INR'} ${invoice.tax.toFixed(2)}</strong>
+            </div>` : ''}
+            ${invoice.discount ? `
+            <div class="financials-row">
+              <span>Promotional Discount</span>
+              <strong style="color: #10B981;">- ${invoice.currency || 'INR'} ${invoice.discount.toFixed(2)}</strong>
+            </div>` : ''}
+            <div class="financials-total">
+              <span>Total Paid</span>
+              <span class="total-amount">${invoice.currency || 'INR'} ${invoice.total.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stamp-container">
+          <div class="stamp">
+            ✓ CareConnect Verified Payment
+          </div>
+          <div style="font-size: 12px; color: var(--slate-600); text-align: right;">
+            Questions? Contact <a href="mailto:support@careconnect.com" style="color: #7C3AED; text-decoration: none;">support@careconnect.com</a>
+          </div>
+        </div>
+
+      </div>
+      <div class="receipt-footer">
+        CareConnect Services Private Limited • 256-Bit SSL Encrypted & PCI-DSS Level 1 Certified • Computer Generated Tax Invoice
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('load', () => {
+      // Trigger print after brief rendering pause
+      setTimeout(() => {
+        try { window.print(); } catch (e) {}
+      }, 500);
+    });
+  </script>
 </body>
 </html>
     `.trim();

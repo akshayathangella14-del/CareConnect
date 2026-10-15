@@ -6,7 +6,7 @@ import {
   useGetServiceTraceQuery
 } from '@/features/bookings';
 import { Card, Button, StatusBadge, Alert, Tabs, Timeline, Badge, PaymentModal } from '@/components';
-import { CalendarClock, MapPin, Wrench, Shield, CheckCircle2, FileText, Camera } from 'lucide-react';
+import { CalendarClock, MapPin, Wrench, Shield, CheckCircle2, FileText, Camera, Download, Receipt } from 'lucide-react';
 import ScopeChangeApproval from '@/components/booking/ScopeChangeApproval';
 import ServiceTraceTimeline from '@/components/booking/ServiceTraceTimeline';
 
@@ -17,6 +17,13 @@ export default function BookingDetailPage() {
   
   const [transitionBooking, { isLoading: isTransitioning }] = useTransitionBookingMutation();
   const [invoiceToPay, setInvoiceToPay] = useState(null);
+
+  const handleDownloadReceipt = (invoiceId) => {
+    if (!invoiceId) return;
+    const token = localStorage.getItem('careconnect_token');
+    const url = `/api/v1/invoices/${invoiceId}/download${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+    window.open(url, '_blank');
+  };
 
   if (isLoading) return <div style={{ padding: 'var(--space-8)', textAlign: 'center' }}>Loading booking details...</div>;
   
@@ -55,8 +62,34 @@ export default function BookingDetailPage() {
 
         {booking?.invoice && booking.invoice.status !== 'PAID' && (
           <Button variant="primary" onClick={() => setInvoiceToPay(booking.invoice)}>
-            Pay Invoice
+            Pay Invoice ({booking.invoice.currency || 'INR'} {Number(booking.invoice.total || 0).toFixed(2)})
           </Button>
+        )}
+
+        {booking?.invoice && booking.invoice.status === 'PAID' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <span style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: 'var(--space-1)', 
+              color: '#065F46', 
+              backgroundColor: '#ECFDF5', 
+              border: '1px solid #A7F3D0',
+              padding: '6px 12px', 
+              borderRadius: 'var(--radius-full)',
+              fontSize: 'var(--font-size-small)',
+              fontWeight: 600
+            }}>
+              <CheckCircle2 size={14} color="#10B981" /> Paid in Full
+            </span>
+            <Button
+              variant="outline"
+              leftIcon={<Download size={15} />}
+              onClick={() => handleDownloadReceipt(booking.invoice._id)}
+            >
+              Download Receipt (PDF)
+            </Button>
+          </div>
         )}
         
         {isAwaitingCompletion && (
@@ -169,6 +202,50 @@ export default function BookingDetailPage() {
             </div>
           </Card>
           
+          {/* Invoice & Payment Card */}
+          {booking?.invoice && (
+            <Card padding="md">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-3)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                  <Receipt size={18} color="var(--color-primary)" />
+                  <h4 style={{ fontSize: 'var(--font-size-body)', margin: 0 }}>Billing & Invoice</h4>
+                </div>
+                <StatusBadge status={booking.invoice.status} size="sm" />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-2)', fontSize: 'var(--font-size-small)' }}>
+                <span style={{ color: 'var(--color-text-secondary)' }}>Invoice No.</span>
+                <span style={{ fontWeight: 600 }}>{booking.invoice.invoiceNumber || `INV-${booking.invoice._id.slice(0, 8).toUpperCase()}`}</span>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-4)', fontSize: 'var(--font-size-body)' }}>
+                <span style={{ color: 'var(--color-text-secondary)' }}>Amount Due</span>
+                <strong style={{ fontSize: 'var(--font-size-h4)', color: 'var(--color-primary-dark)' }}>
+                  {booking.invoice.currency || 'INR'} {Number(booking.invoice.total || 0).toFixed(2)}
+                </strong>
+              </div>
+
+              {booking.invoice.status !== 'PAID' ? (
+                <Button 
+                  variant="primary" 
+                  style={{ width: '100%' }} 
+                  onClick={() => setInvoiceToPay(booking.invoice)}
+                >
+                  Pay Now
+                </Button>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  leftIcon={<Download size={14} />} 
+                  style={{ width: '100%' }}
+                  onClick={() => handleDownloadReceipt(booking.invoice._id)}
+                >
+                  Download PDF Receipt
+                </Button>
+              )}
+            </Card>
+          )}
+
           {/* Dispute Action */}
           {(isAwaitingCompletion || isCompleted) && (
             <Card padding="md">

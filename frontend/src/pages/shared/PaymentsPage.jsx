@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '@/features/auth';
-import { Receipt, RefreshCcw } from 'lucide-react';
+import { Receipt, RefreshCcw, Download } from 'lucide-react';
 import { Card, EmptyState, StatusBadge, DataTable, Button } from '@/components';
 import { useListPaymentsQuery, useRefundPaymentMutation } from '@/features/payments';
 
@@ -8,6 +8,13 @@ export default function PaymentsPage() {
   const user = useSelector(selectCurrentUser);
   const { data: payments = [], isLoading, isFetching } = useListPaymentsQuery();
   const [refundPayment] = useRefundPaymentMutation();
+
+  const handleDownloadReceipt = (invoiceId) => {
+    if (!invoiceId) return;
+    const token = localStorage.getItem('careconnect_token');
+    const url = `/api/v1/invoices/${invoiceId}/download${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+    window.open(url, '_blank');
+  };
 
   const handleRefund = async (payment) => {
     const amountStr = window.prompt(`Enter refund amount for ${payment.gatewayTransactionId} (Max: ${payment.amount}):`, payment.amount);
@@ -58,6 +65,24 @@ export default function PaymentsPage() {
       header: 'Status',
       key: 'status',
       render: (payment) => <StatusBadge status={payment.status} size="sm" />,
+    },
+    {
+      header: 'Receipt',
+      key: 'receipt',
+      render: (payment) => {
+        const invoiceId = payment.invoice?._id || (typeof payment.invoice === 'string' ? payment.invoice : null);
+        if (!invoiceId) return <span style={{ color: 'var(--color-text-muted)' }}>-</span>;
+        return (
+          <Button
+            size="sm"
+            variant="outline"
+            leftIcon={<Download size={14} />}
+            onClick={() => handleDownloadReceipt(invoiceId)}
+          >
+            PDF Receipt
+          </Button>
+        );
+      },
     },
   ];
 

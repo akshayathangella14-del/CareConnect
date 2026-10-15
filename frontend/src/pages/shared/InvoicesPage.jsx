@@ -11,7 +11,9 @@ export default function InvoicesPage() {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   const handleDownloadPdf = (invoiceId) => {
-    window.open(`/api/v1/invoices/${invoiceId}/download`, '_blank');
+    const token = localStorage.getItem('careconnect_token');
+    const url = `/api/v1/invoices/${invoiceId}/download${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+    window.open(url, '_blank');
   };
 
   const columns = [
